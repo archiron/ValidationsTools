@@ -2,7 +2,7 @@
 #-*-coding: utf-8 -*-
 
 ################################################################################
-# zeeExtract_MP: a tool to generate Kolmogorov-Smirnov values/pictures
+# createFiles: create file for Kolmogorov-Smirnov maximum diff
 # for egamma validation comparison                              
 #
 # MUST be launched with the cmsenv cmd after a cmsrel cmd !!

@@ -3,6 +3,7 @@
 
 ################################################################################
 # zeeExtract_MP: a tool to generate Kolmogorov-Smirnov values/pictures
+# form ROOT files created with ZEE_Flow scripts.
 # for egamma validation comparison                              
 #
 # MUST be launched with the cmsenv cmd after a cmsrel cmd !!
