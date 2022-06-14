@@ -33,12 +33,12 @@ echo "N= $N"
 #  printf "Current index %d with value %s" $j "${toto[$j]}"
 #done
 LOG_SOURCE="${toto[13]}"
-LOG_OUTPUT="${toto[14]}"
-RESULTFOLDER="${toto[15]}"
 LOG_SOURCE=${LOG_SOURCE//LOG_SOURCE=}
 LOG_SOURCE=${LOG_SOURCE//\"}
+LOG_OUTPUT="${toto[14]}"
 LOG_OUTPUT=${LOG_OUTPUT//LOG_OUTPUT=}
 LOG_OUTPUT=${LOG_OUTPUT//\"}
+RESULTFOLDER="${toto[15]}"
 RESULTFOLDER=${RESULTFOLDER//RESULTFOLDER=}
 RESULTFOLDER=${RESULTFOLDER//\"}
 echo "LOG_SOURCE : $LOG_SOURCE"
@@ -49,12 +49,10 @@ if [[ "$Choice" == "LLR" ]]
   then
     echo "LLR"
     cd $LOG_SOURCE
-    #ls $LOG_SOURCE
     eval `scramv1 runtime -sh`
     #cd -
     for i in $(eval echo "{$Nbegin..$Nend}") 
     do
-      #qsub -l sps=1 -P P_cmsf -pe multicores 8 -q mc_long -o $LOG_OUTPUT zee_flow.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER
       /opt/exp_soft/cms/t3/t3submit -8c -long zee_flow.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER
     done
 elif [[ "$Choice" == "PBS" ]] 
@@ -64,8 +62,6 @@ elif [[ "$Choice" == "PBS" ]]
     eval `scramv1 runtime -sh`
     for i in $(eval echo "{$Nbegin..$Nend}")
     do
-      #/opt/exp_soft/cms/t3_tst/t3submit -8c -long zee_flow.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER
-      #/opt/exp_soft/cms/t3/t3submit -8c -short zee_flow.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER
       sbatch -L sps zee_flow.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER
     done
 fi
