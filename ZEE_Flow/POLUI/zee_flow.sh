@@ -1,10 +1,15 @@
 #!/bin/sh
-# This file is called ./zee_flow.sh
+# This file is called ./zee_flow.sh for LLR computers.
+###################
+## LLR computers ##
+###################
 
 echo "i : $1"
 echo "chemin : $2"
 echo "nb evts : $3"
 echo "folder result : $4"
+echo ""
+
 LOG_SOURCE=$2
 echo "Step 1 in : $LOG_SOURCE"
 
@@ -22,18 +27,23 @@ echo $name32
 echo $name33
 echo $name34
 
-cd $4
-ls
+cd $2
 eval `scramv1 runtime -sh`
+cd -
 
-cmsRun $2/step1.py $1 $3
-cmsRun $2/step2.py $1 $3
-#rm $4/$name1
-cmsRun $2/step3.py $1 $3
-#rm $4/$name2
-cmsRun $2/step4.py $1 $3
-#rm $4/$name31
-#rm $4/$name32
-#rm $4/$name33
-#rm $4/$name34
+cmsRun $2/step1.py $1 $2 $3 $4
+
+cmsRun $2/step2.py $1 $2 $3 $4
+#rm $name1
+cmsRun $2/step3.py $1 $2 $3 $4
+#rm $name2
+
+cmsRun $2/step4.py $1 $2 $3 $4
+#rm $name31
+#rm $name32
+#rm $name33
+#rm $name34
+
+#cp *.root $4
+mv DQM*.root $4
 

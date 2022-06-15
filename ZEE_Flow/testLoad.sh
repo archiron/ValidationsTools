@@ -1,5 +1,9 @@
 #!/bin/sh
 # This file is called ./zee_flow.sh 11_3_0_pre4
+
+JobName="chichi_serial_job_test" # for slurm
+output="chichi_%j.log" # for slurm
+
 Nbegin=0
 Nend=2
 NB_EVTS=9000
@@ -62,7 +66,7 @@ elif [[ "$Choice" == "PBS" ]]
     eval `scramv1 runtime -sh`
     for i in $(eval echo "{$Nbegin..$Nend}")
     do
-      sbatch -L sps zee_flow.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER
+      sbatch -L sps -n 8 --mem=8000 -J $JobName -o $output zee_flow.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER
     done
 fi
 
