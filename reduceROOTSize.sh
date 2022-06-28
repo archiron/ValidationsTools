@@ -1,12 +1,12 @@
-#!/bin/sh
+#!/bin/shchichi_serial_job_test
 # This file is called ./zee_flow.sh 11_3_0_pre4
 
 JobName="chichi_serial_job_test" # for slurm
 output="chichi_%j.log" # for slurm
 
-Nbegin=0
-Nend=2
-NB_EVTS=9000
+Nbegin=20
+Nend=23
+NB_EVTS=10
 
 declare -a readarray
 
@@ -57,7 +57,7 @@ if [[ "$Choice" == "LLR" ]]
     #cd -
     for i in $(eval echo "{$Nbegin..$Nend}") 
     do
-      /opt/exp_soft/cms/t3/t3submit -8c -long zee_flow.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER
+      /opt/exp_soft/cms/t3/t3submit -8c -long zee_reduce.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER
     done
 elif [[ "$Choice" == "PBS" ]] 
   then
@@ -66,7 +66,7 @@ elif [[ "$Choice" == "PBS" ]]
     eval `scramv1 runtime -sh`
     for i in $(eval echo "{$Nbegin..$Nend}")
     do
-      sbatch -L sps -n 8 --mem=8000 -J $JobName -o $output zee_flow.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER
+      sbatch -L sps -n 8 --mem=8000 -J $JobName -o $output zee_reduce.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER
     done
 fi
 

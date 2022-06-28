@@ -1,13 +1,13 @@
 #!/bin/sh
-# This file is called ./zee_flow.sh for LLR computers.
+# This file is called ./zee_flow.sh for CCA computers.
 ###################
 ## LLR computers ##
 ###################
 
-echo "i : $1"
+echo "nb : $1"
 echo "chemin : $2"
 echo "nb evts : $3"
-echo "folder result : $4"
+echo "result folder : $4"
 echo ""
 
 LOG_SOURCE=$2
