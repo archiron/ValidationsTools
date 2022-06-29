@@ -17,5 +17,5 @@ cd $2
 eval `scramv1 runtime -sh`
 cd -
 
-python3 reduceSize1File.py $1 $2 $3 $4
+python3 $2/reduceSize1File.py $1 $2 $3 $4
 
