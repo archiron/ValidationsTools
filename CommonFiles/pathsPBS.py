@@ -14,4 +14,4 @@
 LOG_SOURCE="/pbs/home/c/chiron/private/ValidationsTools/ZEE_Flow/CMSSW_12_1_0_pre5/src/Kolmogorov"
 LOG_OUTPUT="/sps/cms/chiron/TEMP/"
 RESULTFOLDER="/sps/cms/chiron/CMSSW_12_1_0_pre5-16c-12"
-
+LOG_KS_OUTPUT="/pbs/home/c/chiron/private/ValidationsTools/KS_Tools/"
