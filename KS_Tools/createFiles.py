@@ -38,129 +38,91 @@ import matplotlib
 matplotlib.use('agg')
 from matplotlib import pyplot as plt
 
-Chilib_path = '../ChiLib_CMS_Validation'
-Chilib_path = '/pbs/home/c/chiron/private/KS_Tools/ChiLib_CMS_Validation'
-#sys.path.append(Chilib_path)
+Chilib_path = '../ChiLib'
 sys.path.append(Chilib_path)
-import default as dfo
 from graphicFunctions import getHisto
-from default import *
 from DecisionBox import DecisionBox
+Common_path = '../CommonFiles'
+sys.path.append(Common_path)
+import default as dfo
+from default import *
 from sources import *
 
-# these line for daltonians !
-#seaborn.set_palette('colorblind')
+# get the branches for ElectronMcSignalHistos.txt
+branches = []
+branches = getBranches(tp_1)
+cleanBranches(branches) # remove some histo wich have a pbm with KS.
 
-def checkFolderName(folderName):
-    if folderName[-1] != '/':
-        folderName += '/'
-    return folderName
+# nb of files to be used
+nbFiles = 200
 
-def changeColor(color):
-    # 30:noir ; 31:rouge; 32:vert; 33:orange; 34:bleu; 35:violet; 36:turquoise; 37:blanc
-    # other references at https://misc.flogisoft.com/bash/tip_colors_and_formatting
-    if (color == 'black'):
-        return '[30m'
-    elif (color == 'red'):
-        return '[31m'
-    elif (color == 'green'):
-        return '[32m'
-    elif (color == 'orange'):
-        return '[33m'
-    elif (color == 'blue'):
-        return '[34m'
-    elif (color == ''):
-        return '[35m'
-    elif (color == 'purple'):
-        return '[36m'
-    elif (color == 'turquoise'):
-        return '[37m'
-    elif (color == 'lightyellow'):
-        return '[93m'
-    else:
-        return '[30m'
+DB = DecisionBox()
+print("func_Extract")
+dfo.folderName = checkFolderName(dfo.folderName)
+dfo.folder = checkFolderName(dfo.folder)
 
-def colorText(sometext, color):
-    return '\033' + changeColor(color) + sometext + '\033[0m'
-
-def getBranches(t_p):
-    b = []
-    source = open(Chilib_path + "/HistosConfigFiles/ElectronMcSignalHistos.txt", "r")
-    for ligne in source:
-        if t_p in ligne:
-            #print(ligne)
-            tmp = ligne.split(" ", 1)
-            #print(tmp[0].replace(t_p + "/", ""))
-            b.append(tmp[0].replace(t_p + "/", ""))
-    source.close()
-    return b
-
-def cleanBranches(branches):
-    #if (branches[i] == 'h_ele_seedMask_Tec'): # temp (pbm with nan)
-    #if re.search('OfflineV', branches[i]): # temp (pbm with nbins=81 vs nbins=80)
-    toBeRemoved = ['h_ele_seedMask_Tec'] # , 'h_ele_convRadius', 'h_ele_PoPtrue_golden_barrel', 'h_ele_PoPtrue_showering_barrel'
-    for ele in toBeRemoved:
-        if ele in branches:
-            branches.remove(ele)
-
-def func_CreateKS(br, nbFiles):
-    DB = DecisionBox()
-    print("func_Extract")
-    dfo.folderName = checkFolderName(dfo.folderName)
-    dfo.folder = checkFolderName(dfo.folder)
+N_histos = len(branches)
+print('N_histos : %d' % N_histos)
     
-    N_histos = len(br)
-    print('N_histos : %d' % N_histos)
+# nb of bins for sampling
+nbins = 100 
     
-    # nb of bins for sampling
-    nbins = 100 
-    
-    # create folder 
-    if not os.path.exists(folder):
-        try:
-            os.makedirs(folder)
-        except OSError as e:
-            if e.errno != errno.EEXIST: # the folder did not exist
-                raise  # raises the error again
-        print('Creation of %s release folder\n' % folder)
-    else:
-        print('Folder %s already created\n' % folder)
+# create folder 
+if not os.path.exists(folder):
+    try:
+        os.makedirs(folder)
+    except OSError as e:
+        if e.errno != errno.EEXIST: # the folder did not exist
+            raise  # raises the error again
+    print('Creation of %s release folder\n' % folder)
+else:
+    print('Folder %s already created\n' % folder)
 
-    ##### TEMP #####
-    LOG_SOURCE_WORK='/pbs/home/c/chiron/private/KS_Tools/GenExtract/'
-    # get the "new" root file datas
-    f_rel = ROOT.TFile(LOG_SOURCE_WORK + input_rel_file)
+if len(sys.argv) > 1:
+    print(sys.argv)
+    print("step 4 - arg. 0 :", sys.argv[0]) # name of the script
+    print("step 4 - arg. 1 :", sys.argv[1]) # work path
+    print("step 4 - arg. 2 :", sys.argv[2]) # RESULTFOLDER
+    resultPath = sys.argv[2]
+else:
+    print("rien")
+    resultPath = ''
 
-    # get the "reference" root file datas
-    f_ref = ROOT.TFile(LOG_SOURCE_WORK + input_ref_file)
+##### TEMP #####
+LOG_SOURCE_WORK='/pbs/home/c/chiron/private/KS_Tools/GenExtract/'
+# get the "new" root file datas
+f_rel = ROOT.TFile(LOG_SOURCE_WORK + input_rel_file)
 
-    print('we use the %s file as reference' % input_ref_file)
-    print('we use the %s file as new release' % input_rel_file)
+# get the "reference" root file datas
+f_ref = ROOT.TFile(LOG_SOURCE_WORK + input_ref_file)
 
-    nb_red1 = 0
-    nb_green1 = 0
-    nb_red2 = 0
-    nb_green2 = 0
-    nb_red3 = 0
-    nb_green3 = 0
+print('we use the %s file as reference' % input_ref_file)
+print('we use the %s file as new release' % input_rel_file)
 
-    KS_diffName = dfo.folder + "histo_differences_KScurve.txt"
-    print("KSname 1 : %s" % KS_diffName)
-    wKS0 = open(KS_diffName, 'w')
+nb_red1 = 0
+nb_green1 = 0
+nb_red2 = 0
+nb_green2 = 0
+nb_red3 = 0
+nb_green3 = 0
 
-    KS_resume = dfo.folder + "histo_resume.txt"
-    print("KSname 0 : %s" % KS_resume)
-    wKS_ = open(KS_resume, 'w')
+KS_diffName = dfo.folder + "histo_differences_KScurve.txt"
+print("KSname 1 : %s" % KS_diffName)
+wKS0 = open(KS_diffName, 'w')
 
-    KS_pValues = dfo.folder + "histo_pValues.txt"
-    print("KSname 2 : %s" % KS_pValues)
-    wKSp = open(KS_pValues, 'w')
+KS_resume = dfo.folder + "histo_resume.txt"
+print("KSname 0 : %s" % KS_resume)
+wKS_ = open(KS_resume, 'w')
 
-    ind_reference = 199 # np.random.randint(0, nbFiles)
-    print('reference ind. : %d' % ind_reference)
+KS_pValues = dfo.folder + "histo_pValues.txt"
+print("KSname 2 : %s" % KS_pValues)
+wKSp = open(KS_pValues, 'w')
 
-    tic = time.time()
+ind_reference = 199 # np.random.randint(0, nbFiles)
+print('reference ind. : %d' % ind_reference)
 
+tic = time.time()
+'''
     for i in range(0, N_histos): # 1 histo for debug
         name = dfo.folderName + "histo_" + br[i] + '_{:03d}'.format(nbFiles) + "_0_lite.txt"
         print('\n%d - %s' %(i, name))
@@ -523,14 +485,16 @@ def func_CreateKS(br, nbFiles):
         wKS3.write(' '.join("{:10.04e}".format(x) for x in yellowCurveCum3 ))
         wKS3.write('\n')
         wKS3.close()
+'''
 
-        '''R1 = diffR2(mean_df_entries, s_new)
+'''R1 = diffR2(mean_df_entries, s_new)
         R2 = diffR2(series_reference, s_new)
         R3 = diffR2(s_new, s_old)
         print('R1 = %f [mean, new]' % R1)
         print('R2 = %f [ref, new]' % R2)
-        print('R3 = %f [old, new]' % R3)'''
-
+        print('R3 = %f [old, new]' % R3)
+'''
+'''
     toc = time.time()
     print('Done in {:.4f} seconds'.format(toc-tic))
 
@@ -545,20 +509,7 @@ def func_CreateKS(br, nbFiles):
     wKS_.write('KS 2 : %d red - %d green\n' % (nb_red2, nb_green2))
     wKS_.write('KS 3 : %d red - %d green\n' % (nb_red3, nb_green3))
     wKS_.write('KS ttl : %d red - %d green\n' % (nb_red, nb_green))
+    '''
 
-    return
-
-if __name__=="__main__":
-
-    # get the branches for ElectronMcSignalHistos.txt
-    branches = []
-    branches = getBranches(tp_1)
-    cleanBranches(branches) # remove some histo wich have a pbm with KS.
-
-    # nb of files to be used
-    nbFiles = 200
-
-    func_CreateKS(branches, nbFiles)  # create the KS files from histos datas
-
-    print("Fin !")
+print("Fin !")
 

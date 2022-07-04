@@ -18,7 +18,7 @@ eval `scramv1 runtime -sh`
 cd -
 
 #cd $2
-python3 $2/extractValues.py
+python3 $2/extractValues.py $2 $3
 echo "executing $2/extractValues.py"
 #python3 $2/extrGT.py
 #echo "executing $1/extrGT.py"

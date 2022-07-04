@@ -36,7 +36,7 @@ LOG_OUTPUT=${LOG_OUTPUT//\"}
 RESULTFOLDER="${toto[15]}"
 RESULTFOLDER=${RESULTFOLDER//RESULTFOLDER=}
 RESULTFOLDER=${RESULTFOLDER//\"}
-LOG_KS_SOURCE="${toto[15]}"
+LOG_KS_SOURCE="${toto[16]}"
 LOG_KS_SOURCE=${LOG_KS_SOURCE//LOG_KS_SOURCE=}
 LOG_KS_SOURCE=${LOG_KS_SOURCE//\"}
 echo "LOG_SOURCE : $LOG_SOURCE"
@@ -50,13 +50,14 @@ if [[ "$Choice" == "LLR" ]]
     cd $LOG_SOURCE
     eval `scramv1 runtime -sh`
     #cd -
-    /opt/exp_soft/cms/t3/t3submit -8c -long $LOG_KS_SOURCE/extractValues.sh $LOG_SOURCE $LOG_KS_SOURCE $RESULTFOLDER
+    /opt/exp_soft/cms/t3/t3submit -8c -long extractValues.sh $LOG_SOURCE $LOG_KS_SOURCE $RESULTFOLDER
 elif [[ "$Choice" == "PBS" ]] 
   then
     echo "PBS"
     cd $LOG_SOURCE
     eval `scramv1 runtime -sh`
-    sbatch -L sps -n 8 --mem=8000 -J $JobName -o $output $LOG_KS_SOURCE/extractValues.sh $LOG_SOURCE $LOG_KS_SOURCE $RESULTFOLDER
+    cd $LOG_KS_SOURCE
+    sbatch -L sps -n 8 --mem=8000 -J $JobName -o $output extractValues.sh $LOG_SOURCE $LOG_KS_SOURCE $RESULTFOLDER
 fi
 
 echo "END"
