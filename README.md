@@ -8,5 +8,5 @@ this repository get all the validations tools such as Kolmogorov-Smirnov (KS Too
 
 Launching the ROOT files creation
 - createROOTFiles.sh  
-then ALL ROOT files are created, launch :
+When ALL ROOT files are created, launch :
 - reduceROOTSize.sh 
