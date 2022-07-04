@@ -39,6 +39,7 @@ RESULTFOLDER=${RESULTFOLDER//\"}
 LOG_KS_SOURCE="${toto[16]}"
 LOG_KS_SOURCE=${LOG_KS_SOURCE//LOG_KS_SOURCE=}
 LOG_KS_SOURCE=${LOG_KS_SOURCE//\"}
+
 echo "LOG_SOURCE : $LOG_SOURCE"
 echo "LOG_OUTPUT : $LOG_OUTPUT"
 echo "RESULTFOLDER : $RESULTFOLDER"
@@ -56,7 +57,6 @@ elif [[ "$Choice" == "PBS" ]]
     echo "PBS"
     cd $LOG_SOURCE
     eval `scramv1 runtime -sh`
-    cd $LOG_KS_SOURCE
     sbatch -L sps -n 8 --mem=8000 -J $JobName -o $output extractValues.sh $LOG_SOURCE $LOG_KS_SOURCE $RESULTFOLDER
 fi
 

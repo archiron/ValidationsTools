@@ -14,4 +14,4 @@
 LOG_SOURCE="/home/arnaud/cernbox/DEV_PYTHON/ValidationsTools/ZEE_FLOW/CMSSW_11_0_0_pre13/src"
 LOG_OUTPUT="/home/arnaud/cernbox/DEV_PYTHON/ValidationsTools/ZEE_FLOW/CMSSW_11_0_0_pre13/src/TEMP"
 RESULTFOLDER="/home/arnaud/cernbox/DEV_PYTHON/ValidationsTools/HGCAL/TEST_12_1_0_pre5bb"
-LOG_KS_OUTPUT="/home/arnaud/cernbox/DEV_PYTHON/ValidationsTools/KS_Tools/"
+LOG_KS_SOURCE="/home/arnaud/cernbox/DEV_PYTHON/ValidationsTools/KS_Tools/"

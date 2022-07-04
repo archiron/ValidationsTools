@@ -1,5 +1,5 @@
 #!/bin/shchichi_serial_job_test
-# This file is called ./createROOTFiles.sh
+# This file is called . createROOTFiles.sh
 
 JobName="chichi_serial_job_test" # for slurm
 output="chichi_%j.log" # for slurm
