@@ -2,7 +2,8 @@
 #-*-coding: utf-8 -*-
 
 ################################################################################
-# zeeExtract_MP: a tool to generate Kolmogorov-Smirnov values/pictures
+# reduceSize1File: a tool to reduce the size of the ROOT files, keeping only
+# the used branches.
 # for egamma validation comparison                              
 #
 # MUST be launched with the cmsenv cmd after a cmsrel cmd !!
@@ -12,17 +13,6 @@
 ################################################################################
 
 import os,sys, re
-import time
-
-import pandas as pd
-import numpy as np
-import matplotlib
-
-# import matplotlib.dates as md
-matplotlib.use('agg')
-from matplotlib import pyplot as plt
-
-#import seaborn # only with cmsenv on cca.in2p3.fr
 
 # lines below are only for func_Extract
 from sys import argv
@@ -41,12 +31,6 @@ ROOT.gSystem.Load("libDataFormatsFWLite.so")
 ROOT.FWLiteEnabler.enable()
 
 sys.path.append('../ChiLib_CMS_Validation')
-#import default as df
-#rom default import *
-#from sources import *
-
-# these line for daltonians !
-#seaborn.set_palette('colorblind')
 
 def changeDirectory(rootFile, path):
     """

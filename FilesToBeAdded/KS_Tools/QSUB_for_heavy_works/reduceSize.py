@@ -2,8 +2,7 @@
 #-*-coding: utf-8 -*-
 
 ################################################################################
-# reduceSize1File: a tool to reduce the size of the ROOT files, keeping only
-# the used branches.
+# zeeExtract_MP: a tool to generate Kolmogorov-Smirnov values/pictures
 # for egamma validation comparison                              
 #
 # MUST be launched with the cmsenv cmd after a cmsrel cmd !!
@@ -13,6 +12,17 @@
 ################################################################################
 
 import os,sys, re
+import time
+
+import pandas as pd
+import numpy as np
+import matplotlib
+
+# import matplotlib.dates as md
+matplotlib.use('agg')
+from matplotlib import pyplot as plt
+
+#import seaborn # only with cmsenv on cca.in2p3.fr
 
 # lines below are only for func_Extract
 from sys import argv
@@ -31,6 +41,11 @@ ROOT.gSystem.Load("libDataFormatsFWLite.so")
 ROOT.FWLiteEnabler.enable()
 
 sys.path.append('../ChiLib_CMS_Validation')
+from default import *
+from sources import *
+
+# these line for daltonians !
+#seaborn.set_palette('colorblind')
 
 def changeDirectory(rootFile, path):
     """
@@ -45,12 +60,11 @@ def changeDirectory(rootFile, path):
         theDir.cd()
     return 0
 
-def checkLevel(f_rel, f_out, path0, listkeys, nb, inPath):
-    #inPath = 'DQMData/Run 1/Info'
+def checkLevel(f_rel, f_out, path0, listkeys, nb):
+    inPath = 'DQMData/Run 1/EgammaV'
     print('\npath : %s' % path0)
     if path0 != "":
         path0 += '/'
-    
     for elem in listkeys:
         #print('%d == checkLevel : %s' % (nb, elem.GetTitle()))
         if (elem.GetClassName() == "TDirectoryFile"):
@@ -59,7 +73,7 @@ def checkLevel(f_rel, f_out, path0, listkeys, nb, inPath):
                 print('\npath : %s' % path)
                 f_out.mkdir(path)
             tmp = f_rel.Get(path).GetListOfKeys()
-            checkLevel(f_rel, f_out, path, tmp, nb+1, inPath)
+            checkLevel(f_rel, f_out, path, tmp, nb+1)
         elif (elem.GetClassName() == "TTree"):
             #print('------ TTree')
             src = f_rel.Get(path0)
@@ -75,50 +89,46 @@ def checkLevel(f_rel, f_out, path0, listkeys, nb, inPath):
                 changeDirectory(f_out, path0[:-1])
                 elem.ReadObj().Write()
 
-if len(sys.argv) > 1:
-    print(sys.argv)
-    print("step 4 - arg. 0 :", sys.argv[0]) # name of the script
-    print("step 4 - arg. 1 :", sys.argv[1]) # index
-    print("step 4 - arg. 2 :", sys.argv[2]) # path
-    print("step 4 - arg. 3 :", sys.argv[3]) # nb of events
-    print("step 4 - arg. 4 :", sys.argv[4]) # RESULTFOLDER
-    ind = int(sys.argv[1])
-    resultPath = sys.argv[4]
-    max_number = int(sys.argv[3])
-else:
-    print("step 4 - rien")
-    ind = 0
-    resultPath = ''
-    max_number = 10 # number of events
+def getListFiles(path):
+    #print('path : %s' % path)
+    onlyfiles = [f for f in listdir(path) if isfile(join(path, f))]
+    onlyfiles = [f for f in onlyfiles if f.endswith(".root")] # keep only root files
+    #print(onlyfiles)
+    return onlyfiles
 
-print("func_ReduceSize")
-input_file = resultPath + '/DQM_V0001_R000000001__Global__CMSSW_X_Y_Z__RECO_' + '%0004d'%max_number + '_' + '%003d'%ind + '.root'
-racine = input_file.split('.')
-output_file = racine[0] + 'b.' + racine[1]
+def func_ReduceSize(nbFiles):
+    print("func_ReduceSize")
+    
+    fileList = getListFiles(folderName) # get the list of the root files in the folderName folder
+    fileList.sort()
+    print('there is %d files' % len(fileList))
+    fileList = fileList[0:nbFiles]
+    print('file list :')
+    print(fileList)
+    print('-- end --')
 
-print('\n %s' % input_file)
-print('\n %s' % output_file)
+    for elem in fileList:
+        input_file = folderName + str(elem.split()[0])
+        print('\n %s' % input_file)
 
-paths = ['DQMData/Run 1/EgammaV', 'DQMData/Run 1/Info']
+        f_rel = ROOT.TFile(input_file, "UPDATE")
+        racine = input_file.split('.')
+        f_out = TFile(racine[0] + 'b.' + racine[1], 'recreate')
+        t2 = f_rel.GetListOfKeys()
+        print(racine[0] + 'b.' + racine[1])
+        checkLevel(f_rel, f_out, "", t2, 0)
 
-f_rel = ROOT.TFile(input_file, "UPDATE")
-f_out = TFile(output_file, 'recreate')
-t2 = f_rel.GetListOfKeys()
-print(racine[0] + 'b.' + racine[1])
-for elem in paths:
-    checkLevel(f_rel, f_out, "", t2, 0, elem)
+        f_out.Close()
+        f_rel.Close()
 
-f_out.Close()
-f_rel.Close()
+    return
 
-tmp_file = resultPath + '/tmp' + '%0004d'%max_number + '_' + '%003d'%ind + '.root'
-print('\n %s' % tmp_file)
-print('move input_file to tmp_file')
-os.rename(input_file, tmp_file) # mv input_file -> tmp_file
-print('move output_file to input_file')
-os.rename(output_file, input_file) # mv output_file -> input_file
-print('delete tmp_file')
-os.remove(tmp_file) # remove input_file
+if __name__=="__main__":
 
-print("Fin !")
+    # nb of files to be used
+    nbFiles = 750
+
+    func_ReduceSize(nbFiles)
+
+    print("Fin !")
 
