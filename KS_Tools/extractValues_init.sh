@@ -16,5 +16,5 @@ echo "LOG_SOURCE_START : $LOG_SOURCE_START"
 #source /afs/cern.ch/cms/cmsset_default.sh
 eval `scramv1 runtime -sh`
 cd -
-qsub -l sps=1 -P P_cmsf -pe multicores 4 -q mc_long -o $LOG_OUTPUT zee_Extract.sh $LOG_SOURCE_START $LOG_SOURCE_WORK $RESULTFOLDER
+qsub -l sps=1 -P P_cmsf -pe multicores 4 -q mc_long -o $LOG_OUTPUT extractValues.sh $LOG_SOURCE_START $LOG_SOURCE_WORK $RESULTFOLDER
 
