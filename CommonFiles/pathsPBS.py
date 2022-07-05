@@ -15,3 +15,5 @@ LOG_SOURCE="/pbs/home/c/chiron/private/ValidationsTools/ZEE_Flow/CMSSW_12_1_0_pr
 LOG_OUTPUT="/sps/cms/chiron/TEMP/"
 RESULTFOLDER="/sps/cms/chiron/CMSSW_12_1_0_pre5-16c-12"
 LOG_KS_SOURCE="/pbs/home/c/chiron/private/ValidationsTools/KS_Tools/"
+LIB_SOURCE="/pbs/home/c/chiron/private/ValidationsTools/ChiLib/"
+COMMON_SOURCE="/pbs/home/c/chiron/private/ValidationsTools/CommonFiles/"

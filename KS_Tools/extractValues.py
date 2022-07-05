@@ -31,28 +31,39 @@ ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.gSystem.Load("libDataFormatsFWLite.so")
 ROOT.FWLiteEnabler.enable()
 
-Chilib_path = '../ChiLib'
+if len(sys.argv) > 1:
+    print(sys.argv)
+    print("step 4 - arg. 0 :", sys.argv[0]) # name of the script
+    print("step 4 - arg. 1 :", sys.argv[1]) # LIB path
+    print("step 4 - arg. 2 :", sys.argv[2]) # COMMON files path
+    print("step 4 - arg. 3 :", sys.argv[3]) # RESULTFOLDER
+    resultPath = sys.argv[3]
+else:
+    print("rien")
+    resultPath = ''
+
+Chilib_path = sys.argv[1]
 sys.path.append(Chilib_path)
-Common_path = '../CommonFiles'
+Common_path = sys.argv[2]
 sys.path.append(Common_path)
-import default as df
+
 from default import *
-from sources import *
+from controlFunctions import *
+from graphicFunctions import getHisto
 
 # get the branches for ElectronMcSignalHistos.txt
+source = Chilib_path + "/HistosConfigFiles/ElectronMcSignalHistos.txt"
 branches = []
-branches = getBranches(tp_1)
+branches = getBranches(tp_1, source)
 cleanBranches(branches) # remove some histo wich have a pbm with KS.
 
 # nb of files to be used
 nbFiles = 200
 
 print("func_Extract")
-df.folderName = checkFolderName(df.folderName)    
-branches = []
+resultPath = checkFolderName(resultPath)    
 wr = []
 histos = {}
-        
 
 # get the branches for ElectronMcSignalHistos.txt
 #branches += ["h_recEleNum", "h_scl_ESFrac_endcaps", "h_scl_sigietaieta", "h_ele_PoPtrue_endcaps", "h_ele_PoPtrue", "h_scl_bcl_EtotoEtrue_endcaps", "h_scl_bcl_EtotoEtrue_barrel", "h_ele_Et"]
@@ -60,7 +71,7 @@ histos = {}
 for leaf in branches:
     histos[leaf] = []
     
-fileList = getListFiles(df.folderName) # get the list of the root files in the folderName folder
+fileList = getListFiles(resultPath) # get the list of the root files in the folderName folder
 fileList.sort()
 print('there is %d files' % len(fileList))
 fileList = fileList[0:nbFiles]
@@ -69,13 +80,14 @@ print(fileList)
 print('-- end --')
 
 for elem in fileList:
-    input_file = df.folderName + str(elem.split()[0])
-    name_1 = input_file.replace(df.folderName, '').replace('DQM_V0001_R000000001__Global__CMSSW_X_Y_Z__RECO_', '').replace('.root', '')
-    print('\n %s - name_1 : %s' % (input_file, colorText(name_1, 'lightyellow')))
+    input_file = resultPath + str(elem.split()[0])
+    name_1 = input_file.replace(resultPath, '').replace('DQM_V0001_R000000001__Global__CMSSW_X_Y_Z__RECO_', '').replace('.root', '')
+    print('\n %s - name_1 : %s' % (input_file, name_1))
+    #print('\n %s - name_1 : %s' % (input_file, colorText(name_1, 'lightyellow')))
     
     f_root = ROOT.TFile(input_file) # 'DATA/' + 
     h1 = getHisto(f_root, tp_1)
-    #h1.ls()
+    #h1.ls() # OK
     for leaf in branches:
         print("== %s ==" % leaf)
         temp_leaf = []
@@ -96,7 +108,7 @@ for elem in fileList:
             texttoWrite += 'b_' + '{:03d}'.format(i) + ',c_' + '{:03d},'.format(i)
             temp_leaf.append(entry) # b_
             temp_leaf.append(histo.GetBinError(i)) # c_
-             i+=1
+            i+=1
         print('there is %d entries' % i)
         texttoWrite = texttoWrite[:-1] # remove last char
         temp_leaf.append(texttoWrite) # end
@@ -105,7 +117,9 @@ for elem in fileList:
 #print histos into histo named files
 i_leaf = 0
 for leaf in branches:
-    wr.append(open(df.folderName + 'histo_' + str(leaf) + '_' + '{:03d}'.format(nbFiles) + '_0_lite.txt', 'w'))
+    fileName = resultPath + 'histo_' + str(leaf) + '_' + '{:03d}'.format(nbFiles) + '.txt'
+    print('fileName : %s' % fileName)
+    wr.append(open(fileName, 'w'))
     nb_max = len(histos[leaf][0]) - 1
     print("== %s == nb_max : %d" % (leaf, nb_max))
     wr[i_leaf].write('evol,Mean,MeanError,StdDev,nbBins,name,')

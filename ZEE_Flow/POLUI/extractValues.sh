@@ -9,7 +9,9 @@ fi
 
 echo "chemin START : $1"
 echo "chemin WORK : $2"
-echo "result folder : $3"
+echo "chemin LIB : $3"
+echo "chemin COMMON : $4"
+echo "result folder : $5"
 
 #cd $LOG_SOURCE
 cd $1
@@ -18,7 +20,7 @@ eval `scramv1 runtime -sh`
 cd -
 
 #cd $2
-python3 $2/extractValues.py $2 $3
+python3 $2/extractValues.py $3 $4 $5
 echo "executing $2/extractValues.py"
 #python3 $2/extrGT.py
 #echo "executing $1/extrGT.py"
