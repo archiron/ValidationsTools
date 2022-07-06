@@ -2,7 +2,7 @@
 #-*-coding: utf-8 -*-
 
 ################################################################################
-# createFiles: create file for Kolmogorov-Smirnov maximum diff
+# createFiles_v2 : create file for Kolmogorov-Smirnov maximum diff & export the pValues.
 # for egamma validation comparison                              
 #
 # MUST be launched with the cmsenv cmd after a cmsrel cmd !!

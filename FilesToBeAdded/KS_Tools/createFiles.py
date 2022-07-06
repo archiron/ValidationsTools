@@ -2,7 +2,7 @@
 #-*-coding: utf-8 -*-
 
 ################################################################################
-# createFiles: create file for Kolmogorov-Smirnov maximum diff
+# createFiles : create file for Kolmogorov-Smirnov maximum diff
 # for egamma validation comparison                              
 #
 # MUST be launched with the cmsenv cmd after a cmsrel cmd !!
