@@ -23,3 +23,7 @@ this will reduce the size of the ROOT files (typically from 150/200 Mo to 1.5/2 
 ### Extracting values : 
 When all the ROOT files are created and reduced, we need to creates 1 file per histo with all the histo values for each ROOT file.
 It is the first job of the extractValues[_init].sh scripts.
+
+It can be launched with : .  extractValues_init.sh<br>
+and create into the RESULTFOLDER (see 4) a lot of text files. All ROOT files are read, and then for each histo, the values of the histo curve is stored into an array, ROOT file after ROOT file.<br>
+Once we have all the ROOT files read, the array is stored into a text file dedicated to this histo.<br>
