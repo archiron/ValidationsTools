@@ -5,13 +5,8 @@ this repository get all the validations tools such as Kolmogorov-Smirnov (KS Too
 ### Launching the ROOT files creation :
 - git clone https://github.com/archiron/ValidationsTools ValidationsTools 
 - cd ValidationsTools 
-- git clone https://github.com/archiron/ChiLib_CMS_Validation ChiLib<br><br>
-After this, one need to create the environment for the ROOT files creation. This is done with :
-- cd ZEE_Flow
-- cmsrel CMSSW_12_1_0_pre5 CMSSW_12_1_0_pre5
-- cd CMSSW_12_1_0_pre5/src
-- mkdir Kolmogorov
-- depending of the site you are working on (the CC or the LLR site), you have to copy the ZZ_Flow/CCA or ZEE_Flow/LLR files onto the CMSSW_12_1_0_pre5/src/Kolmogorov folder.
+. installValidationsTools.sh<br>
+This install the library (ChiLib), the release file env (cmsrel $Release $Release) and copy the ZEE_Flow/CCA or ZEE_Flow/LLR files (depending of the site you are working on - the CC or the LLR site) onto the $Release/src/Kolmogorov folder. $Release is the release you want working with.
 
 ### Launching the ROOT files creation :
 return to the top of the Tools (i.e. ValidationsTools), then launch :
