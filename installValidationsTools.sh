@@ -25,11 +25,8 @@ do
   fi
 done
 
-if [[ "$Choice" == "pbs" ]]; then
-    $Choice="CCA";
-fi
-if [[ "$Choice" == "llr" ]]; then
-    $Choice="LLR";
+if [[ "$Choice" == "PBS" ]]; then
+    Choice="CCA";
 fi
 echo "Choice is : $Choice"
 
