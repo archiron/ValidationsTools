@@ -49,6 +49,8 @@ echo "LOG_SOURCE : $LOG_SOURCE"
 echo "LOG_OUTPUT : $LOG_OUTPUT"
 echo "RESULTFOLDER : $RESULTFOLDER"
 
+mkdir -p $RESULTFOLDER
+
 if [[ "$Choice" == "LLR" ]] 
   then
     echo "LLR"
