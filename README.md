@@ -5,6 +5,7 @@ this repository get all the validations tools such as Kolmogorov-Smirnov (KS Too
 ### Launching the installation :
 - git clone https://github.com/archiron/ValidationsTools ValidationsTools 
 - cd ValidationsTools <br>
+- chmod 755 *.sh
 then launch : . installValidationsTools.sh<br>
 This install the library (ChiLib), the release file env (cmsrel $Release $Release) and copy the ZEE_Flow/CCA or ZEE_Flow/LLR files (depending of the site you are working on - the CC or the LLR site) onto the $Release/src/Kolmogorov folder. $Release is the release you want working with.
 
