@@ -14,8 +14,9 @@ if len(sys.argv) > 1:
     print("step 1 - arg. 1 :", sys.argv[1])
     print("step 1 - arg. 2 :", sys.argv[2])
     print("step 1 - arg. 3 :", sys.argv[3])
+    print("step 1 - arg. 4 :", sys.argv[4])
     ind = int(sys.argv[2])
-    max_number = int(sys.argv[3])
+    max_number = int(sys.argv[4])
 else:
     print("step 1 - rien")
     ind = 0
@@ -144,8 +145,8 @@ from PhysicsTools.PatAlgos.tools.helpers import associatePatAlgosToolsTask
 associatePatAlgosToolsTask(process)
 
 #Setup FWK for multithreaded
-process.options.numberOfThreads = 8
-process.options.numberOfStreams = 8
+process.options.numberOfThreads = 2
+process.options.numberOfStreams = 2
 process.options.numberOfConcurrentLuminosityBlocks = 0
 process.options.eventSetup.numberOfConcurrentIOVs = 1
 

@@ -15,8 +15,9 @@ if len(sys.argv) > 1:
     print("step 1 - arg. 1 :", sys.argv[1])
     print("step 1 - arg. 2 :", sys.argv[2])
     print("step 1 - arg. 3 :", sys.argv[3])
+    print("step 1 - arg. 4 :", sys.argv[4])
     ind = int(sys.argv[2])
-    max_number = int(sys.argv[3])
+    max_number = int(sys.argv[4])
 else:
     print("step 1 - rien")
     ind = 0
@@ -24,6 +25,13 @@ else:
     max_number = 10 # number of events
 
 max_skipped = ind * max_number
+
+CMSSWBASE = os.getenv("CMSSW_BASE")
+CMSSWRELEASEBASE = os.getenv("CMSSW_RELEASE_BASE")
+CMSSWVERSION = os.getenv("CMSSW_VERSION")
+print('CMSSWBASE : %s' %CMSSWBASE)
+print('CMSSWRELEASEBASE : %s' %CMSSWRELEASEBASE)
+print('CMSSWVERSION : %s' %CMSSWVERSION)
 
 process = cms.Process('HARVESTING',Run3,run3_nanoAOD_devel)
 

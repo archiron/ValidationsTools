@@ -7,10 +7,11 @@ Release="CMSSW_12_1_0_pre5"
 git clone https://github.com/archiron/ChiLib_CMS_Validation ChiLib
 
 cd ZEE_Flow
-cmsrel $Release $RElease
+cmsrel $Release $Release
 cd $Release/src
 mkdir Kolmogorov
 cd ../../
+chmod 755 ZEE_Flow/$release/src/Kolmogorov/*.sh
 
 aa=$PWD
 echo "actual path : $aa"
