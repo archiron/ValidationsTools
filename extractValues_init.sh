@@ -68,5 +68,6 @@ elif [[ "$Choice" == "PBS" ]]
     sbatch -L sps -n 8 --mem=8000 -J $JobName -o $output extractValues.sh $LOG_SOURCE $LOG_KS_SOURCE $LIB_SOURCE $COMMON_SOURCE $RESULTFOLDER
 fi
 
+cd $aa # back to the top
 echo "END"
 

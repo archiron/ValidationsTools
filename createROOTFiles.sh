@@ -91,5 +91,6 @@ elif [[ "$Choice" == "PBS" ]]
     done
 fi
 
+cd $aa # back to the top
 echo "END"
 
