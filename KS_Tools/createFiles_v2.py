@@ -2,7 +2,7 @@
 #-*-coding: utf-8 -*-
 
 ################################################################################
-# createFiles: create file for Kolmogorov-Smirnov maximum diff
+# createFiles_v2 : create file for Kolmogorov-Smirnov maximum diff & export the pValues.
 # for egamma validation comparison                              
 #
 # MUST be launched with the cmsenv cmd after a cmsrel cmd !!
@@ -18,8 +18,6 @@ import time
 
 # lines below are only for func_Extract
 from sys import argv
-from os import listdir
-from os.path import isfile, join
 
 argv.append( '-b-' )
 import ROOT
@@ -40,8 +38,7 @@ import matplotlib
 matplotlib.use('agg')
 from matplotlib import pyplot as plt
 
-Chilib_path = '../ChiLib_CMS_Validation'
-Chilib_path = '/pbs/home/c/chiron/private/KS_Tools/ChiLib_CMS_Validation'
+Chilib_path = '../ChiLib'
 sys.path.append(Chilib_path)
 import default as dfo
 from graphicFunctions import getHisto
