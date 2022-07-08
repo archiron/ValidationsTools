@@ -27,21 +27,22 @@ readarray toor -t array < CommonFiles/$FileName1
 N1=${#toor[@]}
 echo "N1= $N1"
 
-Nbegin="${toor[13]}"
+Nbegin="${toor[15]}"
 Nbegin=${Nbegin//Nbegin = } # WARNING : "Nbegin = " MUST be written in the same form as in rootValues.py
 Nbegin=${Nbegin//\"}
 Nbegin=${Nbegin::-1} # remove last char (\r\n)
-Nend="${toor[14]}"
+Nend="${toor[16]}"
 Nend=${Nend//Nend = }
 Nend=${Nend//\"}
 Nend=${Nend::-1}
-NB_EVTS="${toor[15]}"
+NB_EVTS="${toor[17]}"
 NB_EVTS=${NB_EVTS//NB_EVTS = }
 NB_EVTS=${NB_EVTS//\"}
 NB_EVTS=${NB_EVTS::-1}
 echo "Nbegin : $Nbegin=="
 echo "Nend : $Nend=="
 echo "NB_EVTS : $NB_EVTS=="
+exit()
 
 FileName="paths$Choice.py"
 echo $FileName
