@@ -1,6 +1,19 @@
 # ValidationsTools
 
 this repository get all the validations tools such as Kolmogorov-Smirnov (KS Tools) or AutoEncoders Tools (AE).
+KS : talk about first dev (1 release vs 1 reference) to (1 reference vs lot of releases). pValues.
+From the values of an histogram, we can construct an integrated cumulative curve into one we can take the maximum of the difference between 2 consecutives values. Repeating this operation with a lot of ROOT files (200, 500 or 1000) we can construct a KS curve.
+From this curve we can extract a pValue to obtain an idea of the validity of the histo and then the release.
+
+AE : analyze on a reference and comparison with a lot of releases. The precedent explanation was made for one release vs 1 reference. Keeping the reference we can compare with a lot of releases (here about 12).
+From the ROOT files presented above we can train an autoencoder and predict the result of a given entry for one release. Doing this for a tenth of releases we can obtain a comparison, function of the releases, for the pValues or the differences at the end of the AE.
+
+All thoses files are located into a folder named ValidationsTools which contains at least 5 folders :
+- Doc : containing this documentation,
+- ZEE_Flow : folder used for the creation of the ROOT files,
+- KS_Tools : folder used for the KS pictures and files,
+- AutoEncoder : containing the autoencoder tools and results,
+- DATA : empty at the installation. Contain the « official » ROOT files, i.e. the releases ROOT files used for the comparison mentioned above.
 
 ### Launching the installation :
 - git clone https://github.com/archiron/ValidationsTools ValidationsTools 
