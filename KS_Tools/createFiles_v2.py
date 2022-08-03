@@ -56,7 +56,7 @@ from matplotlib import pyplot as plt
 # these line for daltonians !
 #seaborn.set_palette('colorblind')
 
-print("extractFiles_v2")
+print("\nextractFiles_v2")
 
 blu = imp.load_source(filePaths, commonPath+filePaths)
 print('DATA_SOURCE : %s' % blu.DATA_SOURCE)
@@ -75,6 +75,7 @@ from default import *
 from sources import *
 
 folder = checkFolderName(dfo.folder)
+resultPath = checkFolderName(resultPath)
 
 # get the branches for ElectronMcSignalHistos.txt
 branches = []
@@ -122,175 +123,184 @@ print('we use the %s file as reference' % input_ref_file)
 if (ind_reference == -1): 
     ind_reference = np.random.randint(0, nbFiles)
 print('reference ind. : %d' % ind_reference)
+h2 = getHisto(f_ref, tp_1)
+print(h2)
+tic = time.time()
 
-stop()
-'''
-    h2 = getHisto(f_ref, tp_1)
-    print(h2)
-    tic = time.time()
+for elem in sortedRels:
+    print(elem)
+    rel = elem[1]
+    file = elem[2]
 
-    for elem in sortedRels:
-        print(elem)
-        rel = elem[1]
-        file = elem[2]
+    # get the "new" root file datas
+    input_rel_file = file
+    f_rel = ROOT.TFile(rootFolderName + input_rel_file)
+    print('we use the %s file as new release' % input_rel_file)
 
-        # get the "new" root file datas
-        input_rel_file = file
-        f_rel = ROOT.TFile(LOG_SOURCE_WORK + input_rel_file)
-        print('we use the %s file as new release' % input_rel_file)
+    nb_red1 = 0
+    nb_green1 = 0
+    nb_red2 = 0
+    nb_green2 = 0
+    nb_red3 = 0
+    nb_green3 = 0
 
-        nb_red1 = 0
-        nb_green1 = 0
-        nb_red2 = 0
-        nb_green2 = 0
-        nb_red3 = 0
-        nb_green3 = 0
+    KS_diffName = dfo.folder + "histo_differences_KScurve" + "_" + rel + "_" + '_{:03d}'.format(nbFiles) + "_v2.txt"
+    print("KSname 1 : %s" % KS_diffName)
+    wKS0 = open(KS_diffName, 'w')
 
-        KS_diffName = dfo.folder + "histo_differences_KScurve" + "_" + rel + "_" + '_{:03d}'.format(nbFiles) + ".txt"
-        print("KSname 1 : %s" % KS_diffName)
-        wKS0 = open(KS_diffName, 'w')
+    KS_resume = dfo.folder + "histo_resume" + "_" + rel + "_v2.txt"
+    print("KSname 0 : %s" % KS_resume)
+    wKS_ = open(KS_resume, 'w')
 
-        KS_resume = dfo.folder + "histo_resume" + "_" + rel + ".txt"
-        print("KSname 0 : %s" % KS_resume)
-        wKS_ = open(KS_resume, 'w')
+    KS_pValues = dfo.folder + "histo_pValues" + "_" + rel + "_v2.txt"
+    print("KSname 2 : %s" % KS_pValues)
+    wKSp = open(KS_pValues, 'w')
 
-        KS_pValues = dfo.folder + "histo_pValues" + "_" + rel + ".txt"
-        print("KSname 2 : %s" % KS_pValues)
-        wKSp = open(KS_pValues, 'w')
-
-        h1 = getHisto(f_rel, tp_1)
-        for i in range(0, N_histos): # 1 N_histos histo for debug
-            name = dfo.folderName + "histo_" + br[i] + '_{:03d}'.format(nbFiles) + "_0_lite.txt"
-            print('\n%d - %s' %(i, name))
-            df = pd.read_csv(name)
+    h1 = getHisto(f_rel, tp_1)
+    for i in range(0, N_histos): # 1 N_histos histo for debug
+        name = resultPath + "histo_" + branches[i] + '_{:03d}'.format(nbFiles) + ".txt"
+        print('\n%d - %s' %(i, name))
+        df = pd.read_csv(name)
         
-            print(br[i]) # print histo name
-            histo_1 = h1.Get(br[i])
-            ii=0
-            s_new = []
-            for entry in histo_1:
-                #print("%d/%d : %s - %s") % (ii, histo_1.GetXaxis().GetNbins(), entry, histo_1.GetBinError(i))
-                s_new.append(entry)
-                ii += 1
-            s_new = np.asarray(s_new)
-            s_new = s_new[1:-1]
-            #print(s_new)
-            Ntot_h1 = histo_1.GetEntries()
+        print(branches[i]) # print histo name
+        histo_1 = h1.Get(branches[i])
+        ii=0
+        s_new = []
+        for entry in histo_1:
+            #print("%d/%d : %s - %s") % (ii, histo_1.GetXaxis().GetNbins(), entry, histo_1.GetBinError(i))
+            s_new.append(entry)
+            ii += 1
+        s_new = np.asarray(s_new)
+        s_new = s_new[1:-1]
+        #print(s_new)
+        Ntot_h1 = histo_1.GetEntries()
 
-            histo_2 = h2.Get(br[i])
-            ii=0
-            s_old = []
-            for entry in histo_2:
-                #print("%d/%d : %s - %s") % (ii, histo_2.GetXaxis().GetNbins(), entry, histo_2.GetBinError(i))
-                s_old.append(entry)
-                ii += 1
-            s_old = np.asarray(s_old)
-            s_old = s_old[1:-1]
-            #print(s_old)
-            Ntot_h2 = histo_2.GetEntries()
-            print('Ntot_h1 : %d - Ntot_h2 : %d' % (Ntot_h1, Ntot_h2))
+        histo_2 = h2.Get(branches[i])
+        ii=0
+        s_old = []
+        for entry in histo_2:
+            #print("%d/%d : %s - %s") % (ii, histo_2.GetXaxis().GetNbins(), entry, histo_2.GetBinError(i))
+            s_old.append(entry)
+            ii += 1
+        s_old = np.asarray(s_old)
+        s_old = s_old[1:-1]
+        #print(s_old)
+        Ntot_h2 = histo_2.GetEntries()
+        print('Ntot_h1 : %d - Ntot_h2 : %d' % (Ntot_h1, Ntot_h2))
 
-            # print min/max for the new curve
-            print('\n##########')
-            print('min : %f' % s_new.min())
-            print('max : %f' % s_new.max())
-            print('###########\n')
-            if (s_new.min() < 0.):
-                print('pbm whith histo %s, min < 0' % br[i])
-                continue
-            if (np.floor(s_new.sum()) == 0.):
-                print('pbm whith histo %s, sum = 0' % br[i])
-                continue
+        # print min/max for the new curve
+        print('\n##########')
+        print('min : %f' % s_new.min())
+        print('max : %f' % s_new.max())
+        print('###########\n')
+        if (s_new.min() < 0.):
+            print('pbm whith histo %s, min < 0' % branches[i])
+            continue
+        if (np.floor(s_new.sum()) == 0.):
+            print('pbm whith histo %s, sum = 0' % branches[i])
+            continue
 
-            # create file for KS curve
-            KSname1 = dfo.folder + "histo_" + br[i] + "_KScurve1" + "_" + rel + ".txt"
-            KSname2 = dfo.folder + "histo_" + br[i] + "_KScurve2" + "_" + rel + ".txt"
-            KSname3 = dfo.folder + "histo_" + br[i] + "_KScurve3" + "_" + rel + ".txt"
-            print("KSname 1 : %s" % KSname1)
-            print("KSname 2 : %s" % KSname2)
-            print("KSname 3 : %s" % KSname3)
-            wKS1 = open(KSname1, 'w')
-            wKS2 = open(KSname2, 'w')
-            wKS3 = open(KSname3, 'w')
+        # create file for KS curve
+        KSname1 = dfo.folder + "histo_" + branches[i] + "_KScurve1" + "_" + rel + "_v2.txt"
+        KSname2 = dfo.folder + "histo_" + branches[i] + "_KScurve2" + "_" + rel + "_v2.txt"
+        KSname3 = dfo.folder + "histo_" + branches[i] + "_KScurve3" + "_" + rel + "_v2.txt"
+        print("KSname 1 : %s" % KSname1)
+        print("KSname 2 : %s" % KSname2)
+        print("KSname 3 : %s" % KSname3)
+        wKS1 = open(KSname1, 'w')
+        wKS2 = open(KSname2, 'w')
+        wKS3 = open(KSname3, 'w')
 
-            # check the values data
-            #print(df.head(5))
-            cols = df.columns.values
-            n_cols = len(cols)
-            print('nb of columns for histos : %d' % n_cols)
-            cols_entries = cols[6::2]
-            df_entries = df[cols_entries]
-            #print(df_entries.head(15))#
+        # check the values data
+        #print(df.head(5))
+        cols = df.columns.values
+        n_cols = len(cols)
+        print('nb of columns for histos : %d' % n_cols)
+        cols_entries = cols[6::2]
+        df_entries = df[cols_entries]
+        #print(df_entries.head(15))#
 
-            # nbBins (GetEntries())
-            df_GetEntries = df['nbBins']
+        # check the values data
+        #print(df.head(5))
+        cols = df.columns.values
+        n_cols = len(cols)
+        print('nb of columns for histos : %d' % n_cols)
+        cols_entries = cols[6::2]
+        df_entries = df[cols_entries]
+        #print(df_entries.head(15))#
 
-            # get nb of columns & rows for histos
-            (Nrows, Ncols) = df_entries.shape
-            print('[Nrows, Ncols] : [%d, %d]' % (Nrows, Ncols))
-            df_entries = df_entries.iloc[:, 1:Ncols-1]
-            (Nrows, Ncols) = df_entries.shape
-            print('[Nrows, Ncols] : [%d, %d]' % (Nrows, Ncols))
+        # nbBins (GetEntries())
+        df_GetEntries = df['nbBins']
 
-            # create the datas for the p-Value graph
-            # by comparing all curves between them. (KS 1)
-            nb1 = 0
-            totalDiff = []
-            for k in range(0,Nrows-1):
-                for l in range(k+1, Nrows):
-                    nb1 += 1
-                    series0 = df_entries.iloc[k,:]
-                    series1 = df_entries.iloc[l,:]     
-                    sum0 = df_GetEntries[k]
-                    sum1 = df_GetEntries[l]
-                    totalDiff.append(DB.diffMAXKS(series0, series1, sum0, sum1)[0]) # 9000, 9000
+        # get nb of columns & rows for histos
+        (Nrows, Ncols) = df_entries.shape
+        print('[Nrows, Ncols] : [%d, %d]' % (Nrows, Ncols))
+        df_entries = df_entries.iloc[:, 1:Ncols-1]
+        (Nrows, Ncols) = df_entries.shape
+        print('[Nrows, Ncols] : [%d, %d]' % (Nrows, Ncols))
 
-            print('ttl nb1 of couples 1 : %d' % nb1)
+        # create the datas for the p-Value graph
+        # by comparing all curves between them. (KS 1)
+        nb1 = 0
+        totalDiff = []
+        for k in range(0,Nrows-1):
+            for l in range(k+1, Nrows):
+                nb1 += 1
+                series0 = df_entries.iloc[k,:]
+                series1 = df_entries.iloc[l,:]     
+                sum0 = df_GetEntries[k]
+                sum1 = df_GetEntries[l]
+                totalDiff.append(DB.diffMAXKS(series0, series1, sum0, sum1)[0]) # 9000, 9000
 
-            # create the datas for the p-Value graph
-            # by comparing 1 curve with the others.
-            # Get a random histo as reference (KS 2)
-            series_reference = df_entries.iloc[ind_reference,:]
-            nbBins_reference = df_GetEntries[ind_reference]
-            print('nb bins reference : %d' % nbBins_reference)
-            #print(series_reference)
-            nb2 = 0
-            totalDiff2 = []
-            for k in range(0,Nrows-0):
-                if (k != ind_reference):
-                    nb2 += 1
-                    series0 = df_entries.iloc[k,:]
-                    sum0 = df_GetEntries[k]
-                    totalDiff2.append(DB.diffMAXKS(series0, series_reference, sum0, nbBins_reference)[0]) # 9000, 9000
+        print('ttl nb1 of couples 1 : %d' % nb1)
 
-            print('ttl nb of couples 2 : %d' % nb2)
-        
-            # create the datas for the p-Value graph
-            # by comparing the new curve with the others.
-            # Get the new as reference (KS 3)
-            nb3 = 0
-            totalDiff3 = []
-            for k in range(0,Nrows-0):
-                nb3 += 1
+        # create the datas for the p-Value graph
+        # by comparing 1 curve with the others.
+        # Get a random histo as reference (KS 2)
+        series_reference = df_entries.iloc[ind_reference,:]
+        nbBins_reference = df_GetEntries[ind_reference]
+        print('nb bins reference : %d' % nbBins_reference)
+        #print(series_reference)
+        nb2 = 0
+        totalDiff2 = []
+        for k in range(0,Nrows-0):
+            if (k != ind_reference):
+                nb2 += 1
                 series0 = df_entries.iloc[k,:]
                 sum0 = df_GetEntries[k]
-                totalDiff3.append(DB.diffMAXKS(series0, s_new, sum0, Ntot_h1)[0])
+                totalDiff2.append(DB.diffMAXKS(series0, series_reference, sum0, nbBins_reference)[0]) # 9000, 9000
 
-            print('ttl nb of couples 3 : %d' % nb3)
+        print('ttl nb of couples 2 : %d' % nb2)
         
-            # plot some datas
-            plt_entries = df_entries.plot(kind='line')
-            fig = plt_entries.get_figure()
-            fig.clf()
-            # create the integrated curve
-            curves = []
-            for k in range(0,Nrows):
-                series0 = df_entries.iloc[k,:]
-                curves = DB.funcKS(series0)
-                plt.plot(curves)
-            fig.savefig(dfo.folder + '/cumulative_curve_' + br[i] + "_" + rel + '.png')
-            fig.clf()
+        # create the datas for the p-Value graph
+        # by comparing the new curve with the others.
+        # Get the new as reference (KS 3)
+        nb3 = 0
+        totalDiff3 = []
+        for k in range(0,Nrows-0):
+            nb3 += 1
+            series0 = df_entries.iloc[k,:]
+            sum0 = df_GetEntries[k]
+            totalDiff3.append(DB.diffMAXKS(series0, s_new, sum0, Ntot_h1)[0])
+
+        print('ttl nb of couples 3 : %d' % nb3)
         
+        # plot some datas
+        plt_entries = df_entries.plot(kind='line')
+        fig = plt_entries.get_figure()
+        fig.clf()
+        # create the integrated curve
+        curves = []
+        for k in range(0,Nrows):
+            series0 = df_entries.iloc[k,:]
+            curves = DB.funcKS(series0)
+            plt.plot(curves)
+        fig.savefig(dfo.folder + '/cumulative_curve_' + branches[i] + "_" + rel + '_v2.png')
+        fig.clf()
+        
+stop()
+
+'''
             # ================================ #
             # create the mean curve of entries #
             # ================================ #
@@ -308,7 +318,7 @@ stop()
             # diff max between new & old
             diffMax0, posMax0, sDKS = DB.diffMAXKS2(s_old, s_new, Ntot_h2, Ntot_h1)
             print("diffMax0 : %f - posMax0 : %f" % (diffMax0, posMax0))
-            wKS0.write('%s : %e\n' % (br[i], diffMax0))
+            wKS0.write('%s : %e\n' % (branches[i], diffMax0))
             print(s_new[0:8])
             print(s_old[0:8])
             print(sDKS[0:8]) # diff
@@ -322,7 +332,7 @@ stop()
 
             # Kolmogoroff-Smirnov curve
             seriesTotalDiff1 = pd.DataFrame(totalDiff, columns=['KSDiff'])
-            KSDiffname1 = dfo.folder + '/KSDiffValues_1_' + br[i] + '.csv'
+            KSDiffname1 = dfo.folder + '/KSDiffValues_1_' + branches[i] + '.csv'
             df.to_csv(KSDiffname1)
             plt_diff_KS1 = seriesTotalDiff1.plot.hist(bins=nbins, title='KS diff. 1')
             print('\ndiffMin0/sTD.min 1 : %f/%f' % (diffMax0, seriesTotalDiff1.values.min()))
@@ -343,12 +353,12 @@ stop()
             ymi, yMa = plt_diff_KS1.get_ylim()
             plt_diff_KS1.vlines(x1, ymi, 0.9*yMa, color=color1, linewidth=4)
             fig = plt_diff_KS1.get_figure()
-            fig.savefig(dfo.folder + '/KS-ttlDiff_1_' + br[i] + '.png')
+            fig.savefig(dfo.folder + '/KS-ttlDiff_1_' + branches[i] + '.png')
             fig.clf()
             count, division = np.histogram(seriesTotalDiff1[~np.isnan(seriesTotalDiff1)], bins=nbins)
             div_min = np.amin(division)
             div_max = np.amax(division)
-            KSDiffHistoname1 = dfo.folder + '/KSDiffHistoValues_1_' + br[i] + '.csv'
+            KSDiffHistoname1 = dfo.folder + '/KSDiffHistoValues_1_' + branches[i] + '.csv'
             wKSDiff1 = open(KSDiffHistoname1, 'w')
             wKSDiff1.write(' '.join("{:10.04e}".format(x) for x in count))
             wKSDiff1.write('\n')
@@ -399,12 +409,12 @@ stop()
             ymi, yMa = plt_diff_KS2.get_ylim()
             plt_diff_KS2.vlines(x2, ymi, 0.9*yMa, color=color2, linewidth=4)
             fig = plt_diff_KS2.get_figure()
-            fig.savefig(dfo.folder + '/KS-ttlDiff_2_' + br[i] + '.png')
+            fig.savefig(dfo.folder + '/KS-ttlDiff_2_' + branches[i] + '.png')
             fig.clf()
             count, division = np.histogram(seriesTotalDiff2, bins=nbins)
             div_min = np.amin(division)
             div_max = np.amax(division)
-            KSDiffHistoname2 = dfo.folder + '/KSDiffHistoValues_2_' + br[i] + '.csv'
+            KSDiffHistoname2 = dfo.folder + '/KSDiffHistoValues_2_' + branches[i] + '.csv'
             wKSDiff2 = open(KSDiffHistoname2, 'w')
             wKSDiff2.write(' '.join("{:10.04e}".format(x) for x in count))
             wKSDiff2.write('\n')
@@ -454,12 +464,12 @@ stop()
             ymi, yMa = plt_diff_KS3.get_ylim()
             plt_diff_KS3.vlines(x3, ymi, 0.9*yMa, color=color3, linewidth=4)
             fig = plt_diff_KS3.get_figure()
-            fig.savefig(dfo.folder + '/KS-ttlDiff_3_' + br[i] + '.png')
+            fig.savefig(dfo.folder + '/KS-ttlDiff_3_' + branches[i] + '.png')
             fig.clf()
             count, division = np.histogram(seriesTotalDiff3, bins=nbins)
             div_min = np.amin(division)
             div_max = np.amax(division)
-            KSDiffHistoname3 = dfo.folder + '/KSDiffHistoValues_3_' + br[i] + '.csv'
+            KSDiffHistoname3 = dfo.folder + '/KSDiffHistoValues_3_' + branches[i] + '.csv'
             wKSDiff3 = open(KSDiffHistoname3, 'w')
             wKSDiff3.write(' '.join("{:10.04e}".format(x) for x in count))
             wKSDiff3.write('\n')
@@ -485,7 +495,7 @@ stop()
             print('\nunormalized p_Value : %0.4e for nbins=%d' % (pValue3, nbins))
             print('normalized p_Value : %0.4e for nbins=%d' % (pValue3/I_max3, nbins))
 
-            wKSp.write('%s, %e, %e, %e\n' % (br[i], pValue/I_max, pValue2/I_max2, pValue3/I_max3))
+            wKSp.write('%s, %e, %e, %e\n' % (branches[i], pValue/I_max, pValue2/I_max2, pValue3/I_max3))
 
             plt.close('all')
             # save the KS curves
