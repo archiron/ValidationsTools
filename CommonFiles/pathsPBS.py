@@ -2,7 +2,7 @@
 #-*-coding: utf-8 -*-
 
 ################################################################################
-# sources.py : list of paths to be used with zeeExtract tools
+# pathsPBS.py : list of paths to be used with the tools
 # for egamma validation comparison                              
 # 
 # Arnaud Chiron-Turlay LLR - arnaud.chiron@llr.in2p3.fr                        
@@ -11,6 +11,8 @@
 
 # CCA
 # pwd : /pbs/home/c/chiron
+
+# be careful to not forget the '/' at the end of the path
 LOG_SOURCE="/pbs/home/c/chiron/private/ValidationsTools/ZEE_Flow/CMSSW_12_1_0_pre5/src/Kolmogorov"
 LOG_OUTPUT="/sps/cms/chiron/TEMP/"
 RESULTFOLDER="/sps/cms/chiron/CMSSW_12_1_0_pre5-16c-13"

@@ -12,6 +12,7 @@
 ################################################################################
 
 import os,sys
+import imp
 import time
 
 #import seaborn # only with cmsenv on cca.in2p3.fr
@@ -20,6 +21,7 @@ import time
 from sys import argv
 from os import listdir
 from os.path import isfile, join
+from tracemalloc import stop
 
 argv.append( '-b-' )
 import ROOT
@@ -32,6 +34,17 @@ ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.gSystem.Load("libDataFormatsFWLite.so")
 ROOT.FWLiteEnabler.enable()
 
+if len(sys.argv) > 1:
+    print(sys.argv)
+    print("step 4 - arg. 0 :", sys.argv[0]) # name of the script
+    print("step 4 - arg. 2 :", sys.argv[1]) # COMMON files path
+    print("step 4 - arg. 4 :", sys.argv[2]) # FileName for paths
+    commonPath = sys.argv[1]
+    filePaths = sys.argv[2]
+else:
+    print("rien")
+    resultPath = ''
+
 import pandas as pd
 import numpy as np
 import matplotlib
@@ -40,61 +53,78 @@ import matplotlib
 matplotlib.use('agg')
 from matplotlib import pyplot as plt
 
-sys.path.append('../ChiLib_CMS_Validation')
-import default as dfo
-from graphicFunctions import getHisto
-from default import *
-from DecisionBox import DecisionBox
-from sources import *
-from controlFunctions import *
-
 # these line for daltonians !
 #seaborn.set_palette('colorblind')
 
-def func_CreateKS(br):
-    DB = DecisionBox()
-    rels = []
+print("extractFiles_v2")
 
-    print("func_Extract")
-    dfo.folderName = checkFolderName(dfo.folderName)
-    dfo.folder = checkFolderName(dfo.folder)
+blu = imp.load_source(filePaths, commonPath+filePaths)
+print('DATA_SOURCE : %s' % blu.DATA_SOURCE)
+resultPath = blu.RESULTFOLDER # checkFolderName(blu.RESULTFOLDER)
+print('result path : {:s}'.format(resultPath))
     
-    N_histos = len(br)
-    print('N_histos : %d' % N_histos)
-    
-    # create folder 
-    if not os.path.exists(folder):
-        try:
-            os.makedirs(folder)
-        except OSError as e:
-            if e.errno != errno.EEXIST: # the folder did not exist
-                raise  # raises the error again
-        print('Creation of %s release folder\n' % folder)
-    else:
-        print('Folder %s already created\n' % folder)
+Chilib_path = blu.LIB_SOURCE # checkFolderName(blu.LIB_SOURCE) # sys.argv[1]
+sys.path.append(Chilib_path)
+sys.path.append(commonPath)
 
-    # get list of files
-    rootFolderName = '/pbs/home/c/chiron/private/KS_Tools/GenExtract/DATA/NewFiles'
-    rootFilesList = getListFiles(rootFolderName, 'root')
-    print('we use the files :')
-    for item in rootFilesList:
-        print('%s' % item)
-        b = (item.split('__')[2]).split('-')
-        #print('%s - %s' % (b[0], b[0][6:]))
-        rels.append([b[0], b[0][6:], item])
-    #print('-')
-    #for elem in rels:
-    #    print(elem)
-    sortedRels = sorted(rels, key = lambda x: x[0]) # gives an array with releases sorted
-    #print('-')
-    LOG_SOURCE_WORK='/pbs/home/c/chiron/private/KS_Tools/GenExtract/DATA/NewFiles/'
-    # get the "reference" root file datas
-    f_ref = ROOT.TFile(LOG_SOURCE_WORK + input_ref_file)
-    print('we use the %s file as reference' % input_ref_file)
+import default as dfo
+from controlFunctions import *
+from graphicFunctions import getHisto
+from DecisionBox import DecisionBox
+from default import *
+from sources import *
 
-    ind_reference = 199 # np.random.randint(0, nbFiles)
-    print('reference ind. : %d' % ind_reference)
+folder = checkFolderName(dfo.folder)
 
+# get the branches for ElectronMcSignalHistos.txt
+branches = []
+source = Chilib_path + "/HistosConfigFiles/ElectronMcSignalHistos.txt"
+branches = getBranches(tp_1, source)
+cleanBranches(branches) # remove some histo wich have a pbm with KS.
+
+DB = DecisionBox()
+rels = []
+
+N_histos = len(branches)
+print('N_histos : %d' % N_histos)
+
+# create folder 
+if not os.path.exists(folder):
+    try:
+        os.makedirs(folder)
+    except OSError as e:
+        if e.errno != errno.EEXIST: # the folder did not exist
+            raise  # raises the error again
+    print('Creation of %s release folder\n' % folder)
+else:
+    print('Folder %s already created\n' % folder)
+
+# get list of files
+rootFolderName = blu.DATA_SOURCE # '/pbs/home/c/chiron/private/KS_Tools/GenExtract/DATA/NewFiles'
+rootFilesList = getListFiles(rootFolderName, 'root')
+print('we use the files :')
+for item in rootFilesList:
+    print('%s' % item)
+    b = (item.split('__')[2]).split('-')
+    #print('%s - %s' % (b[0], b[0][6:]))
+    rels.append([b[0], b[0][6:], item])
+
+#print('-')
+#for elem in rels:
+#    print(elem)
+sortedRels = sorted(rels, key = lambda x: x[0]) # gives an array with releases sorted
+#print('-')
+#LOG_SOURCE_WORK= #'/pbs/home/c/chiron/private/KS_Tools/GenExtract/DATA/NewFiles/'
+# get the "reference" root file datas
+f_ref = ROOT.TFile(rootFolderName + input_ref_file)
+print('we use the %s file as reference' % input_ref_file)
+
+if (ind_reference == -1): 
+    ind_reference = np.random.randint(0, nbFiles)
+print('reference ind. : %d' % ind_reference)
+
+stop()
+'''
     h2 = getHisto(f_ref, tp_1)
     print(h2)
     tic = time.time()
@@ -130,7 +160,7 @@ def func_CreateKS(br):
 
         h1 = getHisto(f_rel, tp_1)
         for i in range(0, N_histos): # 1 N_histos histo for debug
-            name = dfo.folderName + "histo_" + br[i] + '_{:03d}'.format(nbFiles) + ".txt"
+            name = dfo.folderName + "histo_" + br[i] + '_{:03d}'.format(nbFiles) + "_0_lite.txt"
             print('\n%d - %s' %(i, name))
             df = pd.read_csv(name)
         
@@ -486,19 +516,7 @@ def func_CreateKS(br):
     wKS_.write('KS 3 : %d red - %d green for %s\n' % (nb_red3, nb_green3, rel))
     wKS_.write('KS ttl : %d red - %d green for %s\n' % (nb_red, nb_green, rel))
 
-    return
+'''
 
-if __name__=="__main__":
-
-    # get the branches for ElectronMcSignalHistos.txt
-    branches = []
-    source = Chilib_path + "/HistosConfigFiles/ElectronMcSignalHistos.txt"
-    branches = getBranches(tp_1, source)
-    cleanBranches(branches) # remove some histo wich have a pbm with KS.
-
-    # nb of files to be used
-
-    func_CreateKS(branches)  # create the KS files from histos datas
-
-    print("Fin !")
+print("Fin !\n")
 

@@ -26,4 +26,7 @@ folder = 'TMP_Extraction_25/' # 200
 # nb of bins for sampling
 nbins = 100 
 
+# reference index : -1=random integer (0<=index<=nbFiles)
+ind_reference = 199
+
 #############################################################################
