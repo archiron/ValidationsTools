@@ -17,3 +17,4 @@ RESULTFOLDER="/home/arnaud/cernbox/DEV_PYTHON/ValidationsTools/HGCAL/TEST_12_1_0
 LOG_KS_SOURCE="/home/arnaud/cernbox/DEV_PYTHON/ValidationsTools/KS_Tools/"
 LIB_SOURCE="/home/arnaud/cernbox/DEV_PYTHON/ValidationsTools/ChiLib/"
 COMMON_SOURCE="/home/arnaud/cernbox/DEV_PYTHON/ValidationsTools/CommonFiles/"
+DATA_SOURCE="/pbs/home/c/chiron/private/ValidationsTools/DATA/"
