@@ -57,9 +57,6 @@ branches = []
 branches = getBranches(tp_1, source)
 cleanBranches(branches) # remove some histo wich have a pbm with KS.
 
-# nb of files to be used
-nbFiles = 200
-
 print("func_Extract")
 resultPath = checkFolderName(resultPath)    
 wr = []
