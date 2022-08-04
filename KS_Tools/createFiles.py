@@ -280,243 +280,236 @@ for i in range(0, N_histos): # 1 histo for debug
     fig.savefig(dfo.folder + '/cumulative_curve_' + branches[i] + '.png')
     fig.clf()
     
-stop()
-
-'''
-        # ================================ #
-        # create the mean curve of entries #
-        # ================================ #
-        mean_df_entries = df_entries.mean()
-        mean_sum = mean_df_entries.sum()
+    # ================================ #
+    # create the mean curve of entries #
+    # ================================ #
+    mean_df_entries = df_entries.mean()
+    mean_sum = mean_df_entries.sum()
         
-        diffMax1, posMax1 = DB.diffMAXKS(mean_df_entries, s_new, mean_sum, Ntot_h1)
-        diffMax2, posMax2 = DB.diffMAXKS(series_reference, s_new, nbBins_reference, Ntot_h1)
-        diffMax3, posMax3 = DB.diffMAXKS(s_new, s_old, Ntot_h1, Ntot_h2)
-        print("diffMax1 : %f - posMax1 : %f" % (diffMax1, posMax1))
-        print("diffMax2 : %f - posMax2 : %f" % (diffMax2, posMax2))
-        print("diffMax3 : %f - posMax3 : %f" % (diffMax3, posMax3))
-        print('Ntot_h1 : %d - Ntot_h2 : %d' % (Ntot_h1, Ntot_h2))
+    diffMax1, posMax1 = DB.diffMAXKS(mean_df_entries, s_new, mean_sum, Ntot_h1)
+    diffMax2, posMax2 = DB.diffMAXKS(series_reference, s_new, nbBins_reference, Ntot_h1)
+    diffMax3, posMax3 = DB.diffMAXKS(s_new, s_old, Ntot_h1, Ntot_h2)
+    print("diffMax1 : %f - posMax1 : %f" % (diffMax1, posMax1))
+    print("diffMax2 : %f - posMax2 : %f" % (diffMax2, posMax2))
+    print("diffMax3 : %f - posMax3 : %f" % (diffMax3, posMax3))
+    print('Ntot_h1 : %d - Ntot_h2 : %d' % (Ntot_h1, Ntot_h2))
 
-        # diff max between new & old
-        diffMax0, posMax0, sDKS = DB.diffMAXKS2(s_old, s_new, Ntot_h2, Ntot_h1)
-        print("diffMax0 : %f - posMax0 : %f" % (diffMax0, posMax0))
-        wKS0.write('%s : %e\n' % (branches[i], diffMax0))
-        print(s_new[0:8])
-        print(s_old[0:8])
-        print(sDKS[0:8]) # diff
+    # diff max between new & old
+    diffMax0, posMax0, sDKS = DB.diffMAXKS2(s_old, s_new, Ntot_h2, Ntot_h1)
+    print("diffMax0 : %f - posMax0 : %f" % (diffMax0, posMax0))
+    wKS0.write('%s : %e\n' % (branches[i], diffMax0))
+    print(s_new[0:8])
+    print(s_old[0:8])
+    print(sDKS[0:8]) # diff
 
-        yellowCurve1 = mean_df_entries
-        yellowCurve2 = series_reference
-        yellowCurve3 = s_new
-        yellowCurveCum1 = DB.funcKS(mean_df_entries) #  cumulative yellow curve
-        yellowCurveCum2 = DB.funcKS(series_reference)
-        yellowCurveCum3 = DB.funcKS(s_new)
+    yellowCurve1 = mean_df_entries
+    yellowCurve2 = series_reference
+    yellowCurve3 = s_new
+    yellowCurveCum1 = DB.funcKS(mean_df_entries) #  cumulative yellow curve
+    yellowCurveCum2 = DB.funcKS(series_reference)
+    yellowCurveCum3 = DB.funcKS(s_new)
 
-        # Kolmogoroff-Smirnov curve
-        seriesTotalDiff1 = pd.DataFrame(totalDiff, columns=['KSDiff'])
-        KSDiffname1 = dfo.folder + '/KSDiffValues_1_' + branches[i] + '.csv'
-        df.to_csv(KSDiffname1)
-        plt_diff_KS1 = seriesTotalDiff1.plot.hist(bins=nbins, title='KS diff. 1')
-        print('\ndiffMin0/sTD.min 1 : %f/%f' % (diffMax0, seriesTotalDiff1.values.min()))
-        print('\ndiffMax0/sTD.max 1 : %f/%f' % (diffMax0, seriesTotalDiff1.values.max()))
-        if (diffMax0 >= seriesTotalDiff1.values.max()):
-            color1 = 'r'
-            nb_red1 += 1
-            x1 = seriesTotalDiff1.values.max()
-        elif (diffMax0 <= seriesTotalDiff1.values.min()):
-            color1 = 'g'
-            nb_green1 += 1
-            x1 = seriesTotalDiff1.values.min()
-        else:
-            color1 = 'g'
-            nb_green1 += 1
-            x1 = diffMax0
-        print('x1 : %f' % x1)
-        ymi, yMa = plt_diff_KS1.get_ylim()
-        plt_diff_KS1.vlines(x1, ymi, 0.9*yMa, color=color1, linewidth=4)
-        fig = plt_diff_KS1.get_figure()
-        fig.savefig(dfo.folder + '/KS-ttlDiff_1_' + branches[i] + '.png')
-        fig.clf()
-        count, division = np.histogram(seriesTotalDiff1[~np.isnan(seriesTotalDiff1)], bins=nbins)
-        div_min = np.amin(division)
-        div_max = np.amax(division)
-        KSDiffHistoname1 = dfo.folder + '/KSDiffHistoValues_1_' + branches[i] + '.csv'
-        wKSDiff1 = open(KSDiffHistoname1, 'w')
-        wKSDiff1.write(' '.join("{:10.04e}".format(x) for x in count))
-        wKSDiff1.write('\n')
-        wKSDiff1.write(' '.join("{:10.04e}".format(x) for x in division))
-        wKSDiff1.write('\n')
-        wKSDiff1.close()
+    # Kolmogoroff-Smirnov curve
+    seriesTotalDiff1 = pd.DataFrame(totalDiff, columns=['KSDiff'])
+    KSDiffname1 = dfo.folder + '/KSDiffValues_1_' + branches[i] + '.txt' # csv imposed by pd.to_csv
+    df.to_csv(KSDiffname1)
+    plt_diff_KS1 = seriesTotalDiff1.plot.hist(bins=nbins, title='KS diff. 1')
+    print('\ndiffMin0/sTD.min 1 : %f/%f' % (diffMax0, seriesTotalDiff1.values.min()))
+    print('\ndiffMax0/sTD.max 1 : %f/%f' % (diffMax0, seriesTotalDiff1.values.max()))
+    if (diffMax0 >= seriesTotalDiff1.values.max()):
+        color1 = 'r'
+        nb_red1 += 1
+        x1 = seriesTotalDiff1.values.max()
+    elif (diffMax0 <= seriesTotalDiff1.values.min()):
+        color1 = 'g'
+        nb_green1 += 1
+        x1 = seriesTotalDiff1.values.min()
+    else:
+        color1 = 'g'
+        nb_green1 += 1
+        x1 = diffMax0
+    print('x1 : %f' % x1)
+    ymi, yMa = plt_diff_KS1.get_ylim()
+    plt_diff_KS1.vlines(x1, ymi, 0.9*yMa, color=color1, linewidth=4)
+    fig = plt_diff_KS1.get_figure()
+    fig.savefig(dfo.folder + '/KS-ttlDiff_1_' + branches[i] + '.png')
+    fig.clf()
+    count, division = np.histogram(seriesTotalDiff1[~np.isnan(seriesTotalDiff1)], bins=nbins)
+    div_min = np.amin(division)
+    div_max = np.amax(division)
+    KSDiffHistoname1 = dfo.folder + '/KSDiffHistoValues_1_' + branches[i] + '.txt'
+    wKSDiff1 = open(KSDiffHistoname1, 'w')
+    wKSDiff1.write(' '.join("{:10.04e}".format(x) for x in count))
+    wKSDiff1.write('\n')
+    wKSDiff1.write(' '.join("{:10.04e}".format(x) for x in division))
+    wKSDiff1.write('\n')
+    wKSDiff1.close()
 
-        # Get the max of the integral
-        I_max = DB.integralpValue(division, count, 0.)
-        print('\nMax. integral 1 : %0.4e for nbins=%d' % (I_max, nbins))
-        # print the min/max values of differences
-        print('Kolmogoroff-Smirnov min value : %0.4e - max value : %0.4e | diff value : %e \n' % (div_min, div_max, x1))
-        #stop
-        pValue = DB.integralpValue(division, count, diffMax0)
-        #print(division)
-        #print(count)
-        # save the KS curves
-        wKS1.write('%e, %d\n' % (I_max, nbins))
-        wKS1.write('%e, %e\n' % (div_min, div_max))
-        wKS1.write(' '.join("{:10.04e}".format(x) for x in count))
-        wKS1.write('\n')
-        wKS1.write(' '.join("{:10.04e}".format(x) for x in division))
-        wKS1.write('\n')
-        wKS1.write(' '.join("{:10.04e}".format(x) for x in yellowCurve1 )) # average (mean) curve
-        wKS1.write('\n')
-        wKS1.write(' '.join("{:10.04e}".format(x) for x in yellowCurveCum1 ))
-        wKS1.write('\n')
-        wKS1.close()
+    # Get the max of the integral
+    I_max = DB.integralpValue(division, count, 0.)
+    print('\nMax. integral 1 : %0.4e for nbins=%d' % (I_max, nbins))
+    # print the min/max values of differences
+    print('Kolmogoroff-Smirnov min value : %0.4e - max value : %0.4e | diff value : %e \n' % (div_min, div_max, x1))
+    pValue = DB.integralpValue(division, count, diffMax0)
+    #print(division)
+    #print(count)
+    # save the KS curves
+    wKS1.write('%e, %d\n' % (I_max, nbins))
+    wKS1.write('%e, %e\n' % (div_min, div_max))
+    wKS1.write(' '.join("{:10.04e}".format(x) for x in count))
+    wKS1.write('\n')
+    wKS1.write(' '.join("{:10.04e}".format(x) for x in division))
+    wKS1.write('\n')
+    wKS1.write(' '.join("{:10.04e}".format(x) for x in yellowCurve1 )) # average (mean) curve
+    wKS1.write('\n')
+    wKS1.write(' '.join("{:10.04e}".format(x) for x in yellowCurveCum1 ))
+    wKS1.write('\n')
+    wKS1.close()
 
-        # Kolmogoroff-Smirnov curve 2
-        seriesTotalDiff2 = pd.DataFrame(totalDiff2, columns=['KSDiff'])
-        plt_diff_KS2 = seriesTotalDiff2.plot.hist(bins=nbins, title='KS diff. 2')
-        print('\ndiffMin0/sTD.min 1 : %f/%f' % (diffMax0, seriesTotalDiff2.values.min()))
-        print('\ndiffMax0/sTD.max 2 : %f/%f' % (diffMax0, seriesTotalDiff2.values.max()))
-        if (diffMax0 >= seriesTotalDiff2.values.max()):
-            color2 = 'r'
-            nb_red2 += 1
-            x2 = seriesTotalDiff2.values.max()
-        elif (diffMax0 <= seriesTotalDiff2.values.min()):
-            color2 = 'g'
-            nb_green2 += 1
-            x2 = seriesTotalDiff2.values.min()
-        else:
-            color2 = 'g'
-            nb_green2 += 1
-            x2 = diffMax0
-        print('x2 : %f' % x2)
-        ymi, yMa = plt_diff_KS2.get_ylim()
-        plt_diff_KS2.vlines(x2, ymi, 0.9*yMa, color=color2, linewidth=4)
-        fig = plt_diff_KS2.get_figure()
-        fig.savefig(dfo.folder + '/KS-ttlDiff_2_' + branches[i] + '.png')
-        fig.clf()
-        count, division = np.histogram(seriesTotalDiff2, bins=nbins)
-        div_min = np.amin(division)
-        div_max = np.amax(division)
-        KSDiffHistoname2 = dfo.folder + '/KSDiffHistoValues_2_' + branches[i] + '.csv'
-        wKSDiff2 = open(KSDiffHistoname2, 'w')
-        wKSDiff2.write(' '.join("{:10.04e}".format(x) for x in count))
-        wKSDiff2.write('\n')
-        wKSDiff2.write(' '.join("{:10.04e}".format(x) for x in division))
-        wKSDiff2.write('\n')
-        wKSDiff2.close()
+    # Kolmogoroff-Smirnov curve 2
+    seriesTotalDiff2 = pd.DataFrame(totalDiff2, columns=['KSDiff'])
+    plt_diff_KS2 = seriesTotalDiff2.plot.hist(bins=nbins, title='KS diff. 2')
+    print('\ndiffMin0/sTD.min 1 : %f/%f' % (diffMax0, seriesTotalDiff2.values.min()))
+    print('\ndiffMax0/sTD.max 2 : %f/%f' % (diffMax0, seriesTotalDiff2.values.max()))
+    if (diffMax0 >= seriesTotalDiff2.values.max()):
+        color2 = 'r'
+        nb_red2 += 1
+        x2 = seriesTotalDiff2.values.max()
+    elif (diffMax0 <= seriesTotalDiff2.values.min()):
+        color2 = 'g'
+        nb_green2 += 1
+        x2 = seriesTotalDiff2.values.min()
+    else:
+        color2 = 'g'
+        nb_green2 += 1
+        x2 = diffMax0
+    print('x2 : %f' % x2)
+    ymi, yMa = plt_diff_KS2.get_ylim()
+    plt_diff_KS2.vlines(x2, ymi, 0.9*yMa, color=color2, linewidth=4)
+    fig = plt_diff_KS2.get_figure()
+    fig.savefig(dfo.folder + '/KS-ttlDiff_2_' + branches[i] + '.png')
+    fig.clf()
+    count, division = np.histogram(seriesTotalDiff2, bins=nbins)
+    div_min = np.amin(division)
+    div_max = np.amax(division)
+    KSDiffHistoname2 = dfo.folder + '/KSDiffHistoValues_2_' + branches[i] + '.txt'
+    wKSDiff2 = open(KSDiffHistoname2, 'w')
+    wKSDiff2.write(' '.join("{:10.04e}".format(x) for x in count))
+    wKSDiff2.write('\n')
+    wKSDiff2.write(' '.join("{:10.04e}".format(x) for x in division))
+    wKSDiff2.write('\n')
+    wKSDiff2.close()
     
-        # Get the max of the integral
-        I_max2 = DB.integralpValue(division, count, 0.)
-        print('\nMax. integral 2 : %0.4e for nbins=%d' % (I_max2, nbins))
-        # print the min/max values of differences
-        print('Kolmogoroff-Smirnov min value : %0.4e - max value : %0.4e | diff value : %e \n' % (div_min, div_max, x2))
-        pValue2 = DB.integralpValue(division, count, diffMax0)
-        #print(division)
-        #print(count)
-        # save the KS curves
-        wKS2.write('%e, %d\n' % (I_max2, nbins))
-        wKS2.write('%e, %e\n' % (div_min, div_max))
-        wKS2.write(' '.join("{:10.04e}".format(x) for x in count))
-        wKS2.write('\n')
-        wKS2.write(' '.join("{:10.04e}".format(x) for x in division))
-        wKS2.write('\n')
-        wKS2.write(' '.join("{:10.04e}".format(x) for x in yellowCurve2 )) # random curve
-        wKS2.write('\n')
-        wKS2.write(' '.join("{:10.04e}".format(x) for x in yellowCurveCum2 ))
-        wKS2.write('\n')
-        wKS2.close()
+    # Get the max of the integral
+    I_max2 = DB.integralpValue(division, count, 0.)
+    print('\nMax. integral 2 : %0.4e for nbins=%d' % (I_max2, nbins))
+    # print the min/max values of differences
+    print('Kolmogoroff-Smirnov min value : %0.4e - max value : %0.4e | diff value : %e \n' % (div_min, div_max, x2))
+    pValue2 = DB.integralpValue(division, count, diffMax0)
+    #print(division)
+    #print(count)
+    # save the KS curves
+    wKS2.write('%e, %d\n' % (I_max2, nbins))
+    wKS2.write('%e, %e\n' % (div_min, div_max))
+    wKS2.write(' '.join("{:10.04e}".format(x) for x in count))
+    wKS2.write('\n')
+    wKS2.write(' '.join("{:10.04e}".format(x) for x in division))
+    wKS2.write('\n')
+    wKS2.write(' '.join("{:10.04e}".format(x) for x in yellowCurve2 )) # random curve
+    wKS2.write('\n')
+    wKS2.write(' '.join("{:10.04e}".format(x) for x in yellowCurveCum2 ))
+    wKS2.write('\n')
+    wKS2.close()
 
-        # Kolmogoroff-Smirnov curve 3
-        seriesTotalDiff3 = pd.DataFrame(totalDiff3, columns=['new'])
-        plt_diff_KS3 = seriesTotalDiff3.plot.hist(bins=nbins, title='KS diff. 3')
-        print('\ndiffMin0/sTD.min 3 : %f/%f' % (diffMax0, seriesTotalDiff3.values.min()))
-        print('diffMax0/sTD.max 3 : %f/%f' % (diffMax0, seriesTotalDiff3.values.max()))
-        if (diffMax0 >= seriesTotalDiff3.values.max()):
-            color3 = 'r'
-            nb_red3 += 1
-            x3 = seriesTotalDiff3.values.max()
-        elif (diffMax0 <= seriesTotalDiff3.values.min()):
-            color3 = 'g'
-            nb_green3 += 1
-            x3 = seriesTotalDiff3.values.min()
-        else:
-            color3 = 'g'
-            nb_green3 += 1
-            x3 = diffMax0
-        print('x3 : %f' % x3)
-        ymi, yMa = plt_diff_KS3.get_ylim()
-        plt_diff_KS3.vlines(x3, ymi, 0.9*yMa, color=color3, linewidth=4)
-        fig = plt_diff_KS3.get_figure()
-        fig.savefig(dfo.folder + '/KS-ttlDiff_3_' + branches[i] + '.png')
-        fig.clf()
-        count, division = np.histogram(seriesTotalDiff3, bins=nbins)
-        div_min = np.amin(division)
-        div_max = np.amax(division)
-        KSDiffHistoname3 = dfo.folder + '/KSDiffHistoValues_3_' + branches[i] + '.csv'
-        wKSDiff3 = open(KSDiffHistoname3, 'w')
-        wKSDiff3.write(' '.join("{:10.04e}".format(x) for x in count))
-        wKSDiff3.write('\n')
-        wKSDiff3.write(' '.join("{:10.04e}".format(x) for x in division))
-        wKSDiff3.write('\n')
-        wKSDiff3.close()
+    # Kolmogoroff-Smirnov curve 3
+    seriesTotalDiff3 = pd.DataFrame(totalDiff3, columns=['new'])
+    plt_diff_KS3 = seriesTotalDiff3.plot.hist(bins=nbins, title='KS diff. 3')
+    print('\ndiffMin0/sTD.min 3 : %f/%f' % (diffMax0, seriesTotalDiff3.values.min()))
+    print('diffMax0/sTD.max 3 : %f/%f' % (diffMax0, seriesTotalDiff3.values.max()))
+    if (diffMax0 >= seriesTotalDiff3.values.max()):
+        color3 = 'r'
+        nb_red3 += 1
+        x3 = seriesTotalDiff3.values.max()
+    elif (diffMax0 <= seriesTotalDiff3.values.min()):
+        color3 = 'g'
+        nb_green3 += 1
+        x3 = seriesTotalDiff3.values.min()
+    else:
+        color3 = 'g'
+        nb_green3 += 1
+        x3 = diffMax0
+    print('x3 : %f' % x3)
+    ymi, yMa = plt_diff_KS3.get_ylim()
+    plt_diff_KS3.vlines(x3, ymi, 0.9*yMa, color=color3, linewidth=4)
+    fig = plt_diff_KS3.get_figure()
+    fig.savefig(dfo.folder + '/KS-ttlDiff_3_' + branches[i] + '.png')
+    fig.clf()
+    count, division = np.histogram(seriesTotalDiff3, bins=nbins)
+    div_min = np.amin(division)
+    div_max = np.amax(division)
+    KSDiffHistoname3 = dfo.folder + '/KSDiffHistoValues_3_' + branches[i] + '.txt'
+    wKSDiff3 = open(KSDiffHistoname3, 'w')
+    wKSDiff3.write(' '.join("{:10.04e}".format(x) for x in count))
+    wKSDiff3.write('\n')
+    wKSDiff3.write(' '.join("{:10.04e}".format(x) for x in division))
+    wKSDiff3.write('\n')
+    wKSDiff3.close()
     
-        # Get the max of the integral
-        I_max3 = DB.integralpValue(division, count, 0.)
-        print('\nMax. integral 3 : %0.4e for nbins=%d' % (I_max3, nbins))
-        # print the min/max values of differences
-        print('Kolmogoroff-Smirnov min value : %0.4e - max value : %0.4e | diff value : %e \n' % (div_min, div_max, x3))
-        pValue3 = DB.integralpValue(division, count, diffMax0)
-        #print(division)
-        #print(count)
-        # print the p-Value
-        print('\nunormalized p_Value : %0.4e for nbins=%d' % (pValue, nbins))
-        print('normalized p_Value : %0.4e for nbins=%d' % (pValue/I_max, nbins))
-        # print the p-Value 2
-        print('\nunormalized p_Value : %0.4e for nbins=%d' % (pValue2, nbins))
-        print('normalized p_Value : %0.4e for nbins=%d' % (pValue2/I_max2, nbins))
-        # print the p-Value 3
-        print('\nunormalized p_Value : %0.4e for nbins=%d' % (pValue3, nbins))
-        print('normalized p_Value : %0.4e for nbins=%d' % (pValue3/I_max3, nbins))
+    # Get the max of the integral
+    I_max3 = DB.integralpValue(division, count, 0.)
+    print('\nMax. integral 3 : %0.4e for nbins=%d' % (I_max3, nbins))
+    # print the min/max values of differences
+    print('Kolmogoroff-Smirnov min value : %0.4e - max value : %0.4e | diff value : %e \n' % (div_min, div_max, x3))
+    pValue3 = DB.integralpValue(division, count, diffMax0)
+    #print(division)
+    #print(count)
+    # print the p-Value
+    print('\nunormalized p_Value : %0.4e for nbins=%d' % (pValue, nbins))
+    print('normalized p_Value : %0.4e for nbins=%d' % (pValue/I_max, nbins))
+    # print the p-Value 2
+    print('\nunormalized p_Value : %0.4e for nbins=%d' % (pValue2, nbins))
+    print('normalized p_Value : %0.4e for nbins=%d' % (pValue2/I_max2, nbins))
+    # print the p-Value 3
+    print('\nunormalized p_Value : %0.4e for nbins=%d' % (pValue3, nbins))
+    print('normalized p_Value : %0.4e for nbins=%d' % (pValue3/I_max3, nbins))
 
-        wKSp.write('%s, %e, %e, %e\n' % (branches[i], pValue/I_max, pValue2/I_max2, pValue3/I_max3))
+    wKSp.write('%s, %e, %e, %e\n' % (branches[i], pValue/I_max, pValue2/I_max2, pValue3/I_max3))
 
-        plt.close('all')
-        # save the KS curves
-        wKS3.write('%e, %d\n' % (I_max3, nbins))
-        wKS3.write('%e, %e\n' % (div_min, div_max))
-        wKS3.write(' '.join("{:10.04e}".format(x) for x in count))
-        wKS3.write('\n')
-        wKS3.write(' '.join("{:10.04e}".format(x) for x in division))
-        wKS3.write('\n')
-        wKS3.write(' '.join("{:10.04e}".format(x) for x in yellowCurve3 )) # new curve
-        wKS3.write('\n')
-        wKS3.write(' '.join("{:10.04e}".format(x) for x in yellowCurveCum3 ))
-        wKS3.write('\n')
-        wKS3.close()
-'''
+    plt.close('all')
+    # save the KS curves
+    wKS3.write('%e, %d\n' % (I_max3, nbins))
+    wKS3.write('%e, %e\n' % (div_min, div_max))
+    wKS3.write(' '.join("{:10.04e}".format(x) for x in count))
+    wKS3.write('\n')
+    wKS3.write(' '.join("{:10.04e}".format(x) for x in division))
+    wKS3.write('\n')
+    wKS3.write(' '.join("{:10.04e}".format(x) for x in yellowCurve3 )) # new curve
+    wKS3.write('\n')
+    wKS3.write(' '.join("{:10.04e}".format(x) for x in yellowCurveCum3 ))
+    wKS3.write('\n')
+    wKS3.close()
 
-'''R1 = diffR2(mean_df_entries, s_new)
-        R2 = diffR2(series_reference, s_new)
-        R3 = diffR2(s_new, s_old)
-        print('R1 = %f [mean, new]' % R1)
-        print('R2 = %f [ref, new]' % R2)
-        print('R3 = %f [old, new]' % R3)
-'''
-'''
-    toc = time.time()
-    print('Done in {:.4f} seconds'.format(toc-tic))
+    R1 = diffR2(mean_df_entries, s_new)
+    R2 = diffR2(series_reference, s_new)
+    R3 = diffR2(s_new, s_old)
+    print('R1 = %f [mean, new]' % R1)
+    print('R2 = %f [ref, new]' % R2)
+    print('R3 = %f [old, new]' % R3)
 
-    # print nb of red/green lines
-    print('KS 1 : %d red - %d green' % (nb_red1, nb_green1))
-    print('KS 2 : %d red - %d green' % (nb_red2, nb_green2))
-    print('KS 3 : %d red - %d green' % (nb_red3, nb_green3))
-    nb_red = nb_red1 + nb_red2 + nb_red3
-    nb_green = nb_green1 + nb_green2 + nb_green3
-    print('KS ttl : %d red - %d green' % (nb_red, nb_green))
-    wKS_.write('KS 1 : %d red - %d green\n' % (nb_red1, nb_green1))
-    wKS_.write('KS 2 : %d red - %d green\n' % (nb_red2, nb_green2))
-    wKS_.write('KS 3 : %d red - %d green\n' % (nb_red3, nb_green3))
-    wKS_.write('KS ttl : %d red - %d green\n' % (nb_red, nb_green))
-    '''
+toc = time.time()
+print('Done in {:.4f} seconds'.format(toc-tic))
+
+# print nb of red/green lines
+print('KS 1 : %d red - %d green' % (nb_red1, nb_green1))
+print('KS 2 : %d red - %d green' % (nb_red2, nb_green2))
+print('KS 3 : %d red - %d green' % (nb_red3, nb_green3))
+nb_red = nb_red1 + nb_red2 + nb_red3
+nb_green = nb_green1 + nb_green2 + nb_green3
+print('KS ttl : %d red - %d green' % (nb_red, nb_green))
+wKS_.write('KS 1 : %d red - %d green\n' % (nb_red1, nb_green1))
+wKS_.write('KS 2 : %d red - %d green\n' % (nb_red2, nb_green2))
+wKS_.write('KS 3 : %d red - %d green\n' % (nb_red3, nb_green3))
+wKS_.write('KS ttl : %d red - %d green\n' % (nb_red, nb_green))
 
 print("Fin !\n")
 
