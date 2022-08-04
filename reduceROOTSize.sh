@@ -35,7 +35,7 @@ Nend="${toor[16]}"
 Nend=${Nend//Nend = }
 Nend=${Nend//\"}
 Nend=${Nend::-1}
-NB_EVTS="${toor[175]}"
+NB_EVTS="${toor[17]}"
 NB_EVTS=${NB_EVTS//NB_EVTS = }
 NB_EVTS=${NB_EVTS//\"}
 NB_EVTS=${NB_EVTS::-1}
@@ -60,7 +60,7 @@ LOG_SOURCE=${LOG_SOURCE//\"}
 LOG_OUTPUT="${toto[16]}"
 LOG_OUTPUT=${LOG_OUTPUT//LOG_OUTPUT=}
 LOG_OUTPUT=${LOG_OUTPUT//\"}
-RESULTFOLDER="${toto[175]}"
+RESULTFOLDER="${toto[17]}"
 RESULTFOLDER=${RESULTFOLDER//RESULTFOLDER=}
 RESULTFOLDER=${RESULTFOLDER//\"}
 echo "LOG_SOURCE : $LOG_SOURCE"
