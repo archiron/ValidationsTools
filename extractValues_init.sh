@@ -27,22 +27,22 @@ readarray toto -t array < CommonFiles/$FileName
 N=${#toto[@]}
 echo "N= $N"
 
-LOG_SOURCE="${toto[13]}"
+LOG_SOURCE="${toto[15]}"
 LOG_SOURCE=${LOG_SOURCE//LOG_SOURCE=}
 LOG_SOURCE=${LOG_SOURCE//\"}
-LOG_OUTPUT="${toto[14]}"
+LOG_OUTPUT="${toto[16]}"
 LOG_OUTPUT=${LOG_OUTPUT//LOG_OUTPUT=}
 LOG_OUTPUT=${LOG_OUTPUT//\"}
-RESULTFOLDER="${toto[15]}"
+RESULTFOLDER="${toto[17]}"
 RESULTFOLDER=${RESULTFOLDER//RESULTFOLDER=}
 RESULTFOLDER=${RESULTFOLDER//\"}
-LOG_KS_SOURCE="${toto[16]}"
+LOG_KS_SOURCE="${toto[18]}"
 LOG_KS_SOURCE=${LOG_KS_SOURCE//LOG_KS_SOURCE=}
 LOG_KS_SOURCE=${LOG_KS_SOURCE//\"}
-LIB_SOURCE="${toto[17]}"
+LIB_SOURCE="${toto[19]}"
 LIB_SOURCE=${LIB_SOURCE//LIB_SOURCE=}
 LIB_SOURCE=${LIB_SOURCE//\"}
-COMMON_SOURCE="${toto[18]}"
+COMMON_SOURCE="${toto[20]}"
 COMMON_SOURCE=${COMMON_SOURCE//COMMON_SOURCE=}
 COMMON_SOURCE=${COMMON_SOURCE//\"}
 
@@ -68,6 +68,5 @@ elif [[ "$Choice" == "PBS" ]]
     sbatch -L sps -n 8 --mem=8000 -J $JobName -o $output extractValues.sh $LOG_SOURCE $LOG_KS_SOURCE $LIB_SOURCE $COMMON_SOURCE $RESULTFOLDER
 fi
 
-cd $aa # back to the top
 echo "END"
 

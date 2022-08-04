@@ -65,7 +65,7 @@ elif [[ "$Choice" == "PBS" ]]
     echo "PBS"
     cd $LOG_SOURCE
     eval `scramv1 runtime -sh`
-    sbatch -L sps -n 8 --mem=8000 -J $JobName -o $output createFiles.sh $LOG_SOURCE $LOG_KS_SOURCE $COMMON_SOURCE $FileName
+    sbatch -L sps -n 2 --mem=8000 -J $JobName -o $output createFiles.sh $LOG_SOURCE $LOG_KS_SOURCE $COMMON_SOURCE $FileName
 fi
 
 echo "END"

@@ -42,7 +42,6 @@ NB_EVTS=${NB_EVTS::-1}
 echo "Nbegin : $Nbegin=="
 echo "Nend : $Nend=="
 echo "NB_EVTS : $NB_EVTS=="
-exit()
 
 FileName="paths$Choice.py"
 echo $FileName
@@ -55,13 +54,13 @@ echo "N= $N"
 #do
 #  printf "Current index %d with value %s" $j "${toto[$j]}"
 #done
-LOG_SOURCE="${toto[13]}"
+LOG_SOURCE="${toto[15]}"
 LOG_SOURCE=${LOG_SOURCE//LOG_SOURCE=}
 LOG_SOURCE=${LOG_SOURCE//\"}
-LOG_OUTPUT="${toto[14]}"
+LOG_OUTPUT="${toto[16]}"
 LOG_OUTPUT=${LOG_OUTPUT//LOG_OUTPUT=}
 LOG_OUTPUT=${LOG_OUTPUT//\"}
-RESULTFOLDER="${toto[15]}"
+RESULTFOLDER="${toto[17]}"
 RESULTFOLDER=${RESULTFOLDER//RESULTFOLDER=}
 RESULTFOLDER=${RESULTFOLDER//\"}
 echo "LOG_SOURCE : $LOG_SOURCE"
@@ -91,6 +90,5 @@ elif [[ "$Choice" == "PBS" ]]
     done
 fi
 
-cd $aa # back to the top
 echo "END"
 

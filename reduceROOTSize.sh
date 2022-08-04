@@ -4,10 +4,6 @@
 JobName="chichi_serial_job_test" # for slurm
 output="chichi_%j.log" # for slurm
 
-Nbegin=20
-Nend=23
-NB_EVTS=10
-
 declare -a readarray
 
 aa=$PWD
@@ -25,6 +21,28 @@ done
 
 echo "Choice is : $Choice"
 
+FileName1="rootValues.py"
+echo $FileName1
+readarray toor -t array < CommonFiles/$FileName1
+N1=${#toor[@]}
+echo "N1= $N1"
+
+Nbegin="${toor[15]}"
+Nbegin=${Nbegin//Nbegin = } # WARNING : "Nbegin = " MUST be written in the same form as in rootValues.py
+Nbegin=${Nbegin//\"}
+Nbegin=${Nbegin::-1} # remove last char (\r\n)
+Nend="${toor[16]}"
+Nend=${Nend//Nend = }
+Nend=${Nend//\"}
+Nend=${Nend::-1}
+NB_EVTS="${toor[175]}"
+NB_EVTS=${NB_EVTS//NB_EVTS = }
+NB_EVTS=${NB_EVTS//\"}
+NB_EVTS=${NB_EVTS::-1}
+echo "Nbegin : $Nbegin=="
+echo "Nend : $Nend=="
+echo "NB_EVTS : $NB_EVTS=="
+
 FileName="paths$Choice.py"
 echo $FileName
 readarray toto -t array < CommonFiles/$FileName
@@ -36,13 +54,13 @@ echo "N= $N"
 #do
 #  printf "Current index %d with value %s" $j "${toto[$j]}"
 #done
-LOG_SOURCE="${toto[13]}"
+LOG_SOURCE="${toto[15]}"
 LOG_SOURCE=${LOG_SOURCE//LOG_SOURCE=}
 LOG_SOURCE=${LOG_SOURCE//\"}
-LOG_OUTPUT="${toto[14]}"
+LOG_OUTPUT="${toto[16]}"
 LOG_OUTPUT=${LOG_OUTPUT//LOG_OUTPUT=}
 LOG_OUTPUT=${LOG_OUTPUT//\"}
-RESULTFOLDER="${toto[15]}"
+RESULTFOLDER="${toto[175]}"
 RESULTFOLDER=${RESULTFOLDER//RESULTFOLDER=}
 RESULTFOLDER=${RESULTFOLDER//\"}
 echo "LOG_SOURCE : $LOG_SOURCE"
