@@ -329,7 +329,7 @@ for elem in sortedRels:
 
         # Kolmogoroff-Smirnov curve
         seriesTotalDiff1 = pd.DataFrame(totalDiff, columns=['KSDiff'])
-        KSDiffname1 = dfo.folder + '/KSDiffValues_1_' + branches[i] + '_v2.txt' # csv imposed by pd.to_csv
+        KSDiffname1 = dfo.folder + '/KSDiffValues_1_' + branches[i] + "_" + rel + '_v2.txt' # csv imposed by pd.to_csv
         df.to_csv(KSDiffname1)
         plt_diff_KS1 = seriesTotalDiff1.plot.hist(bins=nbins, title='KS diff. 1')
         print('\ndiffMin0/sTD.min 1 : %f/%f' % (diffMax0, seriesTotalDiff1.values.min()))
@@ -350,12 +350,12 @@ for elem in sortedRels:
         ymi, yMa = plt_diff_KS1.get_ylim()
         plt_diff_KS1.vlines(x1, ymi, 0.9*yMa, color=color1, linewidth=4)
         fig = plt_diff_KS1.get_figure()
-        fig.savefig(dfo.folder + '/KS-ttlDiff_1_' + branches[i] + '.png')
+        fig.savefig(dfo.folder + '/KS-ttlDiff_1_' + branches[i] + '_v2.png')
         fig.clf()
         count, division = np.histogram(seriesTotalDiff1[~np.isnan(seriesTotalDiff1)], bins=nbins)
         div_min = np.amin(division)
         div_max = np.amax(division)
-        KSDiffHistoname1 = dfo.folder + '/KSDiffHistoValues_1_' + branches[i] + '_v2.txt'
+        KSDiffHistoname1 = dfo.folder + '/KSDiffHistoValues_1_' + branches[i] + "_" + rel + '_v2.txt'
         wKSDiff1 = open(KSDiffHistoname1, 'w')
         wKSDiff1.write(' '.join("{:10.04e}".format(x) for x in count))
         wKSDiff1.write('\n')
@@ -405,12 +405,12 @@ for elem in sortedRels:
         ymi, yMa = plt_diff_KS2.get_ylim()
         plt_diff_KS2.vlines(x2, ymi, 0.9*yMa, color=color2, linewidth=4)
         fig = plt_diff_KS2.get_figure()
-        fig.savefig(dfo.folder + '/KS-ttlDiff_2_' + branches[i] + '.png')
+        fig.savefig(dfo.folder + '/KS-ttlDiff_2_' + branches[i] + '_v2.png')
         fig.clf()
         count, division = np.histogram(seriesTotalDiff2, bins=nbins)
         div_min = np.amin(division)
         div_max = np.amax(division)
-        KSDiffHistoname2 = dfo.folder + '/KSDiffHistoValues_2_' + branches[i] + '_v2.txt'
+        KSDiffHistoname2 = dfo.folder + '/KSDiffHistoValues_2_' + branches[i] + "_" + rel + '_v2.txt'
         wKSDiff2 = open(KSDiffHistoname2, 'w')
         wKSDiff2.write(' '.join("{:10.04e}".format(x) for x in count))
         wKSDiff2.write('\n')
@@ -460,12 +460,12 @@ for elem in sortedRels:
         ymi, yMa = plt_diff_KS3.get_ylim()
         plt_diff_KS3.vlines(x3, ymi, 0.9*yMa, color=color3, linewidth=4)
         fig = plt_diff_KS3.get_figure()
-        fig.savefig(dfo.folder + '/KS-ttlDiff_3_' + branches[i] + '.png')
+        fig.savefig(dfo.folder + '/KS-ttlDiff_3_' + branches[i] + '_v2.png')
         fig.clf()
         count, division = np.histogram(seriesTotalDiff3, bins=nbins)
         div_min = np.amin(division)
         div_max = np.amax(division)
-        KSDiffHistoname3 = dfo.folder + '/KSDiffHistoValues_3_' + branches[i] + '_v2.txt'
+        KSDiffHistoname3 = dfo.folder + '/KSDiffHistoValues_3_' + branches[i] + "_" + rel + '_v2.txt'
         wKSDiff3 = open(KSDiffHistoname3, 'w')
         wKSDiff3.write(' '.join("{:10.04e}".format(x) for x in count))
         wKSDiff3.write('\n')
@@ -507,20 +507,20 @@ for elem in sortedRels:
         wKS3.write('\n')
         wKS3.close()
 
+    # print nb of red/green lines
+    print('KS 1 : %d red - %d green for %s' % (nb_red1, nb_green1, rel))
+    print('KS 2 : %d red - %d green for %s' % (nb_red2, nb_green2, rel))
+    print('KS 3 : %d red - %d green for %s' % (nb_red3, nb_green3, rel))
+    nb_red = nb_red1 + nb_red2 + nb_red3
+    nb_green = nb_green1 + nb_green2 + nb_green3
+    print('KS ttl : %d red - %d green for %s' % (nb_red, nb_green, rel))
+    wKS_.write('KS 1 : %d red - %d green for %s\n' % (nb_red1, nb_green1, rel))
+    wKS_.write('KS 2 : %d red - %d green for %s\n' % (nb_red2, nb_green2, rel))
+    wKS_.write('KS 3 : %d red - %d green for %s\n' % (nb_red3, nb_green3, rel))
+    wKS_.write('KS ttl : %d red - %d green for %s\n' % (nb_red, nb_green, rel))
+
 toc = time.time()
 print('Done in {:.4f} seconds'.format(toc-tic))
-
-# print nb of red/green lines
-print('KS 1 : %d red - %d green for %s' % (nb_red1, nb_green1, rel))
-print('KS 2 : %d red - %d green for %s' % (nb_red2, nb_green2, rel))
-print('KS 3 : %d red - %d green for %s' % (nb_red3, nb_green3, rel))
-nb_red = nb_red1 + nb_red2 + nb_red3
-nb_green = nb_green1 + nb_green2 + nb_green3
-print('KS ttl : %d red - %d green for %s' % (nb_red, nb_green, rel))
-wKS_.write('KS 1 : %d red - %d green for %s\n' % (nb_red1, nb_green1, rel))
-wKS_.write('KS 2 : %d red - %d green for %s\n' % (nb_red2, nb_green2, rel))
-wKS_.write('KS 3 : %d red - %d green for %s\n' % (nb_red3, nb_green3, rel))
-wKS_.write('KS ttl : %d red - %d green for %s\n' % (nb_red, nb_green, rel))
 
 print("Fin !\n")
 

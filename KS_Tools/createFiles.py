@@ -489,13 +489,6 @@ for i in range(0, N_histos): # 1 histo for debug
     wKS3.write('\n')
     wKS3.close()
 
-    R1 = diffR2(mean_df_entries, s_new)
-    R2 = diffR2(series_reference, s_new)
-    R3 = diffR2(s_new, s_old)
-    print('R1 = %f [mean, new]' % R1)
-    print('R2 = %f [ref, new]' % R2)
-    print('R3 = %f [old, new]' % R3)
-
 toc = time.time()
 print('Done in {:.4f} seconds'.format(toc-tic))
 
