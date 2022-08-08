@@ -122,15 +122,22 @@ nb_green2 = 0
 nb_red3 = 0
 nb_green3 = 0
 
-KS_diffName = dfo.folder + "histo_differences_KScurve.txt"
+# get list of root files
+rootFilesList_0 = getListFiles(resultPath, 'root')
+print('there is ' + '{:03d}'.format(len(rootFilesList_0)) + ' ROOT files')
+nbFiles = change_nbFiles(len(rootFilesList_0), nbFiles)
+folder += '{:03d}'.format(nbFiles)
+checkFolder(folder)
+
+KS_diffName = folder +  "/histo_differences_KScurve.txt"
 print("KSname 1 : %s" % KS_diffName)
 wKS0 = open(KS_diffName, 'w')
 
-KS_resume = dfo.folder + "histo_resume.txt"
+KS_resume = folder + "/histo_resume.txt"
 print("KSname 0 : %s" % KS_resume)
 wKS_ = open(KS_resume, 'w')
 
-KS_pValues = dfo.folder + "histo_pValues.txt" 
+KS_pValues = folder + "/histo_pValues.txt" 
 print("KSname 2 : %s" % KS_pValues)
 wKSp = open(KS_pValues, 'w')
 
@@ -199,9 +206,9 @@ for i in range(0, N_histos): # 1 histo for debug
         continue
 
     # create file for KS curve
-    KSname1 = dfo.folder + "histo_" + branches[i] + "_KScurve1.txt"
-    KSname2 = dfo.folder + "histo_" + branches[i] + "_KScurve2.txt"
-    KSname3 = dfo.folder + "histo_" + branches[i] + "_KScurve3.txt"
+    KSname1 = folder + "/histo_" + branches[i] + "_KScurve1.txt"
+    KSname2 = folder + "/histo_" + branches[i] + "_KScurve2.txt"
+    KSname3 = folder + "/histo_" + branches[i] + "_KScurve3.txt"
     print("KSname 1 : %s" % KSname1)
     print("KSname 2 : %s" % KSname2)
     print("KSname 3 : %s" % KSname3)
@@ -288,7 +295,7 @@ for i in range(0, N_histos): # 1 histo for debug
         series0 = df_entries.iloc[k,:]
         curves = DB.funcKS(series0)
         plt.plot(curves)
-    fig.savefig(dfo.folder + '/cumulative_curve_' + branches[i] + '.png')
+    fig.savefig(folder + '/cumulative_curve_' + branches[i] + '.png')
     fig.clf()
     
     # ================================ #
@@ -322,7 +329,7 @@ for i in range(0, N_histos): # 1 histo for debug
 
     # Kolmogoroff-Smirnov curve
     seriesTotalDiff1 = pd.DataFrame(totalDiff, columns=['KSDiff'])
-    KSDiffname1 = dfo.folder + '/KSDiffValues_1_' + branches[i] + '.txt' # csv imposed by pd.to_csv
+    KSDiffname1 = folder + '/KSDiffValues_1_' + branches[i] + '.txt' # csv imposed by pd.to_csv
     df.to_csv(KSDiffname1)
     plt_diff_KS1 = seriesTotalDiff1.plot.hist(bins=nbins, title='KS diff. 1')
     print('\ndiffMin0/sTD.min 1 : %f/%f' % (diffMax0, seriesTotalDiff1.values.min()))
@@ -343,12 +350,12 @@ for i in range(0, N_histos): # 1 histo for debug
     ymi, yMa = plt_diff_KS1.get_ylim()
     plt_diff_KS1.vlines(x1, ymi, 0.9*yMa, color=color1, linewidth=4)
     fig = plt_diff_KS1.get_figure()
-    fig.savefig(dfo.folder + '/KS-ttlDiff_1_' + branches[i] + '.png')
+    fig.savefig(folder + '/KS-ttlDiff_1_' + branches[i] + '.png')
     fig.clf()
     count, division = np.histogram(seriesTotalDiff1[~np.isnan(seriesTotalDiff1)], bins=nbins)
     div_min = np.amin(division)
     div_max = np.amax(division)
-    KSDiffHistoname1 = dfo.folder + '/KSDiffHistoValues_1_' + branches[i] + '.txt'
+    KSDiffHistoname1 = folder + '/KSDiffHistoValues_1_' + branches[i] + '.txt'
     wKSDiff1 = open(KSDiffHistoname1, 'w')
     wKSDiff1.write(' '.join("{:10.04e}".format(x) for x in count))
     wKSDiff1.write('\n')
@@ -398,12 +405,12 @@ for i in range(0, N_histos): # 1 histo for debug
     ymi, yMa = plt_diff_KS2.get_ylim()
     plt_diff_KS2.vlines(x2, ymi, 0.9*yMa, color=color2, linewidth=4)
     fig = plt_diff_KS2.get_figure()
-    fig.savefig(dfo.folder + '/KS-ttlDiff_2_' + branches[i] + '.png')
+    fig.savefig(folder + '/KS-ttlDiff_2_' + branches[i] + '.png')
     fig.clf()
     count, division = np.histogram(seriesTotalDiff2, bins=nbins)
     div_min = np.amin(division)
     div_max = np.amax(division)
-    KSDiffHistoname2 = dfo.folder + '/KSDiffHistoValues_2_' + branches[i] + '.txt'
+    KSDiffHistoname2 = folder + '/KSDiffHistoValues_2_' + branches[i] + '.txt'
     wKSDiff2 = open(KSDiffHistoname2, 'w')
     wKSDiff2.write(' '.join("{:10.04e}".format(x) for x in count))
     wKSDiff2.write('\n')
@@ -453,12 +460,12 @@ for i in range(0, N_histos): # 1 histo for debug
     ymi, yMa = plt_diff_KS3.get_ylim()
     plt_diff_KS3.vlines(x3, ymi, 0.9*yMa, color=color3, linewidth=4)
     fig = plt_diff_KS3.get_figure()
-    fig.savefig(dfo.folder + '/KS-ttlDiff_3_' + branches[i] + '.png')
+    fig.savefig(folder + '/KS-ttlDiff_3_' + branches[i] + '.png')
     fig.clf()
     count, division = np.histogram(seriesTotalDiff3, bins=nbins)
     div_min = np.amin(division)
     div_max = np.amax(division)
-    KSDiffHistoname3 = dfo.folder + '/KSDiffHistoValues_3_' + branches[i] + '.txt'
+    KSDiffHistoname3 = folder + '/KSDiffHistoValues_3_' + branches[i] + '.txt'
     wKSDiff3 = open(KSDiffHistoname3, 'w')
     wKSDiff3.write(' '.join("{:10.04e}".format(x) for x in count))
     wKSDiff3.write('\n')

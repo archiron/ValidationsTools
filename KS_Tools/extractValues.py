@@ -74,7 +74,8 @@ print('there is %d files' % len(fileList))
 fileList = fileList[0:nbFiles]
 print('file list :')
 print(fileList)
-print('-- end --')
+
+nbFiles = change_nbFiles(len(fileList), nbFiles)
 
 for elem in fileList:
     input_file = resultPath + str(elem.split()[0])

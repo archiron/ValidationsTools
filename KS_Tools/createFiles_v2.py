@@ -21,9 +21,6 @@ import time
 
 # lines below are only for func_Extract
 from sys import argv
-from os import listdir
-from os.path import isfile, join
-from tracemalloc import stop
 
 argv.append( '-b-' )
 import ROOT
@@ -111,7 +108,7 @@ if not os.path.exists(folder):
 else:
     print('Folder %s already created\n' % folder)
 
-# get list of files
+# get list of files for comparison
 rootFolderName = blo.DATA_SOURCE # '/pbs/home/c/chiron/private/KS_Tools/GenExtract/DATA/NewFiles'
 rootFilesList = getListFiles(rootFolderName, 'root')
 print('we use the files :')
@@ -120,6 +117,13 @@ for item in rootFilesList:
     b = (item.split('__')[2]).split('-')
     #print('%s - %s' % (b[0], b[0][6:]))
     rels.append([b[0], b[0][6:], item])
+
+# get list of root files
+rootFilesList_0 = getListFiles(resultPath, 'root')
+print('there is ' + '{:03d}'.format(len(rootFilesList_0)) + ' ROOT files')
+nbFiles = change_nbFiles(len(rootFilesList_0), nbFiles)
+folder += '{:03d}'.format(nbFiles)
+checkFolder(folder)
 
 #print('-')
 #for elem in rels:
@@ -136,6 +140,7 @@ if (ind_reference == -1):
 print('reference ind. : %d' % ind_reference)
 h2 = getHisto(f_ref, tp_1)
 print(h2)
+
 tic = time.time()
 
 for elem in sortedRels:
@@ -155,15 +160,15 @@ for elem in sortedRels:
     nb_red3 = 0
     nb_green3 = 0
 
-    KS_diffName = dfo.folder + "histo_differences_KScurve" + "_" + rel + "_" + '_{:03d}'.format(nbFiles) + "_v2.txt"
+    KS_diffName = folder + "/histo_differences_KScurve" + "_" + rel + "_" + '_{:03d}'.format(nbFiles) + "_v2.txt"
     print("KSname 1 : %s" % KS_diffName)
     wKS0 = open(KS_diffName, 'w')
 
-    KS_resume = dfo.folder + "histo_resume" + "_" + rel + "_v2.txt"
+    KS_resume = folder + "/histo_resume" + "_" + rel + "_v2.txt"
     print("KSname 0 : %s" % KS_resume)
     wKS_ = open(KS_resume, 'w')
 
-    KS_pValues = dfo.folder + "histo_pValues" + "_" + rel + "_v2.txt"
+    KS_pValues = folder + "/histo_pValues" + "_" + rel + "_v2.txt"
     print("KSname 2 : %s" % KS_pValues)
     wKSp = open(KS_pValues, 'w')
 
@@ -212,9 +217,9 @@ for elem in sortedRels:
             continue
 
         # create file for KS curve
-        KSname1 = dfo.folder + "histo_" + branches[i] + "_KScurve1" + "_" + rel + "_v2.txt"
-        KSname2 = dfo.folder + "histo_" + branches[i] + "_KScurve2" + "_" + rel + "_v2.txt"
-        KSname3 = dfo.folder + "histo_" + branches[i] + "_KScurve3" + "_" + rel + "_v2.txt"
+        KSname1 = folder + "/histo_" + branches[i] + "_KScurve1" + "_" + rel + "_v2.txt"
+        KSname2 = folder + "/histo_" + branches[i] + "_KScurve2" + "_" + rel + "_v2.txt"
+        KSname3 = folder + "/histo_" + branches[i] + "_KScurve3" + "_" + rel + "_v2.txt"
         print("KSname 1 : %s" % KSname1)
         print("KSname 2 : %s" % KSname2)
         print("KSname 3 : %s" % KSname3)
@@ -306,7 +311,7 @@ for elem in sortedRels:
             series0 = df_entries.iloc[k,:]
             curves = DB.funcKS(series0)
             plt.plot(curves)
-        fig.savefig(dfo.folder + '/cumulative_curve_' + branches[i] + "_" + rel + '_v2.png')
+        fig.savefig(folder + '/cumulative_curve_' + branches[i] + "_" + rel + '_v2.png')
         fig.clf()
         
         # ================================ #
@@ -340,7 +345,7 @@ for elem in sortedRels:
 
         # Kolmogoroff-Smirnov curve
         seriesTotalDiff1 = pd.DataFrame(totalDiff, columns=['KSDiff'])
-        KSDiffname1 = dfo.folder + '/KSDiffValues_1_' + branches[i] + "_" + rel + '_v2.txt' # csv imposed by pd.to_csv
+        KSDiffname1 = folder + '/KSDiffValues_1_' + branches[i] + "_" + rel + '_v2.txt' # csv imposed by pd.to_csv
         df.to_csv(KSDiffname1)
         plt_diff_KS1 = seriesTotalDiff1.plot.hist(bins=nbins, title='KS diff. 1')
         print('\ndiffMin0/sTD.min 1 : %f/%f' % (diffMax0, seriesTotalDiff1.values.min()))
@@ -361,12 +366,12 @@ for elem in sortedRels:
         ymi, yMa = plt_diff_KS1.get_ylim()
         plt_diff_KS1.vlines(x1, ymi, 0.9*yMa, color=color1, linewidth=4)
         fig = plt_diff_KS1.get_figure()
-        fig.savefig(dfo.folder + '/KS-ttlDiff_1_' + branches[i] + '_v2.png')
+        fig.savefig(folder + '/KS-ttlDiff_1_' + branches[i] + '_v2.png')
         fig.clf()
         count, division = np.histogram(seriesTotalDiff1[~np.isnan(seriesTotalDiff1)], bins=nbins)
         div_min = np.amin(division)
         div_max = np.amax(division)
-        KSDiffHistoname1 = dfo.folder + '/KSDiffHistoValues_1_' + branches[i] + "_" + rel + '_v2.txt'
+        KSDiffHistoname1 = folder + '/KSDiffHistoValues_1_' + branches[i] + "_" + rel + '_v2.txt'
         wKSDiff1 = open(KSDiffHistoname1, 'w')
         wKSDiff1.write(' '.join("{:10.04e}".format(x) for x in count))
         wKSDiff1.write('\n')
@@ -416,12 +421,12 @@ for elem in sortedRels:
         ymi, yMa = plt_diff_KS2.get_ylim()
         plt_diff_KS2.vlines(x2, ymi, 0.9*yMa, color=color2, linewidth=4)
         fig = plt_diff_KS2.get_figure()
-        fig.savefig(dfo.folder + '/KS-ttlDiff_2_' + branches[i] + '_v2.png')
+        fig.savefig(folder + '/KS-ttlDiff_2_' + branches[i] + '_v2.png')
         fig.clf()
         count, division = np.histogram(seriesTotalDiff2, bins=nbins)
         div_min = np.amin(division)
         div_max = np.amax(division)
-        KSDiffHistoname2 = dfo.folder + '/KSDiffHistoValues_2_' + branches[i] + "_" + rel + '_v2.txt'
+        KSDiffHistoname2 = folder + '/KSDiffHistoValues_2_' + branches[i] + "_" + rel + '_v2.txt'
         wKSDiff2 = open(KSDiffHistoname2, 'w')
         wKSDiff2.write(' '.join("{:10.04e}".format(x) for x in count))
         wKSDiff2.write('\n')
@@ -471,12 +476,12 @@ for elem in sortedRels:
         ymi, yMa = plt_diff_KS3.get_ylim()
         plt_diff_KS3.vlines(x3, ymi, 0.9*yMa, color=color3, linewidth=4)
         fig = plt_diff_KS3.get_figure()
-        fig.savefig(dfo.folder + '/KS-ttlDiff_3_' + branches[i] + '_v2.png')
+        fig.savefig(folder + '/KS-ttlDiff_3_' + branches[i] + '_v2.png')
         fig.clf()
         count, division = np.histogram(seriesTotalDiff3, bins=nbins)
         div_min = np.amin(division)
         div_max = np.amax(division)
-        KSDiffHistoname3 = dfo.folder + '/KSDiffHistoValues_3_' + branches[i] + "_" + rel + '_v2.txt'
+        KSDiffHistoname3 = folder + '/KSDiffHistoValues_3_' + branches[i] + "_" + rel + '_v2.txt'
         wKSDiff3 = open(KSDiffHistoname3, 'w')
         wKSDiff3.write(' '.join("{:10.04e}".format(x) for x in count))
         wKSDiff3.write('\n')

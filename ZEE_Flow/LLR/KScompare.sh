@@ -21,8 +21,14 @@ eval `scramv1 runtime -sh`
 cd -
 
 #cd $2
-echo "executing $2/createFiles.py $3 $4"
-python3 $2/createFiles.py $3 $4
-echo "executing $2/createFiles_v2.py $3 $4"
-python3 $2/createFiles_v2.py $3 $4
+echo "executing $2/KScompare.py $3 $4"
+python3 $2/KScompare.py $3 $4
+#python3 $2/extrGT.py
+#echo "executing $1/extrGT.py"
+#python3 $2/createFiles_v2.py
+#echo "executing $2/createFiles_v2.py"
+#python3 $2/zeeMapDiff.py
+#echo "executing $2/zeeMapDiff.py"
+#python3 $2/zeepValues.py
+#echo "executing $2/zeepValues.py"
 
