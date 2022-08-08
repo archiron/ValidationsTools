@@ -12,7 +12,9 @@
 ################################################################################
 
 import os,sys
-import imp
+import imp, importlib
+import importlib.machinery
+import importlib.util
 import time
 
 #import seaborn # only with cmsenv on cca.in2p3.fr
@@ -58,12 +60,21 @@ from matplotlib import pyplot as plt
 
 print("\nextractFiles_v2")
 
-blu = imp.load_source(filePaths, commonPath+filePaths)
-print('DATA_SOURCE : %s' % blu.DATA_SOURCE)
-resultPath = blu.RESULTFOLDER # checkFolderName(blu.RESULTFOLDER)
+#blu = imp.load_source(filePaths, commonPath+filePaths)
+#print('DATA_SOURCE : %s' % blu.DATA_SOURCE)
+#resultPath = blu.RESULTFOLDER # checkFolderName(blu.RESULTFOLDER)
+#print('result path : {:s}'.format(resultPath))
+
+# Import module
+loader = importlib.machinery.SourceFileLoader( filePaths, commonPath+filePaths )
+spec = importlib.util.spec_from_loader( filePaths, loader )
+blo = importlib.util.module_from_spec( spec )
+loader.exec_module( blo )
+print('DATA_SOURCE : %s' % blo.DATA_SOURCE)
+resultPath = blo.RESULTFOLDER 
 print('result path : {:s}'.format(resultPath))
-    
-Chilib_path = blu.LIB_SOURCE # checkFolderName(blu.LIB_SOURCE) # sys.argv[1]
+
+Chilib_path = blo.LIB_SOURCE # checkFolderName(blo.LIB_SOURCE) # sys.argv[1]
 sys.path.append(Chilib_path)
 sys.path.append(commonPath)
 
@@ -101,7 +112,7 @@ else:
     print('Folder %s already created\n' % folder)
 
 # get list of files
-rootFolderName = blu.DATA_SOURCE # '/pbs/home/c/chiron/private/KS_Tools/GenExtract/DATA/NewFiles'
+rootFolderName = blo.DATA_SOURCE # '/pbs/home/c/chiron/private/KS_Tools/GenExtract/DATA/NewFiles'
 rootFilesList = getListFiles(rootFolderName, 'root')
 print('we use the files :')
 for item in rootFilesList:
