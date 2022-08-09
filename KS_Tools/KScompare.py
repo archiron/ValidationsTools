@@ -91,7 +91,7 @@ if not os.path.exists(folder):
 else:
     print('Folder %s already created\n' % folder)
 
-# get list of files
+# get list of the added ROOT files
 rootFolderName = blo.DATA_SOURCE # '/pbs/home/c/chiron/private/KS_Tools/GenExtract/DATA/NewFiles'
 rootFilesList = getListFiles(rootFolderName, 'root')
 print('we use the files :')
@@ -101,7 +101,7 @@ for item in rootFilesList:
     rels.append([b[0], b[0][6:]])
 sortedRels = sorted(rels, key = lambda x: x[0]) # gives an array with releases sorted
 
-# get list of root files
+# get list of generated ROOT files
 rootFilesList_0 = getListFiles(resultPath, 'root')
 print('there is ' + '{:03d}'.format(len(rootFilesList_0)) + ' ROOT files')
 nbFiles = change_nbFiles(len(rootFilesList_0), nbFiles)
