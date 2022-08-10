@@ -18,7 +18,20 @@ import importlib.machinery
 import importlib.util
 import time
 
+from sys import argv
+
 #import seaborn # only with cmsenv on cca.in2p3.fr
+
+argv.append( '-b-' )
+import ROOT
+ROOT.gROOT.SetBatch(True)
+argv.remove( '-b-' )
+
+from ROOT import *
+
+ROOT.gSystem.Load("libFWCoreFWLite.so")
+ROOT.gSystem.Load("libDataFormatsFWLite.so")
+ROOT.FWLiteEnabler.enable()
 
 if len(sys.argv) > 1:
     print(sys.argv)
@@ -62,9 +75,10 @@ sys.path.append(commonPath)
 sys.path.append(Chilib_path)
 import default as dfo
 from default import *
+from controlFunctions import *
 from sources import *
 from graphicAutoEncoderFunctions import *
-from controlFunctions import *
+from graphicFunctions import getHisto, getHistoConfEntry, fill_Snew2, fill_Snew
 
 folder = checkFolderName(dfo.folder)
 resultPath = checkFolderName(resultPath)
@@ -76,6 +90,8 @@ branches = getBranches(tp_1, source)
 cleanBranches(branches) # remove some histo wich have a pbm with KS.
 
 rels = []
+tmp_branches = []
+nb_ttl_histos = []
 
 N_histos = len(branches)
 print('N_histos : %d' % N_histos)
@@ -96,9 +112,41 @@ rootFolderName = blo.DATA_SOURCE # '/pbs/home/c/chiron/private/KS_Tools/GenExtra
 rootFilesList = getListFiles(rootFolderName, 'root')
 print('we use the files :')
 for item in rootFilesList:
+    tmp_branch = []
+    nbHistos = 0
     print('%s' % item)
     b = (item.split('__')[2]).split('-')
     rels.append([b[0], b[0][6:]])
+    f_root = ROOT.TFile(rootFolderName + item)
+    h1 = getHisto(f_root, tp_1)
+    for i in range(0, N_histos): # 1 N_histos histo for debug
+        histo_1 = h1.Get(branches[i])
+        d = getHistoConfEntry(histo_1)
+        #s_tmp = fill_Snew2(d, histo_1)
+        s_tmp = fill_Snew(histo_1)
+        if (s_tmp.min() < 0.):
+            print('pbm whith histo %s, min < 0' % branches[i])
+        elif (np.floor(s_tmp.sum()) == 0.):
+            print('pbm whith histo %s, sum = 0' % branches[i])
+        else:
+            nbHistos += 1
+            tmp_branch.append(branches[i])
+    nb_ttl_histos.append(nbHistos)
+    tmp_branches.append(tmp_branch)
+
+if(len(set(nb_ttl_histos))==1):
+    print('All elements are the same with value {:d}.'.format(nb_ttl_histos[0]))
+else:
+    print('All elements are not the same.')
+    print('nb ttl of histos : ' , nb_ttl_histos)
+    newBranches = optimizeBranches(tmp_branches)
+
+    print('len std branches : {:d}'.format(len(branches)))
+    print('len new branches : {:d}'.format(len(newBranches)))
+    branches = newBranches
+N_histos = len(branches)
+print('N_histos : %d' % N_histos)
+
 sortedRels = sorted(rels, key = lambda x: x[0]) # gives an array with releases sorted
 
 # get list of generated ROOT files
@@ -106,6 +154,9 @@ rootFilesList_0 = getListFiles(resultPath, 'root')
 print('there is ' + '{:03d}'.format(len(rootFilesList_0)) + ' ROOT files')
 nbFiles = change_nbFiles(len(rootFilesList_0), nbFiles)
 folder += '{:03d}'.format(nbFiles)
+folder = checkFolderName(folder)
+print('folder après check : %s' % folder)
+checkFolder(folder)
 
 tic = time.time()
 
@@ -162,13 +213,15 @@ print(df1.head(5))
 print()
 print(df2.head(5))
     
+folder += 'KS'
+folder =checkFolderName(folder)
+print('folder après check : %s' % folder)
+checkFolder(folder)
+
 labels = list(df1)[1:]
 print(labels)
 (N_histos, _) = df1.shape
-########################################################################
-# Il faut verifier que chaque colonne a la meme hauteur que les autres !
-# Il faut extraire les bonnes colonnes !
-########################################################################
+
 for ind in df1.index:
     print(ind)
     a = df1.iloc[ind].to_numpy()
@@ -176,28 +229,27 @@ for ind in df1.index:
     print(branch)
     val = list(a[1:])
     #print(val)
-    pictureName = folder + 'KS/comparison_KS_values_' + branch + '_{:03d}'.format(nbFiles) +'.png' # 
+    pictureName = folder + 'comparison_KS_values_' + branch + '_{:03d}'.format(nbFiles) +'.png' # 
     print(pictureName)
-    title = r"$\bf{" + branch + "}$" + ' : Comparison of KS values as function of releases.'
+    title = r"$\bf{" + branch + "}$" + ' : Comparison of KS diff values as function of releases.'
     createCompLossesPicture(labels,val, pictureName, title)
     #if ind == 2:
     #    break
 
-'''
-    for ind in df2.index:
-        print(ind)
-        a = df2.iloc[ind].to_numpy()
-        branch = a[0]
-        print(branch)
-        val = list(a[1:])
-        #print(val)
-        pictureName = folder + 'KS/comparison_pValues_' + branch + '_{:03d}'.format(nbFiles) +'.png' # 
-        print(pictureName)
-        title = r"$\bf{" + branch + "}$" + ' : Comparison of KS pValues as function of releases.'
-        createCompPValuesPicture(labels,val, pictureName, title)
-        #if ind == 2:
-        #    break
-'''
+for ind in df2.index:
+    print(ind)
+    a = df2.iloc[ind].to_numpy()
+    branch = a[0]
+    print(branch)
+    val = list(a[1:])
+    #print(val)
+    pictureName = folder + 'comparison_pValues_' + branch + '_{:03d}'.format(nbFiles) +'.png' # 
+    print(pictureName)
+    title = r"$\bf{" + branch + "}$" + ' : Comparison of KS pValues as function of releases.'
+    createCompPValuesPicture(labels,val, pictureName, title)
+    #if ind == 2:
+    #    break
+
 toc = time.time()
 print('Done in {:.4f} seconds'.format(toc-tic))
 

@@ -77,10 +77,10 @@ sys.path.append(Chilib_path)
 sys.path.append(commonPath)
 
 import default as dfo
+from default import *
 from controlFunctions import *
 from graphicFunctions import getHisto, getHistoConfEntry, fill_Snew2, fill_Snew
 from DecisionBox import DecisionBox
-from default import *
 from sources import *
 
 folder = checkFolderName(dfo.folder)
@@ -158,6 +158,7 @@ print('there is ' + '{:03d}'.format(len(rootFilesList_0)) + ' ROOT files')
 nbFiles = change_nbFiles(len(rootFilesList_0), nbFiles)
 
 folder += '{:03d}'.format(nbFiles)
+folder = checkFolderName(folder)
 checkFolder(folder)
 
 #print('-')
