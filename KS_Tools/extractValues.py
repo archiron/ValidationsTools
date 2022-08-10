@@ -49,7 +49,7 @@ sys.path.append(Common_path)
 
 from default import *
 from controlFunctions import *
-from graphicFunctions import getHisto
+from graphicFunctions import getHisto, getHistoConfEntry
 
 # get the branches for ElectronMcSignalHistos.txt
 source = Chilib_path + "/HistosConfigFiles/ElectronMcSignalHistos.txt"
@@ -90,6 +90,7 @@ for elem in fileList:
         print("== %s ==" % leaf)
         temp_leaf = []
         histo = h1.Get(leaf)
+        d = getHistoConfEntry(histo)
 
         temp_leaf.append(histo.GetMean()) # 0
         temp_leaf.append(histo.GetMeanError()) # 2
@@ -104,7 +105,16 @@ for elem in fileList:
         for entry in histo:
             #print(i,entry)
             texttoWrite += 'b_' + '{:03d}'.format(i) + ',c_' + '{:03d},'.format(i)
-            temp_leaf.append(entry) # b_
+            if ( d == 1):
+                temp_leaf.append(entry) # b_
+            else :
+                if ((histo.GetBinEntries(i) == 0.) and (entry == 0.)):
+                    temp_leaf.append(0.)
+                elif ((histo.GetBinEntries(i) == 0.) and (entry != 0.)):
+                    temp_leaf.append(1.e38)
+                    print('========================================',i,entry,histo.GetBinEntries(i))
+                else:
+                    temp_leaf.append(entry/histo.GetBinEntries(i))
             temp_leaf.append(histo.GetBinError(i)) # c_
             i+=1
         print('there is %d entries' % i)

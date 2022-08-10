@@ -70,23 +70,6 @@ from DecisionBox import DecisionBox
 from default import *
 from sources import *
 
-def optimizeBranches(tmp_branches):
-    #tmp_branches = np.asarray(tmp_branches)
-    nb_branches = len(tmp_branches)
-    print('nb branches : %d' % nb_branches)
-    t0 = tmp_branches[0]
-    print(t0)
-    for i in range(1,nb_branches):
-        #print(i)
-        t1 = tmp_branches[i]
-        for item in t0:
-            if (t1.count(item) == 0):
-                print('%s not in t1' % item)
-                t0.remove(item)
-        print('{:d} : '.format(i), t0)
-    print(len(t0))
-    return t0
-
 folder = checkFolderName(dfo.folder)
 resultPath = checkFolderName(resultPath)
 dataPath = checkFolderName(dataPath)

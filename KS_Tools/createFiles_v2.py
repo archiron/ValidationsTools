@@ -21,6 +21,7 @@ import time
 
 # lines below are only for func_Extract
 from sys import argv
+from tracemalloc import stop
 
 argv.append( '-b-' )
 import ROOT
@@ -77,7 +78,7 @@ sys.path.append(commonPath)
 
 import default as dfo
 from controlFunctions import *
-from graphicFunctions import getHisto
+from graphicFunctions import getHisto, getHistoConfEntry, fill_Snew2, fill_Snew
 from DecisionBox import DecisionBox
 from default import *
 from sources import *
@@ -93,6 +94,8 @@ cleanBranches(branches) # remove some histo wich have a pbm with KS.
 
 DB = DecisionBox()
 rels = []
+tmp_branches = []
+nb_ttl_histos = []
 
 N_histos = len(branches)
 print('N_histos : %d' % N_histos)
@@ -108,20 +111,52 @@ if not os.path.exists(folder):
 else:
     print('Folder %s already created\n' % folder)
 
-# get list of files for comparison
+# get list of added ROOT files for comparison
 rootFolderName = blo.DATA_SOURCE # '/pbs/home/c/chiron/private/KS_Tools/GenExtract/DATA/NewFiles'
 rootFilesList = getListFiles(rootFolderName, 'root')
 print('we use the files :')
 for item in rootFilesList:
-    print('%s' % item)
+    tmp_branch = []
+    nbHistos = 0
+    print('\n%s' % item)
     b = (item.split('__')[2]).split('-')
     #print('%s - %s' % (b[0], b[0][6:]))
     rels.append([b[0], b[0][6:], item])
+    f_root = ROOT.TFile(rootFolderName + item)
+    h1 = getHisto(f_root, tp_1)
+    for i in range(0, N_histos): # 1 N_histos histo for debug
+        histo_1 = h1.Get(branches[i])
+        d = getHistoConfEntry(histo_1)
+        #s_tmp = fill_Snew2(d, histo_1)
+        s_tmp = fill_Snew(histo_1)
+        if (s_tmp.min() < 0.):
+            print('pbm whith histo %s, min < 0' % branches[i])
+        elif (np.floor(s_tmp.sum()) == 0.):
+            print('pbm whith histo %s, sum = 0' % branches[i])
+        else:
+            nbHistos += 1
+            tmp_branch.append(branches[i])
+    nb_ttl_histos.append(nbHistos)
+    tmp_branches.append(tmp_branch)
 
-# get list of root files
+if(len(set(nb_ttl_histos))==1):
+    print('All elements are the same with value {:d}.'.format(nb_ttl_histos[0]))
+else:
+    print('All elements are not the same.')
+    print('nb ttl of histos : ' , nb_ttl_histos)
+    newBranches = optimizeBranches(tmp_branches)
+
+    print('len std branches : {:d}'.format(len(branches)))
+    print('len new branches : {:d}'.format(len(newBranches)))
+    branches = newBranches
+N_histos = len(branches)
+print('N_histos : %d' % N_histos)
+
+# get list of generated ROOT files
 rootFilesList_0 = getListFiles(resultPath, 'root')
 print('there is ' + '{:03d}'.format(len(rootFilesList_0)) + ' ROOT files')
 nbFiles = change_nbFiles(len(rootFilesList_0), nbFiles)
+
 folder += '{:03d}'.format(nbFiles)
 checkFolder(folder)
 
@@ -236,14 +271,14 @@ for elem in sortedRels:
         df_entries = df[cols_entries]
         #print(df_entries.head(15))#
 
-        # check the values data
+        '''# check the values data
         #print(df.head(5))
         cols = df.columns.values
         n_cols = len(cols)
         print('nb of columns for histos : %d' % n_cols)
         cols_entries = cols[6::2]
         df_entries = df[cols_entries]
-        #print(df_entries.head(15))#
+        #print(df_entries.head(15))#'''
 
         # nbBins (GetEntries())
         df_GetEntries = df['nbBins']

@@ -73,7 +73,7 @@ sys.path.append(commonPath)
 
 import default as dfo
 from controlFunctions import *
-from graphicFunctions import getHisto
+from graphicFunctions import getHisto, getHistoConfEntry, fill_Snew2
 from DecisionBox import DecisionBox
 from default import *
 from sources import *
@@ -122,7 +122,7 @@ nb_green2 = 0
 nb_red3 = 0
 nb_green3 = 0
 
-# get list of root files
+# get list of generated ROOT files
 rootFilesList_0 = getListFiles(resultPath, 'root')
 print('there is ' + '{:03d}'.format(len(rootFilesList_0)) + ' ROOT files')
 nbFiles = change_nbFiles(len(rootFilesList_0), nbFiles)
@@ -157,6 +157,9 @@ for i in range(0, N_histos): # 1 histo for debug
     #print(h1)
     print(branches[i]) # print histo name
     histo_1 = h1.Get(branches[i])
+    d = getHistoConfEntry(histo_1)
+    print("d = {}".format(d))
+    
     ii=0
     s_new = []
     e_new = []
