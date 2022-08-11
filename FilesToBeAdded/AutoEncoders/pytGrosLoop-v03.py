@@ -208,7 +208,7 @@ print('device : {:s}'.format(str(device)))
 
 t = datetime.datetime.today()
 
-loopMaxValue = nbBranches # nbBranches
+loopMaxValue = 3 # nbBranches
 for i in range(0, loopMaxValue):
     folderName = data_res+"/HL_1.{:03d}".format(hidden_size_1) + "_HL_2.{:03d}".format(hidden_size_2)
     if useHL3 == 1:

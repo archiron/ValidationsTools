@@ -3,6 +3,7 @@
 
 ################################################################################
 # zeeExtract_MP: a tool to generate Kolmogorov-Smirnov values/pictures
+# form ROOT files created with ZEE_Flow scripts.
 # for egamma validation comparison                              
 #
 # MUST be launched with the cmsenv cmd after a cmsrel cmd !!
@@ -26,6 +27,8 @@ from matplotlib import pyplot as plt
 
 # lines below are only for func_Extract
 from sys import argv
+from os import listdir
+from os.path import isfile, join
 
 argv.append( '-b-' )
 import ROOT
@@ -38,10 +41,8 @@ ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.gSystem.Load("libDataFormatsFWLite.so")
 ROOT.FWLiteEnabler.enable()
 
-Chilib_path = '../ChiLib_CMS_Validation'
-Chilib_path = '/pbs/home/c/chiron/private/KS_Tools/ChiLib_CMS_Validation'
-#sys.path.append(Chilib_path)
-sys.path.append(Chilib_path)
+sys.path.append('../ChiLib_CMS_Validation')
+import default as df
 from graphicFunctions import getHisto
 from default import *
 from DecisionBox import DecisionBox
@@ -49,6 +50,26 @@ from sources import *
 
 # these line for daltonians !
 #seaborn.set_palette('colorblind')
+
+def getHistoConfEntry(h1):
+    d = 1
+
+    if ( h1.InheritsFrom("TH2") ):
+        print('TH2')
+    elif ( h1.InheritsFrom("TProfile") ):
+        print('TProfile')
+        d = 0
+    elif ( h1.InheritsFrom("TH1")): # TH1
+        print('TH1')
+    else:
+        print("don't know")
+
+    return d
+
+def checkFolderName(folderName):
+    if folderName[-1] != '/':
+        folderName += '/'
+    return folderName
 
 def changeColor(color):
     # 30:noir ; 31:rouge; 32:vert; 33:orange; 34:bleu; 35:violet; 36:turquoise; 37:blanc
@@ -77,9 +98,57 @@ def changeColor(color):
 def colorText(sometext, color):
     return '\033' + changeColor(color) + sometext + '\033[0m'
 
+def changeDirectory(rootFile, path):
+    """
+    Change the current directory (ROOT.gDirectory) by the corresponding (rootFile,pathSplit)
+    module from cmdLineUtils.py
+    """
+    rootFile.cd()
+    theDir = ROOT.gDirectory.Get(path)
+    if not theDir:
+        print("Directory %s does not exist." % path)
+    else:
+        theDir.cd()
+    return 0
+
+def checkLevel(f_rel, f_out, path0, listkeys, nb, inPath):
+    print('\npath : %s' % path0)
+    if path0 != "":
+        path0 += '/'
+    for elem in listkeys:
+        #print('%d == checkLevel : %s' % (nb, elem.GetTitle()))
+        if (elem.GetClassName() == "TDirectoryFile"):
+            path = path0 + elem.GetName()
+            if (nb >= 3 and re.search(inPath, path)):
+                print('\npath : %s' % path)
+                f_out.mkdir(path)
+            tmp = f_rel.Get(path).GetListOfKeys()
+            checkLevel(f_rel, f_out, path, tmp, nb+1)
+        elif (elem.GetClassName() == "TTree"):
+            #print('------ TTree')
+            src = f_rel.Get(path0)
+            cloned = src.CloneTree()
+            #f_out.WriteTObject(cloned, elem.GetName())
+            if (nb >= 3 and re.search(inPath, path0)):
+                changeDirectory(f_out, path0[:-1])
+                cloned.Write()
+        elif (elem.GetClassName() != "TDirectory"):
+            #print('copy %s object into %s path' % (elem.GetName(), path0[:-1]))
+            #f_out.WriteTObject(elem.ReadObj(), elem.GetName())#:"DQMData/Run 1/EgammaV"
+            if (nb >= 3 and re.search(inPath, path0)):
+                changeDirectory(f_out, path0[:-1])
+                elem.ReadObj().Write()
+
+def getListFiles(path):
+    #print('path : %s' % path)
+    onlyfiles = [f for f in listdir(path) if isfile(join(path, f))]
+    onlyfiles = [f for f in onlyfiles if f.endswith(".root")] # keep only root files
+    #print(onlyfiles)
+    return onlyfiles
+
 def getBranches(t_p):
     b = []
-    source = open(Chilib_path + "/HistosConfigFiles/ElectronMcSignalHistos.txt", "r")
+    source = open("../ChiLib_CMS_Validation/HistosConfigFiles/ElectronMcSignalHistos.txt", "r")
     for ligne in source:
         if t_p in ligne:
             #print(ligne)
@@ -97,10 +166,156 @@ def cleanBranches(branches):
         if ele in branches:
             branches.remove(ele)
 
+def diffR2(s0,s1):
+    s0 = np.asarray(s0) # if not this, ind is returned as b_00x instead of int value
+    s1 = np.asarray(s1)
+    #print('s0[%d] - s1[%d]' %(len(s0), len(s1)))
+    N = len(s0)
+    #print('diffR2 : %d' % N)
+    R0 = 0.
+    for i in range(0, N):
+        t0 = s0[i]- s1[i]
+        R0 += t0 * t0
+    return R0/N
+
+def func_Extract(br, nbFiles): # read files
+    print("func_Extract")
+    df.folderName = checkFolderName(df.folderName)
+    branches = []
+    wr = []
+    histos = {}
+        
+
+    # get the branches for ElectronMcSignalHistos.txt
+    #branches += ["h_recEleNum", "h_scl_ESFrac_endcaps", "h_scl_sigietaieta", "h_ele_PoPtrue_endcaps", "h_ele_PoPtrue", "h_scl_bcl_EtotoEtrue_endcaps", "h_scl_bcl_EtotoEtrue_barrel", "h_ele_Et"]
+    #branches += ["h_recEleNum"]
+    branches = br
+    for leaf in branches:
+        histos[leaf] = []
+    
+    fileList = getListFiles(df.folderName) # get the list of the root files in the folderName folder
+    fileList.sort()
+    print('there is %d files' % len(fileList))
+    fileList = fileList[0:nbFiles]
+    print('file list :')
+    print(fileList)
+    print('-- end --')
+
+
+    for elem in fileList:
+        input_file = df.folderName + str(elem.split()[0])
+        name_1 = input_file.replace(df.folderName, '').replace('DQM_V0001_R000000001__Global__CMSSW_X_Y_Z__RECO_', '').replace('.root', '')
+        print('\n %s - name_1 : %s' % (input_file, colorText(name_1, 'lightyellow')))
+        
+        f_root = ROOT.TFile(input_file) # 'DATA/' + 
+        h1 = getHisto(f_root, tp_1)
+        #h1.ls()
+
+        for leaf in branches:
+            print("== %s ==" % leaf)
+            temp_leaf = []
+            histo = h1.Get(leaf)
+            d = getHistoConfEntry(histo)
+            print("d = {}".format(d))
+
+            temp_leaf.append(histo.GetMean()) # 0
+            temp_leaf.append(histo.GetMeanError()) # 2
+            temp_leaf.append(histo.GetStdDev()) # 6
+            temp_leaf.append(histo.GetEntries()) # 6b
+
+            temp_leaf.append(name_1) # 7
+            #print('temp_leaf : %s' % temp_leaf)
+            
+            texttoWrite = ''
+            i=0
+            if (d == 1):
+                for entry in histo:
+                    #print(i,entry)
+                    texttoWrite += 'b_' + '{:03d}'.format(i) + ',c_' + '{:03d},'.format(i)
+                    temp_leaf.append(entry) # b_
+                    temp_leaf.append(histo.GetBinError(i)) # c_
+                    i+=1
+            else:
+                for entry in histo:
+                    print(i,entry)
+                    #print("%d/%d : %f - %f - %f") % (i, histo.GetXaxis().GetNbins()+2, entry, histo.GetBinError(i), histo.GetBinEntries(i))
+                    print(i, histo.GetXaxis().GetNbins()+2, entry, histo.GetBinError(i), histo.GetBinEntries(i))
+                    texttoWrite += 'b_' + '{:03d}'.format(i) + ',c_' + '{:03d},'.format(i)
+                    if ((histo.GetBinEntries(i) == 0.) and (entry == 0.)):
+                        temp_leaf.append(0.)
+                    elif ((histo.GetBinEntries(i) == 0.) and (entry != 0.)):
+                        temp_leaf.append(1.e38)
+                    else:
+                        temp_leaf.append(entry/histo.GetBinEntries(i)) # b_
+                    temp_leaf.append(histo.GetBinError(i)) # c_
+                    i+=1
+            print('there is %d entries' % i)
+            texttoWrite = texttoWrite[:-1] # remove last char
+            temp_leaf.append(texttoWrite) # end
+            histos[leaf].append(temp_leaf)
+
+    #print histos into histo named files
+    i_leaf = 0
+    for leaf in branches:
+        wr.append(open(df.folderName + 'histo_' + str(leaf) + '_' + '{:03d}'.format(nbFiles) + '_0_lite.txt', 'w'))
+        nb_max = len(histos[leaf][0]) - 1
+        print("== %s == nb_max : %d" % (leaf, nb_max))
+        wr[i_leaf].write('evol,Mean,MeanError,StdDev,nbBins,name,')
+        wr[i_leaf].write(str(histos[leaf][0][nb_max]))
+        wr[i_leaf].write('\n')
+        #'''
+        for i_file in range(0, len(fileList)):
+            texttoWrite = str(i_file) + ','
+            wr[i_leaf].write(texttoWrite) 
+            for i in range(0, nb_max-1):
+                #print('i : %d' % i)
+                wr[i_leaf].write(str(histos[leaf][i_file][i]))
+                wr[i_leaf].write(',')
+            wr[i_leaf].write(str(histos[leaf][i_file][nb_max-1]))
+            texttoWrite = '\n'
+            wr[i_leaf].write(texttoWrite) 
+        wr[i_leaf].close()
+        i_leaf +=1
+        #'''
+    return
+
+def func_ReduceSize(nbFiles):
+    print("func_ReduceSize")
+    df.folderName = checkFolderName(df.folderName)
+    
+    fileList = getListFiles(df.folderName) # get the list of the root files in the folderName folder
+    fileList.sort()
+    print('there is %d files' % len(fileList))
+    fileList = fileList[0:nbFiles]
+    print('file list :')
+    print(fileList)
+    print('-- end --')
+
+    for elem in fileList:
+        input_file = df.folderName + str(elem.split()[0])
+        print('\n %s' % input_file)
+
+        paths = ['DQMData/Run 1/EgammaV', 'DQMData/Run 1/Info']
+
+        f_rel = ROOT.TFile(input_file, "UPDATE")
+        racine = input_file.split('.')
+        f_out = TFile(racine[0] + 'b.' + racine[1], 'recreate')
+        t2 = f_rel.GetListOfKeys()
+        print(racine[0] + 'b.' + racine[1])
+        for elem in paths:
+            checkLevel(f_rel, f_out, "", t2, 0, elem)
+
+        f_out.Close()
+        f_rel.Close()
+
+    return
+
 def func_CreateKS(br, nbFiles):
     DB = DecisionBox()
     print("func_Extract")
-    
+    df.folderName = checkFolderName(df.folderName)
+    df.folder = checkFolderName(df.folder)
+
     branches = br
     N_histos = len(branches)
     print('N_histos : %d' % N_histos)
@@ -119,13 +334,11 @@ def func_CreateKS(br, nbFiles):
     else:
         print('Folder %s already created\n' % folder)
 
-    ##### TEMP #####
-    LOG_SOURCE_WORK='/pbs/home/c/chiron/private/KS_Tools/GenExtract/'
     # get the "new" root file datas
-    f_rel = ROOT.TFile(LOG_SOURCE_WORK + input_rel_file)
+    f_rel = ROOT.TFile(input_rel_file)
 
     # get the "reference" root file datas
-    f_ref = ROOT.TFile(LOG_SOURCE_WORK + input_ref_file)
+    f_ref = ROOT.TFile(input_ref_file)
 
     print('we use the %s file as reference' % input_ref_file)
     print('we use the %s file as new release' % input_rel_file)
@@ -137,25 +350,25 @@ def func_CreateKS(br, nbFiles):
     nb_red3 = 0
     nb_green3 = 0
 
-    KS_diffName = folder + "histo_differences_KScurve.txt"
+    KS_diffName = df.folder + "histo_differences_KScurve.txt"
     print("KSname 1 : %s" % KS_diffName)
     wKS0 = open(KS_diffName, 'w')
 
-    KS_resume = folder + "histo_resume.txt"
+    KS_resume = df.folder + "histo_resume.txt"
     print("KSname 0 : %s" % KS_resume)
     wKS_ = open(KS_resume, 'w')
 
-    KS_pValues = folder + "histo_pValues.txt"
+    KS_pValues = df.folder + "histo_pValues.txt"
     print("KSname 2 : %s" % KS_pValues)
     wKSp = open(KS_pValues, 'w')
 
-    ind_reference = 199 # np.random.randint(0, nbFiles)
+    ind_reference = 1#99 # np.random.randint(0, nbFiles)
     print('reference ind. : %d' % ind_reference)
 
     tic = time.time()
 
     for i in range(0, N_histos): # 1 histo for debug
-        name = folderName + "histo_" + branches[i] + '_{:03d}'.format(nbFiles) + "_0_lite.txt"
+        name = df.folderName + "histo_" + branches[i] + '_{:03d}'.format(nbFiles) + "_0_lite.txt"
         print('\n%d - %s' %(i, name))
         df = pd.read_csv(name)
         
@@ -213,9 +426,9 @@ def func_CreateKS(br, nbFiles):
             continue
 
         # create file for KS curve
-        KSname1 = folder + "histo_" + branches[i] + "_KScurve1.txt"
-        KSname2 = folder + "histo_" + branches[i] + "_KScurve2.txt"
-        KSname3 = folder + "histo_" + branches[i] + "_KScurve3.txt"
+        KSname1 = df.folder + "histo_" + branches[i] + "_KScurve1.txt"
+        KSname2 = df.folder + "histo_" + branches[i] + "_KScurve2.txt"
+        KSname3 = df.folder + "histo_" + branches[i] + "_KScurve3.txt"
         print("KSname 1 : %s" % KSname1)
         print("KSname 2 : %s" % KSname2)
         print("KSname 3 : %s" % KSname3)
@@ -304,7 +517,7 @@ def func_CreateKS(br, nbFiles):
             series0 = df_entries.iloc[k,:]
             curves = DB.funcKS(series0)
             plt.plot(curves)
-        fig.savefig(folder + '/cumulative_curve_' + branches[i] + '.png')
+        fig.savefig(df.folder + '/cumulative_curve_' + branches[i] + '.png')
         fig.clf()
     
         # ================================ #
@@ -338,7 +551,7 @@ def func_CreateKS(br, nbFiles):
 
         # Kolmogoroff-Smirnov curve
         seriesTotalDiff1 = pd.DataFrame(totalDiff, columns=['KSDiff'])
-        KSDiffname1 = folder + '/KSDiffValues_1_' + branches[i] + '.csv'
+        KSDiffname1 = df.folder + '/KSDiffValues_1_' + branches[i] + '.csv'
         df.to_csv(KSDiffname1)
         plt_diff_KS1 = seriesTotalDiff1.plot.hist(bins=nbins, title='KS diff. 1')
         print('\ndiffMin0/sTD.min 1 : %f/%f' % (diffMax0, seriesTotalDiff1.values.min()))
@@ -359,12 +572,12 @@ def func_CreateKS(br, nbFiles):
         ymi, yMa = plt_diff_KS1.get_ylim()
         plt_diff_KS1.vlines(x1, ymi, 0.9*yMa, color=color1, linewidth=4)
         fig = plt_diff_KS1.get_figure()
-        fig.savefig(folder + '/KS-ttlDiff_1_' + branches[i] + '.png')
+        fig.savefig(df.folder + '/KS-ttlDiff_1_' + branches[i] + '.png')
         fig.clf()
         count, division = np.histogram(seriesTotalDiff1[~np.isnan(seriesTotalDiff1)], bins=nbins)
         div_min = np.amin(division)
         div_max = np.amax(division)
-        KSDiffHistoname1 = folder + '/KSDiffHistoValues_1_' + branches[i] + '.csv'
+        KSDiffHistoname1 = df.folder + '/KSDiffHistoValues_1_' + branches[i] + '.csv'
         wKSDiff1 = open(KSDiffHistoname1, 'w')
         wKSDiff1.write(' '.join("{:10.04e}".format(x) for x in count))
         wKSDiff1.write('\n')
@@ -415,12 +628,12 @@ def func_CreateKS(br, nbFiles):
         ymi, yMa = plt_diff_KS2.get_ylim()
         plt_diff_KS2.vlines(x2, ymi, 0.9*yMa, color=color2, linewidth=4)
         fig = plt_diff_KS2.get_figure()
-        fig.savefig(folder + '/KS-ttlDiff_2_' + branches[i] + '.png')
+        fig.savefig(df.folder + '/KS-ttlDiff_2_' + branches[i] + '.png')
         fig.clf()
         count, division = np.histogram(seriesTotalDiff2, bins=nbins)
         div_min = np.amin(division)
         div_max = np.amax(division)
-        KSDiffHistoname2 = folder + '/KSDiffHistoValues_2_' + branches[i] + '.csv'
+        KSDiffHistoname2 = df.folder + '/KSDiffHistoValues_2_' + branches[i] + '.csv'
         wKSDiff2 = open(KSDiffHistoname2, 'w')
         wKSDiff2.write(' '.join("{:10.04e}".format(x) for x in count))
         wKSDiff2.write('\n')
@@ -470,12 +683,12 @@ def func_CreateKS(br, nbFiles):
         ymi, yMa = plt_diff_KS3.get_ylim()
         plt_diff_KS3.vlines(x3, ymi, 0.9*yMa, color=color3, linewidth=4)
         fig = plt_diff_KS3.get_figure()
-        fig.savefig(folder + '/KS-ttlDiff_3_' + branches[i] + '.png')
+        fig.savefig(df.folder + '/KS-ttlDiff_3_' + branches[i] + '.png')
         fig.clf()
         count, division = np.histogram(seriesTotalDiff3, bins=nbins)
         div_min = np.amin(division)
         div_max = np.amax(division)
-        KSDiffHistoname3 = folder + '/KSDiffHistoValues_3_' + branches[i] + '.csv'
+        KSDiffHistoname3 = df.folder + '/KSDiffHistoValues_3_' + branches[i] + '.csv'
         wKSDiff3 = open(KSDiffHistoname3, 'w')
         wKSDiff3.write(' '.join("{:10.04e}".format(x) for x in count))
         wKSDiff3.write('\n')
@@ -546,12 +759,20 @@ if __name__=="__main__":
     # get the branches for ElectronMcSignalHistos.txt
     branches = []
     branches = getBranches(tp_1)
+    print(branches[0:10])
+    #branches = branches[25:35]
     cleanBranches(branches) # remove some histo wich have a pbm with KS.
 
     # nb of files to be used
-    nbFiles = 750
+    nbFiles = 200
 
-    func_CreateKS(branches, nbFiles)  # create the KS files from histos datas
+    #func_ReduceSize(nbFiles)
+    
+    #func_Extract(branches[0:5], nbFiles) # create file with histo datas.
+    func_Extract(branches, nbFiles) # create file with histo datas.
+
+    #func_CreateKS(branches[0:5], nbFiles) # create the KS files from histos datas for datasets
+    #func_CreateKS(branches, nbFiles)  # create the KS files from histos datas
 
     print("Fin !")
 
