@@ -1,7 +1,7 @@
 #!/bin/sh
 # This file is called ./zee_flow.sh for CCA computers.
 ###################
-## LLR computers ##
+## CCA computers ##
 ###################
 
 echo "nb : $1"
@@ -34,15 +34,15 @@ cd -
 cmsRun $2/step1.py $1 $2 $3 $4
 
 cmsRun $2/step2.py $1 $2 $3 $4
-#rm $name1
+rm $name1
 cmsRun $2/step3.py $1 $2 $3 $4
-#rm $name2
+rm $name2
 
 cmsRun $2/step4.py $1 $2 $3 $4
-#rm $name31
-#rm $name32
-#rm $name33
-#rm $name34
+rm $name31
+rm $name32
+rm $name33
+rm $name34
 
 #cp *.root $4
 mv DQM*.root $4
