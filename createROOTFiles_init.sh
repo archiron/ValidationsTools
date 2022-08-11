@@ -77,7 +77,7 @@ if [[ "$Choice" == "LLR" ]]
     #cd -
     for i in $(eval echo "{$Nbegin..$Nend}") 
     do
-      /opt/exp_soft/cms/t3/t3submit -8c -long zee_flow.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER
+      /opt/exp_soft/cms/t3/t3submit -8c -long createROOTFiles.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER
     done
 elif [[ "$Choice" == "PBS" ]] 
   then
@@ -86,7 +86,7 @@ elif [[ "$Choice" == "PBS" ]]
     eval `scramv1 runtime -sh`
     for i in $(eval echo "{$Nbegin..$Nend}")
     do
-      sbatch -L sps -n 8 --mem=8000 -J $JobName -o $output zee_flow.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER
+      sbatch -L sps -n 8 --mem=8000 -J $JobName -o $output createROOTFiles.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER
     done
 fi
 
