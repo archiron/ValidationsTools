@@ -134,13 +134,21 @@ for i in range(0, N_histos): # 1 histo for debug
     h1 = getHisto(f_rel, tp_1)
     print(branches[i]) # print histo name
     histo_1 = h1.Get(branches[i])
+    
+    d = getHistoConfEntry(histo_1)
+    #print("d = {}".format(d))
+    
     ii=0
+    '''
     s_new = []
     for entry in histo_1:
         s_new.append(entry)
         ii += 1
     s_new = np.asarray(s_new)
     s_new = s_new[1:-1]
+    '''
+    #s_new = fill_Snew(histo_1)
+    s_new = fill_Snew2(d, histo_1)
     Ntot_h1 = histo_1.GetEntries()
 
     # check the values & errors data
@@ -184,68 +192,66 @@ for i in range(0, N_histos): # 1 histo for debug
     fig.savefig(folder + '/map-ttlDiff_1_' + '_{:03d}'.format(nbFiles) + '_' + branches[i] + '.png')
     fig.clf()
 
-    '''
-        # print 1 line
-        Z = totalDiff1[int(Nrows/2)]
-        XX = np.arange(0,Nrows) # [0,1,2,3,4]
-        fig,ax=plt.subplots(1,1)
-        #ax.plot(XX, Z) # only line
-        ax.plot(XX, Z, 'ro') # only points
-        #ax.plot(XX, Z, 'ro-') # line with points
-        ax.set_title('one line Plot')
-        ax.set_xlabel('file number')
-        ax.set_ylabel('diff values')
-        fig.savefig(folder + '/line-ttlDiff_1_' + '_{:03d}'.format(nbFiles) + '_' + branches[i] + '.png')
-        fig.clf()
+    # print 1 line
+    Z = totalDiff1[int(Nrows/2)]
+    XX = np.arange(0,Nrows) # [0,1,2,3,4]
+    fig,ax=plt.subplots(1,1)
+    #ax.plot(XX, Z) # only line
+    ax.plot(XX, Z, 'ro') # only points
+    #ax.plot(XX, Z, 'ro-') # line with points
+    ax.set_title('one line Plot')
+    ax.set_xlabel('file number')
+    ax.set_ylabel('diff values')
+    fig.savefig(folder + '/line-ttlDiff_1_' + '_{:03d}'.format(nbFiles) + '_' + branches[i] + '.png')
+    fig.clf()
 
-        # create the datas for the p-Value graph
-        # by comparing 1 curve with the others.
-        # Get a random histo as reference (KS 2)
-            #ind_reference = np.random.randint(0, Nrows)
-            #print('reference ind. : %d' % ind_reference)
-        series_reference = df_entries.iloc[ind_reference,:]
-        nbBins_reference = df_GetEntries[ind_reference]
-        print('nb bins reference : %d' % nbBins_reference)
-        nb2 = 0
-        totalDiff2 = np.zeros((Nrows,Nrows))
-        for k in range(0,Nrows-0):
-            if (k != ind_reference):
-                nb2 += 1
-                series0 = df_entries.iloc[k,:]
-                sum0 = df_GetEntries[k]
-                totalDiff2[k][l] = DB.diffMAXKS(series0, series_reference, sum0, nbBins_reference)[0] # 9000, 9000
-        #print(totalDiff2)
-        print('ttl nb of couples 2 : %d' % nb2)
-        fig,ax=plt.subplots(1,1)
-        cp = ax.contourf(X, Y, totalDiff2)
-        fig.colorbar(cp) # Add a colorbar to a plot
-        ax.set_title('Filled Contours Plot')
-        ax.set_xlabel('file number')
-        ax.set_ylabel('file number')
-        fig.savefig(folder + '/map-ttlDiff_2_' + '_{:03d}'.format(nbFiles) + '_' + branches[i] + '.png')
-        fig.clf()
-    
-        # create the datas for the p-Value graph
-        # by comparing the new curve with the others.
-        # Get the new as reference (KS 3)
-        nb3 = 0
-        totalDiff3 = np.zeros((Nrows,Nrows))
-        for k in range(0,Nrows-0):
-            nb3 += 1
+    # create the datas for the p-Value graph
+    # by comparing 1 curve with the others.
+    # Get a random histo as reference (KS 2)
+        #ind_reference = np.random.randint(0, Nrows)
+        #print('reference ind. : %d' % ind_reference)
+    series_reference = df_entries.iloc[ind_reference,:]
+    nbBins_reference = df_GetEntries[ind_reference]
+    print('nb bins reference : %d' % nbBins_reference)
+    nb2 = 0
+    totalDiff2 = np.zeros((Nrows,Nrows))
+    for k in range(0,Nrows-0):
+        if (k != ind_reference):
+            nb2 += 1
             series0 = df_entries.iloc[k,:]
             sum0 = df_GetEntries[k]
-            totalDiff3[k][l] = DB.diffMAXKS(series0, s_new, sum0, Ntot_h1)[0]
-        #print(totalDiff3)
-        print('ttl nb of couples 3 : %d' % nb3)
-        fig,ax=plt.subplots(1,1)
-        cp = ax.contourf(X, Y, totalDiff3)
-        fig.colorbar(cp) # Add a colorbar to a plot
-        ax.set_title('Filled Contours Plot')
-        ax.set_xlabel('file number')
-        ax.set_ylabel('file number')
-        fig.savefig(folder + '/map-ttlDiff_3_' + '_{:03d}'.format(nbFiles) + '_' + branches[i] + '.png')
-        fig.clf()
-    '''
+            totalDiff2[k][l] = DB.diffMAXKS(series0, series_reference, sum0, nbBins_reference)[0] # 9000, 9000
+    #print(totalDiff2)
+    print('ttl nb of couples 2 : %d' % nb2)
+    fig,ax=plt.subplots(1,1)
+    cp = ax.contourf(X, Y, totalDiff2)
+    fig.colorbar(cp) # Add a colorbar to a plot
+    ax.set_title('Filled Contours Plot')
+    ax.set_xlabel('file number')
+    ax.set_ylabel('file number')
+    fig.savefig(folder + '/map-ttlDiff_2_' + '_{:03d}'.format(nbFiles) + '_' + branches[i] + '.png')
+    fig.clf()
+    
+    # create the datas for the p-Value graph
+    # by comparing the new curve with the others.
+    # Get the new as reference (KS 3)
+    nb3 = 0
+    totalDiff3 = np.zeros((Nrows,Nrows))
+    for k in range(0,Nrows-0):
+        nb3 += 1
+        series0 = df_entries.iloc[k,:]
+        sum0 = df_GetEntries[k]
+        totalDiff3[k][l] = DB.diffMAXKS(series0, s_new, sum0, Ntot_h1)[0]
+    #print(totalDiff3)
+    print('ttl nb of couples 3 : %d' % nb3)
+    fig,ax=plt.subplots(1,1)
+    cp = ax.contourf(X, Y, totalDiff3)
+    fig.colorbar(cp) # Add a colorbar to a plot
+    ax.set_title('Filled Contours Plot')
+    ax.set_xlabel('file number')
+    ax.set_ylabel('file number')
+    fig.savefig(folder + '/map-ttlDiff_3_' + '_{:03d}'.format(nbFiles) + '_' + branches[i] + '.png')
+    fig.clf()
     
 toc = time.time()
 print('Done in {:.4f} seconds'.format(toc-tic))

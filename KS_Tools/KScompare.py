@@ -72,7 +72,6 @@ Chilib_path = blo.LIB_SOURCE # checkFolderName(blo.LIB_SOURCE) # sys.argv[1]
 sys.path.append(Chilib_path)
 sys.path.append(commonPath)
 
-sys.path.append(Chilib_path)
 import default as dfo
 from default import *
 from controlFunctions import *
