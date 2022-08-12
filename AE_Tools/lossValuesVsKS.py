@@ -18,10 +18,10 @@ import time
 
 #import seaborn # only with cmsenv on cca.in2p3.fr
 
-from graph import *
-from controlFunctions import *
-from defaultStd import *
 from default import *
+from defaultStd import *
+from controlFunctions import *
+from graphicAutoEncoderFunctions import *
 
 # these line for daltonians !
 #seaborn.set_palette('colorblind')
@@ -82,6 +82,7 @@ def func_CreateLossVsKSComp(branches, nbFiles):
     i = 0
     loopMaxValue = N_histos # N_histos
     for i in range(0, loopMaxValue):
+        '''
         # create the folder name for saving the picture
         folderName = data_res+"/HL_1.{:03d}".format(hidden_size_1) + "_HL_2.{:03d}".format(hidden_size_2)
         if useHL3 == 1:
@@ -89,8 +90,10 @@ def func_CreateLossVsKSComp(branches, nbFiles):
         if useHL4 == 1:
             folderName += "_HL_3.{:03d}".format(hidden_size_3) # if we kept useHL3=0, add HL3 & HL4 !
             folderName += "_HL_4.{:03d}".format(hidden_size_4)
-        folderName += "_LT.{:02d}".format(latent_size) + '/' + "{:04d}".format(nbFiles)
+        folderName += "_LT.{:02d}".format(latent_size) + '/' + "{:03d}".format(nbFiles)
         folderName += '/' + branches[i] + '/'
+        '''
+        folderName = createAEfolderName(hidden_size_1, hidden_size_2, hidden_size_3, hidden_size_4, useHL3, useHL4, latent_size, nbFiles, branches[i])
         affiche = colorText('{:03d}/{:03d}'.format(i,loopMaxValue-1), "green")
         print('\n{:s} : {:s}'.format(affiche, folderName))
         checkFolder(folderName)

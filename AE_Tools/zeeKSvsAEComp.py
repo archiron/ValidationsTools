@@ -26,12 +26,13 @@ matplotlib.use('agg')
 #Chilib_path = '/pbs/home/c/chiron/private/KS_Tools/ChiLib_CMS_Validation'
 Chilib_path = '/home/arnaud/cernbox/DEV_PYTHON/ChiLib'
 sys.path.append(Chilib_path)
+
 import default as dfo
 from default import *
 from defaultStd import *
 from sources import *
-from graph import *
 from controlFunctions import *
+from graphicAutoEncoderFunctions import *
 
 from DecisionBox import *
 DB = DecisionBox()
@@ -91,14 +92,17 @@ def func_createKSvsAECompare(branches):
     for nb in range(0, loopMaxValue):
         #print(branches[nb])
 
+        '''
         # create the folder name
         folderName = data_res+"/HL_1.{:03d}".format(hidden_size_1) + "_HL_2.{:03d}".format(hidden_size_2)
         if useHL3 == 1:
             folderName += "_HL_3.{:03d}".format(hidden_size_3)
         if useHL4 == 1:
             folderName += "_HL_4.{:03d}".format(hidden_size_4)
-        folderName += "_LT.{:02d}".format(latent_size) + '/' + "{:04d}".format(nbFiles)
+        folderName += "_LT.{:02d}".format(latent_size) + '/' + "{:03d}".format(nbFiles)
         folderName += '/' + branches[nb] + '/'
+        '''
+        folderName = createAEfolderName(hidden_size_1, hidden_size_2, hidden_size_3, hidden_size_4, useHL3, useHL4, latent_size, nbFiles, branches[nb])
         affiche = colorText('{:03d}/{:03d}'.format(nb,loopMaxValue-1), "green")
         print('\n{:s} : {:s}'.format(affiche, folderName))
         checkFolder(folderName)

@@ -11,11 +11,11 @@ from torch.utils import data
 from torch.nn.functional import normalize
 import pandas as pd
 
+from default import *
+from defaultStd import *
 from autoEncoders import *
 from controlFunctions import *
-from graph import *
-from defaultStd import *
-from default import *
+from graphicAutoEncoderFunctions import *
 
 def getKeysName(t_p, branchPath):
     b = []
@@ -204,6 +204,8 @@ t = datetime.datetime.today()
 
 loopMaxValue = nbBranches # nbBranches
 for i in range(0, loopMaxValue):
+    '''
+    # create the folder name
     folderName = data_res+"/HL_1.{:03d}".format(hidden_size_1) + "_HL_2.{:03d}".format(hidden_size_2)
     if useHL3 == 1:
         folderName += "_HL_3.{:03d}".format(hidden_size_3)
@@ -212,6 +214,8 @@ for i in range(0, loopMaxValue):
         folderName += "_HL_4.{:03d}".format(hidden_size_4)
     folderName += "_LT.{:02d}".format(latent_size) + '/' + "{:04d}".format(nbFiles)
     folderName += '/' + branches[i] + '/'
+    '''
+    folderName = createAEfolderName(hidden_size_1, hidden_size_2, hidden_size_3, hidden_size_4, useHL3, useHL4, latent_size, nbFiles, branches[i])
     affiche = colorText('{:03d}/{:03d}'.format(i,loopMaxValue-1), "green")
     print('\n{:s} : {:s}'.format(affiche, folderName))
     checkFolder(folderName)
