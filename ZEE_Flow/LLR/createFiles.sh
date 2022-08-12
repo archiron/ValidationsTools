@@ -25,6 +25,4 @@ cd -
 #python3 $2/createFiles.py $3 $4
 echo "executing $2/createFiles_v2.py $3 $4"
 python3 $2/createFiles_v2.py $3 $4
-echo "executing $2/extractNewFilesValues.py $3 $4"
-python3 $2/extractNewFilesValues.py $3 $4
 

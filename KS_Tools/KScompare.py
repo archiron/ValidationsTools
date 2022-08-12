@@ -150,7 +150,7 @@ sortedRels = sorted(rels, key = lambda x: x[0]) # gives an array with releases s
 
 # get list of generated ROOT files
 rootFilesList_0 = getListFiles(resultPath, 'root')
-print('there is ' + '{:03d}'.format(len(rootFilesList_0)) + ' ROOT files')
+print('there is ' + '{:03d}'.format(len(rootFilesList_0)) + ' generated ROOT files')
 nbFiles = change_nbFiles(len(rootFilesList_0), nbFiles)
 folder += '{:03d}'.format(nbFiles)
 folder = checkFolderName(folder)

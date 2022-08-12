@@ -3,7 +3,7 @@
 
 if [ "$1" == "" ] 
 then
-	echo "zee_Extract.sh has no argument"
+	echo "zee_flow.sh has no argument"
 	exit
 fi
 
@@ -20,6 +20,16 @@ eval `scramv1 runtime -sh`
 cd -
 
 #cd $2
-python3 $2/extractValues.py $3 $4 $5
 echo "executing $2/extractValues.py"
+python3 $2/extractValues.py $3 $4 $5
+echo "executing $2/extractNewFilesValues.py $3 $4 $5"
+python3 $2/extractNewFilesValues.py $3 $4 $5
+#python3 $2/extrGT.py
+#echo "executing $1/extrGT.py"
+#python3 $2/createFiles_v2.py
+#echo "executing $2/createFiles_v2.py"
+#python3 $2/zeeMapDiff.py
+#echo "executing $2/zeeMapDiff.py"
+#python3 $2/zeepValues.py
+#echo "executing $2/zeepValues.py"
 

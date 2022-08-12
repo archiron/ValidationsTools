@@ -70,7 +70,7 @@ for leaf in branches:
     
 fileList = getListFiles(resultPath) # get the list of the root files in the folderName folder
 fileList.sort()
-print('there is %d files' % len(fileList))
+print('there is %d generated ROOT files' % len(fileList))
 fileList = fileList[0:nbFiles]
 print('file list :')
 print(fileList)

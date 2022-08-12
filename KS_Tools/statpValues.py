@@ -86,6 +86,10 @@ folder += '{:03d}'.format(nbFiles)
 folder = checkFolderName(folder)
 print('folder après check : %s' % folder)
 checkFolder(folder)
+folder += 'KS'
+folder =checkFolderName(folder)
+print('folder après check : %s' % folder)
+checkFolder(folder)
 
 rels = []
 # get list of the added ROOT files

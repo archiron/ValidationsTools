@@ -2,7 +2,8 @@
 #-*-coding: utf-8 -*-
 
 ################################################################################
-# zeeNewFiles: create files with values for each histo for different releases
+# extractNewFilesValues: create file with values for each histo 
+# for different releases of the added ROOT files
 # for egamma validation comparison                              
 #
 # MUST be launched with the cmsenv cmd after a cmsrel cmd !!
@@ -11,23 +12,12 @@
 #                                                                              
 ################################################################################
 
-import os,sys, re
+import os,sys
 import time
-
-import pandas as pd
-import numpy as np
-import matplotlib
-
-# import matplotlib.dates as md
-matplotlib.use('agg')
-from matplotlib import pyplot as plt
 
 #import seaborn # only with cmsenv on cca.in2p3.fr
 
-# lines below are only for func_Extract
 from sys import argv
-from os import listdir
-from os.path import isfile, join
 
 argv.append( '-b-' )
 import ROOT
@@ -40,128 +30,95 @@ ROOT.gSystem.Load("libFWCoreFWLite.so")
 ROOT.gSystem.Load("libDataFormatsFWLite.so")
 ROOT.FWLiteEnabler.enable()
 
-sys.path.append('../ChiLib_CMS_Validation')
-from graphicFunctions import getHisto
-from controlFunctions import *
+if len(sys.argv) > 1:
+    print(sys.argv)
+    print("step 4 - arg. 0 :", sys.argv[0]) # name of the script
+    print("step 4 - arg. 1 :", sys.argv[1]) # LIB path
+    print("step 4 - arg. 2 :", sys.argv[2]) # COMMON files path
+    print("step 4 - arg. 3 :", sys.argv[3]) # RESULTFOLDER
+    resultPath = sys.argv[3]
+else:
+    print("rien")
+    resultPath = ''
+
+Chilib_path = sys.argv[1]
+sys.path.append(Chilib_path)
+Common_path = sys.argv[2]
+sys.path.append(Common_path)
+
 from default import *
+from controlFunctions import *
+from graphicFunctions import getHisto, getHistoConfEntry, fill_Snew2, fill_Snew
 from sources import *
+
+import numpy as np
+
+# get the branches for ElectronMcSignalHistos.txt
+source = Chilib_path + "/HistosConfigFiles/ElectronMcSignalHistos.txt"
+branches = []
+branches = getBranches(tp_1, source)
+cleanBranches(branches) # remove some histo wich have a pbm with KS.
+
+print("func_ExtractNewFilesVaues")
 
 # these line for daltonians !
 #seaborn.set_palette('colorblind')
 
-def getHistoConfEntry(h1):
-    d = 1
+dataPath = Common_path.replace('CommonFiles', 'DATA')
+dataPath = checkFolderName(dataPath)
+print(dataPath)
 
-    if ( h1.InheritsFrom("TH2") ):
-        print('TH2')
-    elif ( h1.InheritsFrom("TProfile") ):
-        #print('TProfile')
-        d = 0
-    elif ( h1.InheritsFrom("TH1")): # TH1
-        print('TH1')
-    else:
-        print("don't know")
+# get list of generated ROOT files
+rootFilesList_0 = getListFiles(resultPath, 'root')
+print('there is ' + '{:03d}'.format(len(rootFilesList_0)) + ' generated ROOT files')
+nbFiles = change_nbFiles(len(rootFilesList_0), nbFiles)
+folder += '{:03d}'.format(nbFiles)
+folder = checkFolderName(folder)
+print('folder après check : %s' % folder)
+checkFolder(folder)
 
-    return d
+# get list of the added ROOT files
+rootFolderName = dataPath # '/pbs/home/c/chiron/private/KS_Tools/GenExtract/DATA/NewFiles'
+rootFilesList = getListFiles(rootFolderName, 'root')
 
-def func_CreateKS(br, nbFiles):
-    print("func_Extract")
-    folderName = '/home/arnaud/cernbox/DEV_PYTHON/AutoEncoder/2022/DATASETS/NewFiles'
-    folderName = '/pbs/home/c/chiron/private/KS_Tools/GenExtract/DATA/NewFiles'
-    folderName = checkFolderName(folderName)
-    folder = folderName
+print('we use the files :')
+for item in rootFilesList:
+    print('%s' % item)
 
-    branches = br
-    N_histos = len(branches)
-    print('N_histos : %d' % N_histos)
-    
-    # create folder 
-    if not os.path.exists(folder):
-        try:
-            os.makedirs(folder)
-        except OSError as e:
-            if e.errno != errno.EEXIST: # the folder did not exist
-                raise  # raises the error again
-        print('Creation of %s release folder\n' % folder)
-    else:
-        print('Folder %s already created\n' % folder)
+N_histos = len(branches)
+print('N_histos : %d' % N_histos)
 
-    # get list of files
-    rootFilesList = getListFiles(folderName, 'root')
+KS_resume = folder + "branchesHistos_NewFiles.txt"
+print("KSname 0 : %s" % KS_resume)
+wKS_ = open(KS_resume, 'w')
 
-    print('we use the files :')
-    for item in rootFilesList:
-        print('%s' % item)
+tic = time.time()
 
-    KS_resume = folder + "branchesHistos_NewFiles.txt"
-    print("KSname 0 : %s" % KS_resume)
-    wKS_ = open(KS_resume, 'w')
-
-    tic = time.time()
-
-    for i in range(0, N_histos): # 1 histo for debug
+for i in range(0, N_histos): # 1 histo for debug
         
-        for file in rootFilesList:
-            # extract release version
-            fil = file.split('__')[2]
-            fil = fil.split('-')[0]
-            #print(fil)
-            inputFile = 'DATA/NewFiles/' + file
-            #print(inputFile)
-            rFile = ROOT.TFile(inputFile)
-            h1 = getHisto(rFile, tp_1)
-            print(branches[i]) # print histo name
-            histo_1 = h1.Get(branches[i])
-            s_new = []
-#            e_new = []
+    for file in rootFilesList:
+        # extract release version
+        fil = file.split('__')[2]
+        fil = fil.split('-')[0]
+        inputFile = dataPath + file
+        rFile = ROOT.TFile(inputFile)
+        h1 = getHisto(rFile, tp_1)
+        print(fil + '/' + branches[i]) # print histo name
+        histo_1 = h1.Get(branches[i])
 
-            d = getHistoConfEntry(histo_1)
-            #print("d = {}".format(d))
+        d = getHistoConfEntry(histo_1)
+        #print("d = {}".format(d))
 
-            ii = 0
-            texttoWrite = fil + "," + branches[i] + ","
-            if (d==1):
-                for entry in histo_1:
-                    s_new.append(entry)
-#                    e_new.append(histo_1.GetBinError(ii))
-            else:
-                print('GLOBOS')
-                for entry in histo_1:
-                    if ((histo_1.GetBinEntries(ii) == 0.) and (entry == 0.)):
-                        s_new.append(0.)
-                    elif ((histo_1.GetBinEntries(ii) == 0.) and (entry != 0.)):
-                        s_new.append(1.e38)
-                        print('=======================================================',ii,entry,histo_1.GetBinEntries(ii))
-                    else:
-                        s_new.append(entry/histo_1.GetBinEntries(ii))
-                    ii+=1
-            
-            s_new = np.asarray(s_new)
-            s_new = s_new[1:-1]
-#            e_new = e_new[1:-1]
-            for elem in s_new:
-                texttoWrite += str(elem) + ","
-            texttoWrite = texttoWrite[:-1] # remove last char
-            texttoWrite += '\n'
-            wKS_.write(texttoWrite)
+        texttoWrite = fil + "," + branches[i] + ","
+        s_new = fill_Snew2(d, histo_1)
+        
+        for elem in s_new:
+            texttoWrite += str(elem) + ","
+        texttoWrite = texttoWrite[:-1] # remove last char
+        texttoWrite += '\n'
+        wKS_.write(texttoWrite)
 
-    toc = time.time()
-    print('Done in {:.4f} seconds'.format(toc-tic))
-
-    return
-
-if __name__=="__main__":
-
-    # get the branches for ElectronMcSignalHistos.txt
-    branches = []
-    source = open("../ChiLib_CMS_Validation/HistosConfigFiles/ElectronMcSignalHistos.txt", "r")
-    branches = getBranches(tp_1, source)
-    print(branches[0:10])
-    cleanBranches(branches) # remove some histo wich have a pbm with KS.
-
-    nbFiles = 950
-
-    func_CreateKS(branches, nbFiles)  # create the KS files from histos datas
-
-    print("Fin !")
+wKS_.close()
+toc = time.time()
+print('Done in {:.4f} seconds'.format(toc-tic))
 
