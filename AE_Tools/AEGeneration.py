@@ -1,15 +1,68 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-import datetime
-import os
-from turtle import title
+################################################################################
+# AEGeneration : create a KS comparison (max diff) between the original curve 
+# and the predicted one for different egamma validation releases.
+#
+# MUST be launched with the cmsenv cmd after a cmsrel cmd !!
+#                                                                              
+# Arnaud Chiron-Turlay LLR - arnaud.chiron@llr.in2p3.fr                        
+#                                                                              
+################################################################################
 
-import numpy as np
-import torch
-from torch.utils import data
-from torch.nn.functional import normalize
+import datetime, time
+import sys, os
+#from turtle import title
+import imp, importlib
+import importlib.machinery
+import importlib.util
+
+#import seaborn # only with cmsenv on cca.in2p3.fr
+
+# lines below are only for func_Extract
+from sys import argv
+
+if len(sys.argv) > 1:
+    print(sys.argv)
+    print("step 4 - arg. 0 :", sys.argv[0]) # name of the script
+    print("step 4 - arg. 1 :", sys.argv[1]) # COMMON files path
+    print("step 4 - arg. 2 :", sys.argv[2]) # FileName for paths
+    commonPath = sys.argv[1]
+    filePaths = sys.argv[2]
+else:
+    print("rien")
+    resultPath = ''
+
 import pandas as pd
+import numpy as np
+## WARNING pbm with torch
+#import torch
+#from torch.utils import data
+#from torch.nn.functional import normalize
+
+# these line for daltonians !
+#seaborn.set_palette('colorblind')
+
+print("\nAE Generation")
+
+#blu = imp.load_source(filePaths, commonPath+filePaths)
+#print('DATA_SOURCE : %s' % blu.DATA_SOURCE)
+#resultPath = blu.RESULTFOLDER # checkFolderName(blu.RESULTFOLDER)
+#print('result path : {:s}'.format(resultPath))
+
+# Import module
+loader = importlib.machinery.SourceFileLoader( filePaths, commonPath+filePaths )
+spec = importlib.util.spec_from_loader( filePaths, loader )
+blo = importlib.util.module_from_spec( spec )
+loader.exec_module( blo )
+print('DATA_SOURCE : %s' % blo.DATA_SOURCE)
+resultPath = blo.RESULTFOLDER 
+print('result path : {:s}'.format(resultPath))
+
+Chilib_path = blo.LIB_SOURCE # checkFolderName(blo.LIB_SOURCE) # sys.argv[1]
+sys.path.append(Chilib_path)
+sys.path.append(commonPath)
 
 from default import *
 from defaultStd import *
@@ -42,91 +95,6 @@ def getKeysName(t_p, branchPath):
                 key = line
     source.close()
     return b
-
-def testExtension(histoName, histoPrevious):
-    after = "" # $histoName
-    common = histoName
-    if ( '_' not in histoName ): # no _ in histo name
-        before = histoName
-        common = histoName
-    else:
-        afters = histoName.split('_')
-        before = ''
-        nMax = len(afters)
-        #print('nMax : %d, histoprevious : %s'%(nMax,histoPrevious))
-
-        if ( afters[nMax - 1] == "endcaps" ):
-            after = "endcaps"
-            for i in range(0, nMax-1):
-                before += afters[i] + "_"
-                before = before[:-1]
-        elif ( afters[nMax - 1] == "barrel" ):
-            after = "barrel"
-            for i in range(0, nMax-1):
-                before += afters[i] + "_"
-                before = before[:-1]
-        else:
-            if ( histoPrevious == '' ):
-                before = histoName
-                after = ''
-                common = histoName
-            else:
-                avant = '' # afters[0]
-                after = ''
-                for i in range(0, nMax-1):
-                    avant = avant + "_" + afters[i]
-                    avant = avant[1:]
-                    if ( avant == histoPrevious ):
-                        #print('yep')
-                        before = avant
-                        common = histoPrevious
-                        break
-                for j in range(nMax - i, nMax):
-                    after += "_" + afters[j]
-                after = after[1:] # 
-
-    return after, before, common
-
-def testExtension2(histoName, histoPrevious):
-    after = "" # $histoName
-    common = ""
-
-    if '_' in histoName:
-        afters = histoName.split('_')
-        before = afters[0]
-        nMax = len(afters)
-
-        if ( afters[nMax - 1] == "endcaps" ):
-            after = "endcaps"
-            for i in range(1, nMax-1):
-                before += "_" + afters[i]
-        elif ( afters[nMax - 1] == "barrel" ):
-            after = "barrel"
-            for i in range(1, nMax-1):
-                before += "_" + afters[i]
-        else:
-            if ( histoPrevious == "" ):
-                before = histoName
-                after = ""
-                common = histoName
-            else:
-                avant =  afters[0]
-                after = ""
-                for i in range(1, nMax-1):
-                    avant += "_" + afters[i]
-                    if avant == histoPrevious:
-                        before = avant
-                        common = histoPrevious
-                        break
-                for j in range(nMax-1, nMax):
-                    after += "_" + afters[j]
-                after = after[1:]
-
-    else: # no _ in histoName
-        before = histoName
-        common = histoName
-
-    return [after, before, common]
 
 def createAutoEncoderRef(nbFiles, nbBranches, device, lr, epsilon, hidden_size_1, hidden_size_2, hidden_size_3, hidden_size_4, latent_size, batch_size, nb_epochs, percentageTrain):
     Text = []
@@ -169,24 +137,19 @@ o_loss = []
 y_pred_n = []
 y_pred_o = []
 
-data_dir = 'DATASETS' + '/{:03d}'.format(nbFiles)
+data_dir = resultPath + '/{:03d}'.format(nbFiles)
 data_res = 'RESULTS'
 data_img = 'IMAGES'
 
-#branches = ['h_ele_vertexPt', 'h_recCoreNum', 'h_recEleNum', # 0 1 2 
-#            'h_recOfflineVertices', 'h_ele_chargedHadronIso', 'h_ele_etaEff_all', # 3 4 5
-#            'h_ele_PoPtrueVsEta_pfx', 'h_scl_EoEtrue_barrel_new'] # 6 7
-#print(branches)
-
 branches = []
-branchPath = "DATASETS/ElectronMcSignalHistos.txt"
-branches = getBranches(tp_1, branchPath)
+source = Chilib_path + "/HistosConfigFiles/ElectronMcSignalHistos.txt"
+branches = getBranches(tp_1, source)
 cleanBranches(branches) # remove some histo wich have a pbm with KS.
-histoKeysNames = getKeysName(tp_1, branchPath)
+histoKeysNames = getKeysName(tp_1, source)
 #print(len(histoKeysNames))
 
 for branch in branches: # [0:8]
-    fileName = data_dir + "/histo_" + branch + '_{:03d}'.format(nbFiles) + "_0_lite.txt"
+    fileName = data_dir + "/histo_" + branch + '_{:03d}'.format(nbFiles) + ".txt"
     df.append(pd.read_csv(fileName))
     
 nbBranches = len(branches) # [0:8]
@@ -201,10 +164,12 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print('device : {:s}'.format(str(device)))
 
 t = datetime.datetime.today()
-
-loopMaxValue = nbBranches # nbBranches
-for i in range(0, loopMaxValue):
-    '''
+folderName = createAEfolderName(hidden_size_1, hidden_size_2, hidden_size_3, hidden_size_4, useHL3, useHL4, latent_size, nbFiles, branches[i])
+affiche = colorText('{:03d}/{:03d}'.format(i,loopMaxValue-1), "green")
+print('\n{:s} : {:s}'.format(affiche, folderName))
+#loopMaxValue = nbBranches # nbBranches
+#for i in range(0, loopMaxValue):
+'''
     # create the folder name
     folderName = data_res+"/HL_1.{:03d}".format(hidden_size_1) + "_HL_2.{:03d}".format(hidden_size_2)
     if useHL3 == 1:
@@ -215,11 +180,11 @@ for i in range(0, loopMaxValue):
     folderName += "_LT.{:02d}".format(latent_size) + '/' + "{:04d}".format(nbFiles)
     folderName += '/' + branches[i] + '/'
     '''
-    folderName = createAEfolderName(hidden_size_1, hidden_size_2, hidden_size_3, hidden_size_4, useHL3, useHL4, latent_size, nbFiles, branches[i])
+'''    folderName = createAEfolderName(hidden_size_1, hidden_size_2, hidden_size_3, hidden_size_4, useHL3, useHL4, latent_size, nbFiles, branches[i])
     affiche = colorText('{:03d}/{:03d}'.format(i,loopMaxValue-1), "green")
     print('\n{:s} : {:s}'.format(affiche, folderName))
     checkFolder(folderName)
-            
+
     exportParameters = folderName + '/parameters_' + '{:s}'.format(str(branches[i]))
     exportParameters += '{:d}'.format(t.year) + '{:02d}'.format(t.month) + '{:02d}'.format(t.day) + '-'  + '{:02d}'.format(t.hour) + '{:02d}'.format(t.minute) + '.html'
     print(exportParameters)
@@ -395,11 +360,12 @@ for i in range(0, loopMaxValue):
             #print('epoch : %03d : tr_lo = %e : te_lo = %e : r = %e' % (epoch, train_loss, test_loss, r))
             history_da['train_loss'].append(train_loss)
             history_da['test_loss'].append(test_loss)
-            '''bo1 = train_loss < epsilon
-            bo2 = test_loss < epsilon
-            if (bo1 and bo2):
-                break'''
-        r = (train_loss - test_loss) / (train_loss + test_loss)
+'''
+'''bo1 = train_loss < epsilon #deja commenté
+            bo2 = test_loss < epsilon#deja commenté
+            if (bo1 and bo2):#deja commenté
+                break'''#deja commenté
+'''        r = (train_loss - test_loss) / (train_loss + test_loss)
         print('epoch : %03d : tr_lo = %e : te_lo = %e : r = %e' % (epoch, train_loss, test_loss, r))
         fHisto.write('epoch : {:03d} : train_loss = {:e} : test_loss = {:e}<br>\n'.format(epoch, train_loss, test_loss))
         #print('epoch : %03d : tr_lo = %e : te_lo = %e' % (epoch, train_loss, test_loss))
@@ -480,12 +446,13 @@ for i in range(0, loopMaxValue):
         torch_tensor_new = torch.tensor(df_new.values)
 
         # normalize the tensor
-        '''if '_pfx' in branch:
-            print('pfx')
-            torch_tensor_entries_n = torch_tensor_new
-        else:
-            torch_tensor_entries_n = normalize(torch_tensor_new, p=2.0)'''
-        torch_tensor_entries_n = normalize(torch_tensor_new, p=2.0)
+'''
+'''        if '_pfx' in branch:#deja commenté
+            print('pfx')#deja commenté
+            torch_tensor_entries_n = torch_tensor_new#deja commenté
+        else:#deja commenté
+            torch_tensor_entries_n = normalize(torch_tensor_new, p=2.0)'''#deja commenté
+'''        torch_tensor_entries_n = normalize(torch_tensor_new, p=2.0)
         test_loader_n = data.DataLoader(torch_tensor_entries_n)
 
         encoder = torch.load(encoderName)
@@ -606,6 +573,6 @@ for i in range(0, loopMaxValue):
 
     fHisto.write('</table>')
     fHisto.close()
-
+'''
 print('end')
 

@@ -21,7 +21,7 @@ import time
 
 # lines below are only for func_Extract
 from sys import argv
-from tracemalloc import stop
+#from tracemalloc import stop
 
 argv.append( '-b-' )
 import ROOT
