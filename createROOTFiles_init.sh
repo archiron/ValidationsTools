@@ -1,4 +1,4 @@
-#!/bin/shchichi_serial_job_test
+#!/bin/sh
 # This file is called . createROOTFiles.sh
 
 JobName="chichi_serial_job_test" # for slurm
@@ -11,7 +11,7 @@ echo "actual path : $aa"
 
 STR=$aa
 Choice='Local'
-for SUB in 'llr' 'pbs'
+for SUB in 'llr' 'pbs' 'cern'
 do
   if [[ "$STR" == *"$SUB"* ]]; then
     echo "It's $SUB there.";

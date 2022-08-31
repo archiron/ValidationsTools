@@ -11,7 +11,7 @@ echo "actual path : $aa"
 
 STR=$aa
 Choice='Local'
-for SUB in 'llr' 'pbs'
+for SUB in 'llr' 'pbs' 'cern'
 do
   if [[ "$STR" == *"$SUB"* ]]; then
     echo "It's $SUB there.";

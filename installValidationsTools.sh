@@ -1,4 +1,4 @@
-#!/bin/shchichi_serial_job_test
+#!/bin/sh
 # This file is called . installValidationsTools.sh
 
 Release="CMSSW_12_1_0_pre5"
@@ -20,7 +20,7 @@ echo "actual path : $aa"
 
 STR=$aa
 Choice='Local'
-for SUB in 'llr' 'pbs'
+for SUB in 'llr' 'pbs' 'cern'
 do
   if [[ "$STR" == *"$SUB"* ]]; then
     echo "It's $SUB here.";
