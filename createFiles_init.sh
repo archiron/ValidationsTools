@@ -56,15 +56,17 @@ echo "COMMON_SOURCE : $COMMON_SOURCE"
 if [[ "$Choice" == "LLR" ]] 
   then
     echo "LLR"
+    source /opt/exp_soft/llr/root/v6.24.04-el7-gcc9xx-py370/etc/init.sh
     cd $LOG_SOURCE
-    eval `scramv1 runtime -sh`
-    #cd -
     /opt/exp_soft/cms/t3/t3submit -8c -long createFiles.sh $LOG_SOURCE $LOG_KS_SOURCE $COMMON_SOURCE $FileName
 elif [[ "$Choice" == "PBS" ]] 
   then
     echo "PBS"
     cd $LOG_SOURCE
-    eval `scramv1 runtime -sh`
+    module load Programming_Languages/python/3.9.1
+    module load Compilers/gcc/9.3.1
+    module load DataManagement/xrootd/4.8.1
+    module load Analysis/root/6.24.06
     sbatch -L sps -n 2 --mem=8000 -J $JobName -o $output createFiles.sh $LOG_SOURCE $LOG_KS_SOURCE $COMMON_SOURCE $FileName
 fi
 

@@ -72,9 +72,8 @@ mkdir -p $RESULTFOLDER
 if [[ "$Choice" == "LLR" ]] 
   then
     echo "LLR"
+    source /opt/exp_soft/llr/root/v6.24.04-el7-gcc9xx-py370/etc/init.sh
     cd $LOG_SOURCE
-    eval `scramv1 runtime -sh`
-    #cd -
     for i in $(eval echo "{$Nbegin..$Nend}") 
     do
       /opt/exp_soft/cms/t3/t3submit -8c -long createROOTFiles.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER
@@ -83,7 +82,10 @@ elif [[ "$Choice" == "PBS" ]]
   then
     echo "PBS"
     cd $LOG_SOURCE
-    eval `scramv1 runtime -sh`
+    module load Programming_Languages/python/3.9.1
+    module load Compilers/gcc/9.3.1
+    module load DataManagement/xrootd/4.8.1
+    module load Analysis/root/6.24.06
     for i in $(eval echo "{$Nbegin..$Nend}")
     do
       sbatch -L sps -n 8 --mem=8000 -J $JobName -o $output createROOTFiles.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER
