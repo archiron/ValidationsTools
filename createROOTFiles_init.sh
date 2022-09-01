@@ -48,15 +48,12 @@ echo $FileName
 readarray toto -t array < CommonFiles/$FileName
 N=${#toto[@]}
 echo "N= $N"
-#echo ${toto[@]}
 
-#for (( j=0; j<${N}; j++ ));
-#do
-#  printf "Current index %d with value %s" $j "${toto[$j]}"
-#done
 LOG_SOURCE="${toto[15]}"
 LOG_SOURCE=${LOG_SOURCE//LOG_SOURCE=}
 LOG_SOURCE=${LOG_SOURCE//\"}
+LOG_SOURCE=${LOG_SOURCE%?}
+LOG_SOURCE="${LOG_SOURCE}CMSSW_12_1_0_pre5/src/Kolmogorov"
 LOG_OUTPUT="${toto[16]}"
 LOG_OUTPUT=${LOG_OUTPUT//LOG_OUTPUT=}
 LOG_OUTPUT=${LOG_OUTPUT//\"}
@@ -72,8 +69,8 @@ mkdir -p $RESULTFOLDER
 if [[ "$Choice" == "LLR" ]] 
   then
     echo "LLR"
-    source /opt/exp_soft/llr/root/v6.24.04-el7-gcc9xx-py370/etc/init.sh
     cd $LOG_SOURCE
+    eval `scramv1 runtime -sh`
     for i in $(eval echo "{$Nbegin..$Nend}") 
     do
       /opt/exp_soft/cms/t3/t3submit -8c -long createROOTFiles.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER
@@ -82,10 +79,7 @@ elif [[ "$Choice" == "PBS" ]]
   then
     echo "PBS"
     cd $LOG_SOURCE
-    module load Programming_Languages/python/3.9.1
-    module load Compilers/gcc/9.3.1
-    module load DataManagement/xrootd/4.8.1
-    module load Analysis/root/6.24.06
+    eval `scramv1 runtime -sh`
     for i in $(eval echo "{$Nbegin..$Nend}")
     do
       sbatch -L sps -n 8 --mem=8000 -J $JobName -o $output createROOTFiles.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER

@@ -13,7 +13,7 @@
 # pwd : /afs/cern.ch/user/a/archiron
 
 # be careful to not forget the '/' at the end of the path
-LOG_SOURCE="/afs/cern.ch/user/a/archiron/private/ValidationsTools/ZEE_Flow/CMSSW_12_1_0_pre5/src/Kolmogorov"
+LOG_SOURCE="/afs/cern.ch/user/a/archiron/private/ValidationsTools/ZEE_Flow/"
 LOG_OUTPUT="/sps/cms/chiron/TEMP/"
 RESULTFOLDER="/sps/cms/chiron/CMSSW_12_1_0_pre5-16c-13"
 LOG_KS_SOURCE="/afs/cern.ch/user/a/archiron/private/ValidationsTools/KS_Tools/"

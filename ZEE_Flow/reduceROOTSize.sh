@@ -14,8 +14,8 @@ LOG_SOURCE=$2
 echo "Step 1 in : $LOG_SOURCE"
 
 cd $2
-eval `scramv1 runtime -sh`
-cd -
+#eval `scramv1 runtime -sh`
+#cd -
 
-python3 $2/reduceSize1File.py $1 $2 $3 $4
+python3 $2/reduceSize1File.py $1 $3 $4
 

@@ -26,9 +26,9 @@ argv.remove( '-b-' )
 
 from ROOT import *
 
-ROOT.gSystem.Load("libFWCoreFWLite.so")
-ROOT.gSystem.Load("libDataFormatsFWLite.so")
-ROOT.FWLiteEnabler.enable()
+#ROOT.gSystem.Load("libFWCoreFWLite.so")
+#ROOT.gSystem.Load("libDataFormatsFWLite.so")
+#ROOT.FWLiteEnabler.enable()
 
 sys.path.append('../ChiLib')
 
@@ -79,12 +79,12 @@ if len(sys.argv) > 1:
     print(sys.argv)
     print("step 4 - arg. 0 :", sys.argv[0]) # name of the script
     print("step 4 - arg. 1 :", sys.argv[1]) # index
-    print("step 4 - arg. 2 :", sys.argv[2]) # path
-    print("step 4 - arg. 3 :", sys.argv[3]) # nb of events
-    print("step 4 - arg. 4 :", sys.argv[4]) # RESULTFOLDER
+    #print("step 4 - arg. 2 :", sys.argv[2]) # path
+    print("step 4 - arg. 2 :", sys.argv[2]) # nb of events
+    print("step 4 - arg. 3 :", sys.argv[3]) # RESULTFOLDER
     ind = int(sys.argv[1])
-    resultPath = sys.argv[4]
-    max_number = int(sys.argv[3])
+    resultPath = sys.argv[3]
+    max_number = int(sys.argv[2])
 else:
     print("step 4 - rien")
     ind = 0

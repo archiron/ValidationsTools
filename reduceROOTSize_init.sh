@@ -72,8 +72,6 @@ if [[ "$Choice" == "LLR" ]]
     echo "LLR"
     source /opt/exp_soft/llr/root/v6.24.04-el7-gcc9xx-py370/etc/init.sh
     cd $LOG_SOURCE
-    eval `scramv1 runtime -sh`
-    #cd -
     for i in $(eval echo "{$Nbegin..$Nend}") 
     do
       /opt/exp_soft/cms/t3/t3submit -8c -long reduceROOTSize.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER

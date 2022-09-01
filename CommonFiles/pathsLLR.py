@@ -13,8 +13,8 @@
 # pwd : /home/llr/info/chiron_u
 
 # be careful to not forget the '/' at the end of the path
-LOG_SOURCE="/home/llr/info/chiron_u/PYTHON/ValidationsTools/ZEE_Flow/CMSSW_12_1_0_pre5/src/Kolmogorov/"
-LOG_OUTPUT="/home/llr/info/chiron_u/PYTHON/ValidationsTools/ZEE_Flow/CMSSW_12_1_0_pre5/src/Kolmogorov/"
+LOG_SOURCE="/home/llr/info/chiron_u/PYTHON/ValidationsTools/ZEE_Flow/"
+LOG_OUTPUT="/home/llr/info/chiron_u/PYTHON/ValidationsTools/ZEE_Flow/"
 RESULTFOLDER="/data_CMS/cms/chiron/HGCAL/TEST_12_1_0_pre5bb"
 LOG_KS_SOURCE="/home/llr/info/chiron_u/PYTHON/ValidationsTools/KS_Tools/"
 LIB_SOURCE="/home/llr/info/chiron_u/PYTHON/ValidationsTools/ChiLib/"
