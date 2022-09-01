@@ -49,11 +49,21 @@ readarray toto -t array < CommonFiles/$FileName
 N=${#toto[@]}
 echo "N= $N"
 
+# Get local Release used
+for item in `ls -drt ZEE_Flow/*/` 
+do
+  printf "   %s\n" $item
+  release=$item
+done
+echo $release
+release=${release//\/}
+release=${release//ZEE_Flow/}
+
 LOG_SOURCE="${toto[15]}"
 LOG_SOURCE=${LOG_SOURCE//LOG_SOURCE=}
 LOG_SOURCE=${LOG_SOURCE//\"}
 LOG_SOURCE=${LOG_SOURCE%?}
-LOG_SOURCE="${LOG_SOURCE}CMSSW_12_1_0_pre5/src/Kolmogorov"
+LOG_SOURCE="${LOG_SOURCE}${release}/src/Kolmogorov"
 LOG_OUTPUT="${toto[16]}"
 LOG_OUTPUT=${LOG_OUTPUT//LOG_OUTPUT=}
 LOG_OUTPUT=${LOG_OUTPUT//\"}
