@@ -26,9 +26,9 @@ argv.remove( '-b-' )
 
 from ROOT import *
 
-ROOT.gSystem.Load("libFWCoreFWLite.so")
-ROOT.gSystem.Load("libDataFormatsFWLite.so")
-ROOT.FWLiteEnabler.enable()
+#ROOT.gSystem.Load("libFWCoreFWLite.so")
+#ROOT.gSystem.Load("libDataFormatsFWLite.so")
+#ROOT.FWLiteEnabler.enable()
 
 if len(sys.argv) > 1:
     print(sys.argv)
