@@ -1,7 +1,13 @@
 #!/bin/sh
-# This file is called . installValidationsTools.sh
+# This file is called . installValidationsTools.sh nomRelease
+# if nomRelease is empty the default Release is used.
 
-Release="CMSSW_12_1_0_pre5"
+defaultRelease="CMSSW_12_1_0_pre5"
+Release=$defaultRelease
+if [[ $# -eq 1 ]]; then
+  Release=$1
+fi
+echo "use the $Release release"
 
 # tester si on est bien dans ValidationsTools
 echo "Cloning ChiLib"
@@ -13,28 +19,11 @@ cmsrel $Release $Release
 cd $Release/src
 mkdir Kolmogorov
 cd ../../
-chmod 755 ZEE_Flow/$release/src/Kolmogorov/*.sh
-
-aa=$PWD
-echo "actual path : $aa"
-
-STR=$aa
-Choice='Local'
-for SUB in 'llr' 'pbs' 'cern'
-do
-  if [[ "$STR" == *"$SUB"* ]]; then
-    echo "It's $SUB here.";
-    Choice=${SUB^^};
-  fi
-done
-
-if [[ "$Choice" == "PBS" ]]; then
-    Choice="CCA";
-fi
-echo "Choice is : $Choice"
+chmod 755 ZEE_Flow/*.sh
 
 echo "Copying files into Kolmogorov folder"
-cp $Choice/* $Release/src/Kolmogorov
+cp createROOTFiles.sh $Release/src/Kolmogorov
+cp step*.py $Release/src/Kolmogorov
 
 cd ../ # back to /ValidationsTools
 
