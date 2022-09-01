@@ -55,15 +55,17 @@ do
   printf "   %s\n" $item
   release=$item
 done
+release=${release%?}
+#release=${release//\/}
+#release=${release//ZEE_Flow/}
 echo $release
-release=${release//\/}
-release=${release//ZEE_Flow/}
 
-LOG_SOURCE="${toto[15]}"
+#LOG_SOURCE="${toto[15]}"
+LOG_SOURCE=$aa
 LOG_SOURCE=${LOG_SOURCE//LOG_SOURCE=}
 LOG_SOURCE=${LOG_SOURCE//\"}
-LOG_SOURCE=${LOG_SOURCE%?}
-LOG_SOURCE="${LOG_SOURCE}${release}/src/Kolmogorov"
+#LOG_SOURCE=${LOG_SOURCE%?}
+LOG_SOURCE="${LOG_SOURCE}/${release}/src/Kolmogorov"
 LOG_OUTPUT="${toto[16]}"
 LOG_OUTPUT=${LOG_OUTPUT//LOG_OUTPUT=}
 LOG_OUTPUT=${LOG_OUTPUT//\"}
@@ -83,7 +85,7 @@ if [[ "$Choice" == "LLR" ]]
     eval `scramv1 runtime -sh`
     for i in $(eval echo "{$Nbegin..$Nend}") 
     do
-      /opt/exp_soft/cms/t3/t3submit -8c -long createROOTFiles.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER
+      /opt/exp_soft/cms/t3/t3submit -8c -long createROOTFiles.sh $i $aa $NB_EVTS $RESULTFOLDER
     done
 elif [[ "$Choice" == "PBS" ]] 
   then
@@ -92,7 +94,7 @@ elif [[ "$Choice" == "PBS" ]]
     eval `scramv1 runtime -sh`
     for i in $(eval echo "{$Nbegin..$Nend}")
     do
-      sbatch -L sps -n 8 --mem=8000 -J $JobName -o $output createROOTFiles.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER
+      sbatch -L sps -n 8 --mem=8000 -J $JobName -o $output createROOTFiles.sh $i $aa $NB_EVTS $RESULTFOLDER
     done
 fi
 
