@@ -27,22 +27,22 @@ readarray toto -t array < CommonFiles/$FileName
 N=${#toto[@]}
 echo "N= $N"
 
-LOG_SOURCE="${toto[15]}"
+LOG_SOURCE="$aa/${toto[15]}"
 LOG_SOURCE=${LOG_SOURCE//LOG_SOURCE=}
 LOG_SOURCE=${LOG_SOURCE//\"}
-LOG_OUTPUT="${toto[16]}"
+LOG_OUTPUT="$aa/${toto[16]}"
 LOG_OUTPUT=${LOG_OUTPUT//LOG_OUTPUT=}
 LOG_OUTPUT=${LOG_OUTPUT//\"}
 RESULTFOLDER="${toto[17]}"
 RESULTFOLDER=${RESULTFOLDER//RESULTFOLDER=}
 RESULTFOLDER=${RESULTFOLDER//\"}
-LOG_KS_SOURCE="${toto[18]}"
+LOG_KS_SOURCE="$aa/${toto[18]}"
 LOG_KS_SOURCE=${LOG_KS_SOURCE//LOG_KS_SOURCE=}
 LOG_KS_SOURCE=${LOG_KS_SOURCE//\"}
-LIB_SOURCE="${toto[19]}"
+LIB_SOURCE="$aa/${toto[19]}"
 LIB_SOURCE=${LIB_SOURCE//LIB_SOURCE=}
 LIB_SOURCE=${LIB_SOURCE//\"}
-COMMON_SOURCE="${toto[20]}"
+COMMON_SOURCE="$aa/${toto[20]}"
 COMMON_SOURCE=${COMMON_SOURCE//COMMON_SOURCE=}
 COMMON_SOURCE=${COMMON_SOURCE//\"}
 
@@ -58,7 +58,9 @@ if [[ "$Choice" == "LLR" ]]
     echo "LLR"
     source /opt/exp_soft/llr/root/v6.24.04-el7-gcc9xx-py370/etc/init.sh
     cd $LOG_SOURCE
-    /opt/exp_soft/cms/t3/t3submit -8c -long extractValues.sh $LOG_SOURCE $LOG_KS_SOURCE $LIB_SOURCE $COMMON_SOURCE $RESULTFOLDER
+    #/opt/exp_soft/cms/t3/t3submit -8c -long extractValues.sh $LOG_SOURCE $LOG_KS_SOURCE $LIB_SOURCE $COMMON_SOURCE $RESULTFOLDER
+    #/opt/exp_soft/cms/t3/t3submit -8c -short extractValues.sh $LOG_SOURCE $LOG_KS_SOURCE $LIB_SOURCE $COMMON_SOURCE $RESULTFOLDER
+    /opt/exp_soft/cms/t3/t3submit -8c -reserv extractValues.sh $LOG_SOURCE $LOG_KS_SOURCE $LIB_SOURCE $COMMON_SOURCE $RESULTFOLDER
 elif [[ "$Choice" == "PBS" ]] 
   then
     echo "PBS"

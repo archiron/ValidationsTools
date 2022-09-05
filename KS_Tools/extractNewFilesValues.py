@@ -82,6 +82,10 @@ rootFolderName = dataPath # '/pbs/home/c/chiron/private/KS_Tools/GenExtract/DATA
 rootFilesList = getListFiles(rootFolderName, 'root')
 
 print('we use the files :')
+print('there is ' + '{:03d}'.format(len(rootFilesList)) + ' added ROOT files')
+if (len(rootFilesList) == 0):
+    print('no added ROOT files to work with. Existing.')
+    exit()
 for item in rootFilesList:
     print('%s' % item)
 
