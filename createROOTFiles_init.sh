@@ -64,9 +64,8 @@ echo $release
 LOG_SOURCE=$aa
 LOG_SOURCE=${LOG_SOURCE//LOG_SOURCE=}
 LOG_SOURCE=${LOG_SOURCE//\"}
-#LOG_SOURCE=${LOG_SOURCE%?}
 LOG_SOURCE="${LOG_SOURCE}/${release}/src/Kolmogorov"
-LOG_OUTPUT="${toto[16]}"
+LOG_OUTPUT="$aa/${toto[16]}"
 LOG_OUTPUT=${LOG_OUTPUT//LOG_OUTPUT=}
 LOG_OUTPUT=${LOG_OUTPUT//\"}
 RESULTFOLDER="${toto[17]}"
@@ -96,7 +95,7 @@ elif [[ "$Choice" == "PBS" ]]
     eval `scramv1 runtime -sh`
     for i in $(eval echo "{$Nbegin..$Nend}")
     do
-      sbatch -L sps -n 8 --mem=8000 -J $JobName -o $output createROOTFiles.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER
+      sbatch -L sps -n 8 --mem=8000 -J $JobName -o $output createROOTFiles.sh $i $aa $NB_EVTS $RESULTFOLDER
     done
 fi
 

@@ -13,12 +13,12 @@
 # pwd : /home/arnaud
 
 # be careful to not forget the '/' at the end of the path
-LOG_SOURCE="/home/arnaud/cernbox/DEV_PYTHON/ValidationsTools/ZEE_FLOW/"
-LOG_OUTPUT="/home/arnaud/cernbox/DEV_PYTHON/ValidationsTools/ZEE_FLOW/TEMP"
-RESULTFOLDER="/home/arnaud/cernbox/DEV_PYTHON/ValidationsTools/HGCAL/TEST_12_1_0_pre5bb"
-LOG_KS_SOURCE="/home/arnaud/cernbox/DEV_PYTHON/ValidationsTools/KS_Tools/"
-LIB_SOURCE="/home/arnaud/cernbox/DEV_PYTHON/ValidationsTools/ChiLib/"
-COMMON_SOURCE="/home/arnaud/cernbox/DEV_PYTHON/ValidationsTools/CommonFiles/"
-DATA_SOURCE="/home/arnaud/cernbox/DEV_PYTHON/ValidationsTools/DATA/"
-CHECK_SOURCE="/home/arnaud/cernbox/DEV_PYTHON/ValidationsTools/Check/"
-LOG_AE_SOURCE="/home/arnaud/cernbox/DEV_PYTHON/ValidationsTools/AE_Tools/"
+LOG_SOURCE="ZEE_FLOW/"
+LOG_OUTPUT="ZEE_FLOW/TEMP"
+RESULTFOLDER="HGCAL/TEST_12_1_0_pre5bb"
+LOG_KS_SOURCE="KS_Tools/"
+LIB_SOURCE="ChiLib/"
+COMMON_SOURCE="CommonFiles/"
+DATA_SOURCE="DATA/"
+CHECK_SOURCE="Check/"
+LOG_AE_SOURCE="AE_Tools/"

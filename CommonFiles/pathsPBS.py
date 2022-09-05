@@ -13,12 +13,12 @@
 # pwd : /pbs/home/c/chiron
 
 # be careful to not forget the '/' at the end of the path
-LOG_SOURCE="/pbs/home/c/chiron/private/ValidationsTools/ZEE_Flow/"
+LOG_SOURCE="ZEE_Flow/"
 LOG_OUTPUT="/sps/cms/chiron/TEMP/"
 RESULTFOLDER="/sps/cms/chiron/CMSSW_12_1_0_pre5-16c-13/"
-LOG_KS_SOURCE="/pbs/home/c/chiron/private/ValidationsTools/KS_Tools/"
-LIB_SOURCE="/pbs/home/c/chiron/private/ValidationsTools/ChiLib/"
-COMMON_SOURCE="/pbs/home/c/chiron/private/ValidationsTools/CommonFiles/"
-DATA_SOURCE="/pbs/home/c/chiron/private/ValidationsTools/DATA/"
-CHECK_SOURCE="/pbs/home/c/chiron/private/ValidationsTools/Check/"
-LOG_AE_SOURCE="/pbs/home/c/chiron/private/ValidationsTools/AE_Tools/"
+LOG_KS_SOURCE="KS_Tools/"
+LIB_SOURCE="ChiLib/"
+COMMON_SOURCE="CommonFiles/"
+DATA_SOURCE="DATA/"
+CHECK_SOURCE="Check/"
+LOG_AE_SOURCE="AE_Tools/"

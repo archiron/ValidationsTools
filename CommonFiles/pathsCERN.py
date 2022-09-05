@@ -13,12 +13,12 @@
 # pwd : /afs/cern.ch/user/a/archiron
 
 # be careful to not forget the '/' at the end of the path
-LOG_SOURCE="/afs/cern.ch/user/a/archiron/private/ValidationsTools/ZEE_Flow/"
+LOG_SOURCE="ZEE_Flow/"
 LOG_OUTPUT="/sps/cms/chiron/TEMP/"
 RESULTFOLDER="/sps/cms/chiron/CMSSW_12_1_0_pre5-16c-13"
-LOG_KS_SOURCE="/afs/cern.ch/user/a/archiron/private/ValidationsTools/KS_Tools/"
-LIB_SOURCE="/afs/cern.ch/user/a/archiron/private/ValidationsTools/ChiLib/"
-COMMON_SOURCE="/afs/cern.ch/user/a/archiron/private/ValidationsTools/CommonFiles/"
-DATA_SOURCE="/afs/cern.ch/user/a/archiron/private/ValidationsTools/DATA/"
-CHECK_SOURCE="/afs/cern.ch/user/a/archiron/private/ValidationsTools/Check/"
-LOG_AE_SOURCE="/afs/cern.ch/user/a/archiron/private/ValidationsTools/AE_Tools/"
+LOG_KS_SOURCE="KS_Tools/"
+LIB_SOURCE="ChiLib/"
+COMMON_SOURCE="CommonFiles/"
+DATA_SOURCE="DATA/"
+CHECK_SOURCE="Check/"
+LOG_AE_SOURCE="AE_Tools/"

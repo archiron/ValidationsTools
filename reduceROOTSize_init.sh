@@ -50,14 +50,12 @@ N=${#toto[@]}
 echo "N= $N"
 #echo ${toto[@]}
 
-#for (( j=0; j<${N}; j++ ));
-#do
-#  printf "Current index %d with value %s" $j "${toto[$j]}"
-#done
-LOG_SOURCE="${toto[15]}"
+LOG_SOURCE="$aa/${toto[15]}"
+#LOG_SOURCE=$aa
 LOG_SOURCE=${LOG_SOURCE//LOG_SOURCE=}
 LOG_SOURCE=${LOG_SOURCE//\"}
-LOG_OUTPUT="${toto[16]}"
+#LOG_SOURCE="${LOG_SOURCE}/${release}/src/Kolmogorov"
+LOG_OUTPUT="$aa/${toto[16]}"
 LOG_OUTPUT=${LOG_OUTPUT//LOG_OUTPUT=}
 LOG_OUTPUT=${LOG_OUTPUT//\"}
 RESULTFOLDER="${toto[17]}"
@@ -74,7 +72,9 @@ if [[ "$Choice" == "LLR" ]]
     cd $LOG_SOURCE
     for i in $(eval echo "{$Nbegin..$Nend}") 
     do
-      /opt/exp_soft/cms/t3/t3submit -8c -long reduceROOTSize.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER
+      #/opt/exp_soft/cms/t3/t3submit -8c -long reduceROOTSize.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER
+      #/opt/exp_soft/cms/t3/t3submit -8c -short reduceROOTSize.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER
+      /opt/exp_soft/cms/t3/t3submit -8c -reserv reduceROOTSize.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER
     done
 elif [[ "$Choice" == "PBS" ]] 
   then
