@@ -27,9 +27,9 @@ argv.remove( '-b-' )
 
 from ROOT import *
 
-ROOT.gSystem.Load("libFWCoreFWLite.so")
-ROOT.gSystem.Load("libDataFormatsFWLite.so")
-ROOT.FWLiteEnabler.enable()
+#ROOT.gSystem.Load("libFWCoreFWLite.so")
+#ROOT.gSystem.Load("libDataFormatsFWLite.so")
+#ROOT.FWLiteEnabler.enable()
 
 if len(sys.argv) > 1:
     print(sys.argv)
@@ -38,6 +38,7 @@ if len(sys.argv) > 1:
     print("step 4 - arg. 2 :", sys.argv[2]) # Check Folder
     print("step 5 - arg. 3 :", sys.argv[3]) # FileName for paths
     commonPath = sys.argv[1]
+    workPath=sys.argv[2][:-6]
     filePaths = sys.argv[3]
 else:
     print("rien")
@@ -54,9 +55,9 @@ loader.exec_module( blo )
 
 resultPath = blo.RESULTFOLDER 
 print('result path : {:s}'.format(resultPath))
-Chilib_path = blo.LIB_SOURCE # checkFolderName(blo.LIB_SOURCE) # sys.argv[1]
+Chilib_path = workPath + '/' + blo.LIB_SOURCE # checkFolderName(blo.LIB_SOURCE) # sys.argv[1]
 print('Lib path : {:s}'.format(Chilib_path))
-dataPath = blo.DATA_SOURCE
+dataPath = workPath + '/' + blo.DATA_SOURCE
 print('DATA_SOURCE : %s' % dataPath)
 
 sys.path.append(Chilib_path)
