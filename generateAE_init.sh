@@ -2,7 +2,7 @@
 # This file is called . generateAE_init.sh
 
 JobName="chichi_serial_job_test" # for slurm
-output="chichi_%j.log" # for slurm
+output="chichi_%j.log" # for slurm 
 
 declare -a readarray
 
