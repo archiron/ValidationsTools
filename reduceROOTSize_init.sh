@@ -1,12 +1,12 @@
 #!/bin/sh
 # This file is called . reduceROOTSize.sh
 
-JobName="chichi_serial_job_test" # for slurm
-output="chichi_%j.log" # for slurm
+JobName="reduceROOT_serial_job_test" # for slurm
+output="reduceROOT_%j.log" # for slurm
 
 declare -a readarray
 
-aa=$PWD
+aa=$PWD  
 echo "actual path : $aa"
 
 STR=$aa
