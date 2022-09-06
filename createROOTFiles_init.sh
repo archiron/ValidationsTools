@@ -1,8 +1,8 @@
 #!/bin/sh
 # This file is called . createROOTFiles.sh
 
-JobName="chichi_serial_job_test" # for slurm
-output="chichi_%j.log" # for slurm
+JobName="createROOTFiles_serial_job_test" # for slurm
+output="createROOTFiles_%j.log" # for slurm
 
 declare -a readarray
 
@@ -95,7 +95,7 @@ elif [[ "$Choice" == "PBS" ]]
     eval `scramv1 runtime -sh`
     for i in $(eval echo "{$Nbegin..$Nend}")
     do
-      sbatch -L sps -n 8 --mem=8000 -J $JobName -o $output createROOTFiles.sh $i $aa $NB_EVTS $RESULTFOLDER
+      sbatch -L sps -n 8 --mem=8000 -J $JobName -o $output createROOTFiles.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER
     done
 fi
 

@@ -1,8 +1,8 @@
 #!/bin/sh
 # This file is called . createFiles_init.sh
 
-JobName="chichi_serial_job_test" # for slurm
-output="chichi_%j.log" # for slurm
+JobName="createFiles_serial_job_test" # for slurm
+output="createFiles_%j.log" # for slurm
 
 declare -a readarray
 
