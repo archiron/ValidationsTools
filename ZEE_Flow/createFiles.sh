@@ -1,9 +1,9 @@
 #!/bin/sh
-# This file is called ./extractValues.sh by extractValues_init.sh
+# This file is called ./createFiles.sh by createFiles.sh
 
 if [ "$1" == "" ] 
 then
-	echo "zee_Extract.sh has no argument"
+	echo "createFiles.sh has no argument"
 	exit
 fi
 
@@ -17,8 +17,8 @@ echo "paths file : $4"
 #cd $LOG_SOURCE
 cd $1
 #source /afs/cern.ch/cms/cmsset_default.sh
-eval `scramv1 runtime -sh`
-cd -
+#eval `scramv1 runtime -sh`
+#cd -
 
 #cd $2
 #echo "executing $2/createFiles.py $3 $4"

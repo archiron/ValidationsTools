@@ -3,7 +3,7 @@
 
 if [ "$1" == "" ] 
 then
-	echo "zee_flow.sh has no argument"
+	echo "extractValues.sh has no argument"
 	exit
 fi
 

@@ -30,9 +30,9 @@ argv.remove( '-b-' )
 
 from ROOT import *
 
-ROOT.gSystem.Load("libFWCoreFWLite.so")
-ROOT.gSystem.Load("libDataFormatsFWLite.so")
-ROOT.FWLiteEnabler.enable()
+#ROOT.gSystem.Load("libFWCoreFWLite.so")
+#ROOT.gSystem.Load("libDataFormatsFWLite.so")
+#ROOT.FWLiteEnabler.enable()
 
 if len(sys.argv) > 1:
     print(sys.argv)
@@ -41,6 +41,7 @@ if len(sys.argv) > 1:
     print("step 4 - arg. 4 :", sys.argv[2]) # FileName for paths
     commonPath = sys.argv[1]
     filePaths = sys.argv[2]
+    workPath=sys.argv[1][:-12]
 else:
     print("rien")
     resultPath = ''
@@ -72,7 +73,7 @@ print('DATA_SOURCE : %s' % blo.DATA_SOURCE)
 resultPath = blo.RESULTFOLDER 
 print('result path : {:s}'.format(resultPath))
 
-Chilib_path = blo.LIB_SOURCE # checkFolderName(blo.LIB_SOURCE) # sys.argv[1]
+Chilib_path = workPath + '/' + blo.LIB_SOURCE # checkFolderName(blo.LIB_SOURCE) # sys.argv[1]
 sys.path.append(Chilib_path)
 sys.path.append(commonPath)
 
@@ -112,7 +113,7 @@ else:
     print('Folder %s already created\n' % folder)
 
 # get list of added ROOT files for comparison
-rootFolderName = blo.DATA_SOURCE # '/pbs/home/c/chiron/private/KS_Tools/GenExtract/DATA/NewFiles'
+rootFolderName = workPath + '/' + blo.DATA_SOURCE # '/pbs/home/c/chiron/private/KS_Tools/GenExtract/DATA/NewFiles'
 rootFilesList = getListFiles(rootFolderName, 'root')
 print('we use the files :')
 for item in rootFilesList:
