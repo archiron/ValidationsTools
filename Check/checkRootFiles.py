@@ -152,7 +152,7 @@ else:
     newBranches = optimizeBranches(tmp_branches)
 
 # get list of added ROOT files for comparison
-rootFolderName = blo.DATA_SOURCE # '/pbs/home/c/chiron/private/KS_Tools/GenExtract/DATA/NewFiles'
+rootFolderName = workPath + '/' + blo.DATA_SOURCE # '/pbs/home/c/chiron/private/KS_Tools/GenExtract/DATA/NewFiles'
 rootFilesList = getListFiles(rootFolderName, 'root')
 print('\nlist of the added ROOT files')
 print('we use the files :')
@@ -273,7 +273,7 @@ else:
     newBranches = optimizeBranches(tmp_branches)
 
 # get list of added ROOT files for comparison
-rootFolderName = blo.DATA_SOURCE # '/pbs/home/c/chiron/private/KS_Tools/GenExtract/DATA/NewFiles'
+rootFolderName = workPath + '/' + blo.DATA_SOURCE # '/pbs/home/c/chiron/private/KS_Tools/GenExtract/DATA/NewFiles'
 rootFilesList = getListFiles(rootFolderName, 'root')
 print('\nlist of the added ROOT files')
 print('we use the files :')
