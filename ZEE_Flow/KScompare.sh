@@ -17,8 +17,8 @@ echo "paths file : $4"
 #cd $LOG_SOURCE
 cd $1
 #source /afs/cern.ch/cms/cmsset_default.sh
-eval `scramv1 runtime -sh`
-cd -
+#eval `scramv1 runtime -sh`
+#cd -
 
 #cd $2
 echo "executing $2/KScompare.py $3 $4"
