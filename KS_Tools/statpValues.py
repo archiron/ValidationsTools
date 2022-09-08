@@ -88,10 +88,10 @@ folder += '{:03d}'.format(nbFiles)
 folder = checkFolderName(folder)
 print('folder après check : %s' % folder)
 checkFolder(folder)
-folder += 'KS'
-folder =checkFolderName(folder)
-print('folder après check : %s' % folder)
-checkFolder(folder)
+folderKS = folder + 'KS'
+folderKS =checkFolderName(folderKS)
+print('folder KS après check : %s' % folderKS)
+checkFolder(folderKS)
 
 rels = []
 # get list of the added ROOT files
@@ -125,9 +125,9 @@ for elem in sortedRels:
         histo2.Fill(float(a[2])) # pvalue2
         histo3.Fill(float(a[3])) # pvalue3
     
-    createHistoPicture(histo1, folder + 'KS_1_' + rel + '.png')
-    createHistoPicture(histo2, folder + 'KS_2_' + rel + '.png')
-    createHistoPicture(histo3, folder + 'KS_3_' + rel + '.png')
+    createHistoPicture(histo1, folderKS + 'KS_1_' + rel + '.png')
+    createHistoPicture(histo2, folderKS + 'KS_2_' + rel + '.png')
+    createHistoPicture(histo3, folderKS + 'KS_3_' + rel + '.png')
 
 print("Fin !")
 
