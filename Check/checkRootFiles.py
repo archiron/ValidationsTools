@@ -71,7 +71,7 @@ from DecisionBox import DecisionBox
 from default import *
 from sources import *
 
-folder = checkFolderName(dfo.folder)
+folder = resultPath + checkFolderName(dfo.folder)
 resultPath = checkFolderName(resultPath)
 dataPath = checkFolderName(dataPath)
 

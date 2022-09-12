@@ -80,7 +80,7 @@ from sources import *
 # these line for daltonians !
 #seaborn.set_palette('colorblind')
 
-folder = checkFolderName(dfo.folder)
+folder = resultPath + checkFolderName(dfo.folder)
 resultPath = checkFolderName(resultPath)
 dataPath = checkFolderName(dataPath)
 

@@ -73,7 +73,7 @@ rootFilesList_0 = getListFiles(resultPath, 'root')
 print('there is ' + '{:03d}'.format(len(rootFilesList_0)) + ' generated ROOT files')
 nbFiles = change_nbFiles(len(rootFilesList_0), nbFiles)
 folder += '{:03d}'.format(nbFiles)
-folder = checkFolderName(folder)
+folder = resultPath + checkFolderName(folder)
 print('folder après check : %s' % folder)
 checkFolder(folder)
 
