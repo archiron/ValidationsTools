@@ -81,8 +81,8 @@ from sources import *
 from graphicAutoEncoderFunctions import *
 from graphicFunctions import getHisto, getHistoConfEntry, fill_Snew2, fill_Snew
 
-folder = checkFolderName(dfo.folder)
 resultPath = checkFolderName(resultPath)
+folder = resultPath + checkFolderName(dfo.folder)
 
 # get the branches for ElectronMcSignalHistos.txt
 branches = []
@@ -135,17 +135,19 @@ for item in rootFilesList:
     nb_ttl_histos.append(nbHistos)
     tmp_branches.append(tmp_branch)
 
+print('nb_ttl_histos : ', nb_ttl_histos)
 if(len(set(nb_ttl_histos))==1):
     print('All elements are the same with value {:d}.'.format(nb_ttl_histos[0]))
 else:
     print('All elements are not the same.')
     print('nb ttl of histos : ' , nb_ttl_histos)
-    newBranches = optimizeBranches(tmp_branches)
+newBranches = optimizeBranches(tmp_branches)
 
+if (len(branches) != len(newBranches)):
     print('len std branches : {:d}'.format(len(branches)))
     print('len new branches : {:d}'.format(len(newBranches)))
     branches = newBranches
-N_histos = len(branches)
+    N_histos = len(branches)
 print('N_histos : %d' % N_histos)
 
 sortedRels = sorted(rels, key = lambda x: x[0]) # gives an array with releases sorted
@@ -189,6 +191,7 @@ for elem in sortedRels:
     for line in wKS0:
         #print(len(line))
         aa = line.split(' : ')
+        print(aa[0])
         tmpArr1.append(aa[0])
         tmpArr2.append(float(aa[1][:-1]))
     df1['index'] = tmpArr1

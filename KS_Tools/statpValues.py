@@ -76,8 +76,8 @@ from default import *
 from graphicFunctions import createHistoPicture
 from controlFunctions import *
 
-folder = checkFolderName(df.folder)
 resultPath = checkFolderName(resultPath)
+folder = resultPath + checkFolderName(df.folder)
 
 # get list of generated ROOT files
 rootFilesList_0 = getListFiles(resultPath, 'root')

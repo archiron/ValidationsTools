@@ -12,7 +12,7 @@
 ################################################################################
 
 import os,sys
-import imp, importlib
+import importlib
 import importlib.machinery
 import importlib.util
 import time
@@ -21,7 +21,6 @@ import time
 
 # lines below are only for func_Extract
 from sys import argv
-#from tracemalloc import stop
 
 argv.append( '-b-' )
 import ROOT
@@ -29,10 +28,6 @@ ROOT.gROOT.SetBatch(True)
 argv.remove( '-b-' )
 
 from ROOT import *
-
-#ROOT.gSystem.Load("libFWCoreFWLite.so")
-#ROOT.gSystem.Load("libDataFormatsFWLite.so")
-#ROOT.FWLiteEnabler.enable()
 
 if len(sys.argv) > 1:
     print(sys.argv)
@@ -59,11 +54,6 @@ from matplotlib import pyplot as plt
 
 print("\nextractFiles_v2")
 
-#blu = imp.load_source(filePaths, commonPath+filePaths)
-#print('DATA_SOURCE : %s' % blu.DATA_SOURCE)
-#resultPath = blu.RESULTFOLDER # checkFolderName(blu.RESULTFOLDER)
-#print('result path : {:s}'.format(resultPath))
-
 # Import module
 loader = importlib.machinery.SourceFileLoader( filePaths, commonPath+filePaths )
 spec = importlib.util.spec_from_loader( filePaths, loader )
@@ -85,6 +75,7 @@ from DecisionBox import DecisionBox
 from sources import *
 
 resultPath = checkFolderName(resultPath)
+#folder = checkFolderName(dfo.folder)
 folder = resultPath + checkFolderName(dfo.folder)
 
 # get the branches for ElectronMcSignalHistos.txt
@@ -140,17 +131,19 @@ for item in rootFilesList:
     nb_ttl_histos.append(nbHistos)
     tmp_branches.append(tmp_branch)
 
+print('nb_ttl_histos : ', nb_ttl_histos)
 if(len(set(nb_ttl_histos))==1):
     print('All elements are the same with value {:d}.'.format(nb_ttl_histos[0]))
 else:
     print('All elements are not the same.')
     print('nb ttl of histos : ' , nb_ttl_histos)
-    newBranches = optimizeBranches(tmp_branches)
+newBranches = optimizeBranches(tmp_branches)
 
+if (len(branches) != len(newBranches)):
     print('len std branches : {:d}'.format(len(branches)))
     print('len new branches : {:d}'.format(len(newBranches)))
     branches = newBranches
-N_histos = len(branches)
+    N_histos = len(branches)
 print('N_histos : %d' % N_histos)
 
 # get list of generated ROOT files
