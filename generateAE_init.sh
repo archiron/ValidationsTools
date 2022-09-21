@@ -1,8 +1,8 @@
 #!/bin/sh
 # This file is called . generateAE_init.sh
 
-JobName="chichi_serial_job_test" # for slurm
-output="chichi_%j.log" # for slurm 
+JobName="generateAE_serial_job_test" # for slurm
+output="generateAE_%j.log" # for slurm
 
 declare -a readarray
 
@@ -27,7 +27,7 @@ readarray toto -t array < CommonFiles/$FileName
 N=${#toto[@]}
 echo "N= $N"
 
-LOG_SOURCE="${toto[15]}"
+LOG_SOURCE="$aa/${toto[15]}"
 LOG_SOURCE=${LOG_SOURCE//LOG_SOURCE=}
 LOG_SOURCE=${LOG_SOURCE//\"}
 #LOG_OUTPUT="${toto[15]}"
@@ -36,16 +36,16 @@ LOG_SOURCE=${LOG_SOURCE//\"}
 RESULTFOLDER="${toto[15]}"
 RESULTFOLDER=${RESULTFOLDER//RESULTFOLDER=}
 RESULTFOLDER=${RESULTFOLDER//\"}
-LOG_KS_SOURCE="${toto[18]}"
+LOG_KS_SOURCE="$aa/${toto[18]}"
 LOG_KS_SOURCE=${LOG_KS_SOURCE//LOG_KS_SOURCE=}
 LOG_KS_SOURCE=${LOG_KS_SOURCE//\"}
 #LIB_SOURCE="${toto[19]}"
 #LIB_SOURCE=${LIB_SOURCE//LIB_SOURCE=}
 #LIB_SOURCE=${LIB_SOURCE//\"}
-COMMON_SOURCE="${toto[20]}"
+COMMON_SOURCE="$aa/${toto[20]}"
 COMMON_SOURCE=${COMMON_SOURCE//COMMON_SOURCE=}
 COMMON_SOURCE=${COMMON_SOURCE//\"}
-LOG_AE_SOURCE="${toto[23]}"
+LOG_AE_SOURCE="$aa/${toto[23]}"
 LOG_AE_SOURCE=${LOG_AE_SOURCE//LOG_AE_SOURCE=}
 LOG_AE_SOURCE=${LOG_AE_SOURCE//\"}
 
@@ -61,7 +61,9 @@ if [[ "$Choice" == "LLR" ]]
     echo "LLR"
     source /opt/exp_soft/llr/root/v6.24.04-el7-gcc9xx-py370/etc/init.sh
     cd $LOG_SOURCE
-    /opt/exp_soft/cms/t3/t3submit -8c -long generateAE.sh $LOG_SOURCE $LOG_AE_SOURCE $COMMON_SOURCE $FileName
+    #/opt/exp_soft/cms/t3/t3submit -8c -short generateAE.sh $LOG_SOURCE $LOG_AE_SOURCE $COMMON_SOURCE $FileName
+    #/opt/exp_soft/cms/t3/t3submit -8c -long generateAE.sh $LOG_SOURCE $LOG_AE_SOURCE $COMMON_SOURCE $FileName
+    /opt/exp_soft/cms/t3/t3submit -8c -reserv generateAE.sh $LOG_SOURCE $LOG_AE_SOURCE $COMMON_SOURCE $FileName
 elif [[ "$Choice" == "PBS" ]] 
   then
     echo "PBS"

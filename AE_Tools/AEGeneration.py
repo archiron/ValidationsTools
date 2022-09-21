@@ -30,6 +30,7 @@ if len(sys.argv) > 1:
     print("step 4 - arg. 2 :", sys.argv[2]) # FileName for paths
     commonPath = sys.argv[1]
     filePaths = sys.argv[2]
+    workPath=sys.argv[1][:-12]
 else:
     print("rien")
     resultPath = ''
@@ -60,10 +61,12 @@ print('DATA_SOURCE : %s' % blo.DATA_SOURCE)
 resultPath = blo.RESULTFOLDER 
 print('result path : {:s}'.format(resultPath))
 
-Chilib_path = blo.LIB_SOURCE # checkFolderName(blo.LIB_SOURCE) # sys.argv[1]
+Chilib_path = workPath + '/' + blo.LIB_SOURCE # checkFolderName(blo.LIB_SOURCE) # sys.argv[1]
+print('Lib path : {:s}'.format(Chilib_path))
 sys.path.append(Chilib_path)
 sys.path.append(commonPath)
 
+import default as dfo
 from default import *
 from defaultStd import *
 from autoEncoders import *
@@ -137,23 +140,32 @@ o_loss = []
 y_pred_n = []
 y_pred_o = []
 
-data_dir = resultPath + '/{:03d}'.format(nbFiles)
-data_res = 'RESULTS'
-data_img = 'IMAGES'
-
 branches = []
 source = Chilib_path + "/HistosConfigFiles/ElectronMcSignalHistos.txt"
 branches = getBranches(tp_1, source)
 cleanBranches(branches) # remove some histo wich have a pbm with KS.
 histoKeysNames = getKeysName(tp_1, source)
 #print(len(histoKeysNames))
-
-for branch in branches: # [0:8]
-    fileName = data_dir + "/histo_" + branch + '_{:03d}'.format(nbFiles) + ".txt"
-    df.append(pd.read_csv(fileName))
     
 nbBranches = len(branches) # [0:8]
 print('there is {:03d} datasets'.format(nbBranches))
+
+# get list of generated ROOT files
+rootFilesList_0 = getListFiles(resultPath, 'root')
+print('there is ' + '{:03d}'.format(len(rootFilesList_0)) + ' generated ROOT files')
+nbFiles = change_nbFiles(len(rootFilesList_0), nbFiles)
+
+folder = resultPath + checkFolderName(dfo.folder)
+data_dir = folder + '/{:03d}'.format(nbFiles)
+print('data_dir path : {:s}'.format(data_dir))
+data_res = data_dir + '/RESULTS/'
+print('data_res path : {:s}'.format(data_res))
+#data_img = '/IMAGES/'
+
+for branch in branches: # [0:8]
+    fileName = resultPath + "/histo_" + branch + '_{:03d}'.format(nbFiles) + ".txt"
+    print(fileName)
+    df.append(pd.read_csv(fileName))
 
 #load data from branchesHistos_NewFiles.txt file ..
 fileName = data_dir + "/branchesHistos_NewFiles.txt"
@@ -163,23 +175,14 @@ Lines = file1.readlines()
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print('device : {:s}'.format(str(device)))
 
-t = datetime.datetime.today()
-folderName = createAEfolderName(hidden_size_1, hidden_size_2, hidden_size_3, hidden_size_4, useHL3, useHL4, latent_size, nbFiles, branches[i])
-affiche = colorText('{:03d}/{:03d}'.format(i,loopMaxValue-1), "green")
-print('\n{:s} : {:s}'.format(affiche, folderName))
-#loopMaxValue = nbBranches # nbBranches
-#for i in range(0, loopMaxValue):
-'''
-    # create the folder name
-    folderName = data_res+"/HL_1.{:03d}".format(hidden_size_1) + "_HL_2.{:03d}".format(hidden_size_2)
-    if useHL3 == 1:
-        folderName += "_HL_3.{:03d}".format(hidden_size_3)
-    if useHL4 == 1:
-        #folderName += "_HL_3.{:03d}".format(hidden_size_3) # if we kept useHL3=0, add HL3 & HL4 !
-        folderName += "_HL_4.{:03d}".format(hidden_size_4)
-    folderName += "_LT.{:02d}".format(latent_size) + '/' + "{:04d}".format(nbFiles)
-    folderName += '/' + branches[i] + '/'
-    '''
+#t = datetime.datetime.today()
+timeFolder = time.strftime("%Y%m%d-%H%M%S")
+
+loopMaxValue = nbBranches # nbBranches
+for i in range(0, loopMaxValue):
+    folderName = data_res + createAEfolderName(hidden_size_1, hidden_size_2, hidden_size_3, hidden_size_4, useHL3, useHL4, latent_size, branches[i], timeFolder) # , nbFiles
+    affiche = colorText('{:03d}/{:03d}'.format(i,loopMaxValue-1), "green")
+    print('\n{:s} : {:s}'.format(affiche, folderName))
 '''    folderName = createAEfolderName(hidden_size_1, hidden_size_2, hidden_size_3, hidden_size_4, useHL3, useHL4, latent_size, nbFiles, branches[i])
     affiche = colorText('{:03d}/{:03d}'.format(i,loopMaxValue-1), "green")
     print('\n{:s} : {:s}'.format(affiche, folderName))
