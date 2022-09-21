@@ -38,7 +38,7 @@ else:
 import pandas as pd
 import numpy as np
 ## WARNING pbm with torch
-#import torch
+import torch
 #from torch.utils import data
 #from torch.nn.functional import normalize
 
@@ -158,13 +158,13 @@ nbFiles = change_nbFiles(len(rootFilesList_0), nbFiles)
 folder = resultPath + checkFolderName(dfo.folder)
 data_dir = folder + '/{:03d}'.format(nbFiles)
 print('data_dir path : {:s}'.format(data_dir))
-data_res = data_dir + '/RESULTS/'
+data_res = data_dir + '/AE_RESULTS/'
 print('data_res path : {:s}'.format(data_res))
 #data_img = '/IMAGES/'
 
 for branch in branches: # [0:8]
     fileName = resultPath + "/histo_" + branch + '_{:03d}'.format(nbFiles) + ".txt"
-    print(fileName)
+    #print(fileName)
     df.append(pd.read_csv(fileName))
 
 #load data from branchesHistos_NewFiles.txt file ..
@@ -175,29 +175,30 @@ Lines = file1.readlines()
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print('device : {:s}'.format(str(device)))
 
-#t = datetime.datetime.today()
+t = datetime.datetime.today()
 timeFolder = time.strftime("%Y%m%d-%H%M%S")
+
+folderName = data_res + createAEfolderName(hidden_size_1, hidden_size_2, hidden_size_3, hidden_size_4, useHL3, useHL4, latent_size) # , timeFolder, nbFiles, branches[i]
+checkFolder(folderName)
+print('\n{:s}'.format(folderName))
 
 loopMaxValue = nbBranches # nbBranches
 for i in range(0, loopMaxValue):
-    folderName = data_res + createAEfolderName(hidden_size_1, hidden_size_2, hidden_size_3, hidden_size_4, useHL3, useHL4, latent_size, branches[i], timeFolder) # , nbFiles
-    affiche = colorText('{:03d}/{:03d}'.format(i,loopMaxValue-1), "green")
-    print('\n{:s} : {:s}'.format(affiche, folderName))
-'''    folderName = createAEfolderName(hidden_size_1, hidden_size_2, hidden_size_3, hidden_size_4, useHL3, useHL4, latent_size, nbFiles, branches[i])
-    affiche = colorText('{:03d}/{:03d}'.format(i,loopMaxValue-1), "green")
-    print('\n{:s} : {:s}'.format(affiche, folderName))
-    checkFolder(folderName)
 
-    exportParameters = folderName + '/parameters_' + '{:s}'.format(str(branches[i]))
-    exportParameters += '{:d}'.format(t.year) + '{:02d}'.format(t.month) + '{:02d}'.format(t.day) + '-'  + '{:02d}'.format(t.hour) + '{:02d}'.format(t.minute) + '.html'
+    # export parameters of the layers
+    exportParameters = folderName + '/parameters.html'
     print(exportParameters)
     fParam = open(exportParameters, 'w')  # html page
     for line in createAutoEncoderRef(nbFiles, nbBranches, device, lr, epsilon, hidden_size_1, hidden_size_2, hidden_size_3, hidden_size_4, latent_size, batch_size, nb_epochs, percentageTrain):
         fParam.write(line)
     fParam.close()
 
-    resumeHisto = folderName + '/histo_' + '{:s}'.format(str(branches[i]))
-    resumeHisto += '{:d}'.format(t.year) + '{:02d}'.format(t.month) + '{:02d}'.format(t.day) + '-'  + '{:02d}'.format(t.hour) + '{:02d}'.format(t.minute) + '.html'
+    # add a subfolder with the name of the histo and a folder with date/time
+    folderNameBranch = folderName + branches[i] + '/' + timeFolder
+    checkFolder(folderNameBranch)
+
+    resumeHisto = folderNameBranch + '/histo_' + '{:s}'.format(str(branches[i]))
+    resumeHisto += '.html'
     print(resumeHisto)
     fHisto = open(resumeHisto, 'w')  # web page
     fHisto.write("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 3.2 Final//EN\">\n")
@@ -209,9 +210,10 @@ for i in range(0, loopMaxValue):
 
     short_histo_name = reduceBranch(branches[i])
     fHisto.write(' <h1><center><b><font color=\'blue\'>{:s}</font></b></center></h1> <br>\n'.format(str(branches[i])))
-    fHisto.write('<b>folderName : </b>{:s}<br>\n'.format(folderName))
+    fHisto.write('<b>folderName : </b>{:s}<br>\n'.format(folderNameBranch))
     fHisto.write('<br>\n')
     
+'''
     df_entries = []
     df_errors = []
     linOp = []
@@ -575,7 +577,7 @@ for i in range(0, loopMaxValue):
     fHisto.write("</td></tr>")
 
     fHisto.write('</table>')
-    fHisto.close()
 '''
+fHisto.close()
 print('end')
 
