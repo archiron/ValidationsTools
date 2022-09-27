@@ -39,8 +39,8 @@ import pandas as pd
 import numpy as np
 ## WARNING pbm with torch
 import torch
-#from torch.utils import data
-#from torch.nn.functional import normalize
+from torch.utils import data
+from torch.nn.functional import normalize
 
 # these line for daltonians !
 #seaborn.set_palette('colorblind')
@@ -72,32 +72,6 @@ from defaultStd import *
 from autoEncoders import *
 from controlFunctions import *
 from graphicAutoEncoderFunctions import *
-
-def getKeysName(t_p, branchPath):
-    b = []
-    key = ''
-    tmp = []
-    source = open(branchPath, "r")
-    for line in source:
-        if line in ['\n', '\r\n']: # blank line
-            if ( (len(key) != 0) and (len(tmp) != 0) ):
-                b.append([key, tmp])
-                key = ''
-                tmp = []
-        else: # line not empty
-            if t_p in line:
-                aaa = line.split(' ')
-                bbb = []
-                for elem in aaa:
-                    if elem != '':
-                        bbb.append(elem)
-                line = bbb[0].split('/')[1].replace(t_p, '')
-                name = line.split(' ')[0]
-                tmp.append([name, bbb[3]]) 
-            else:
-                key = line
-    source.close()
-    return b
 
 def createAutoEncoderRef(nbFiles, nbBranches, device, lr, epsilon, hidden_size_1, hidden_size_2, hidden_size_3, hidden_size_4, latent_size, batch_size, nb_epochs, percentageTrain):
     Text = []
@@ -182,16 +156,16 @@ folderName = data_res + createAEfolderName(hidden_size_1, hidden_size_2, hidden_
 checkFolder(folderName)
 print('\n{:s}'.format(folderName))
 
+# export parameters of the layers
+exportParameters = folderName + '/parameters.html'
+print(exportParameters)
+fParam = open(exportParameters, 'w')  # html page
+for line in createAutoEncoderRef(nbFiles, nbBranches, device, lr, epsilon, hidden_size_1, hidden_size_2, hidden_size_3, hidden_size_4, latent_size, batch_size, nb_epochs, percentageTrain):
+    fParam.write(line)
+fParam.close()
+
 loopMaxValue = nbBranches # nbBranches
 for i in range(0, loopMaxValue):
-
-    # export parameters of the layers
-    exportParameters = folderName + '/parameters.html'
-    print(exportParameters)
-    fParam = open(exportParameters, 'w')  # html page
-    for line in createAutoEncoderRef(nbFiles, nbBranches, device, lr, epsilon, hidden_size_1, hidden_size_2, hidden_size_3, hidden_size_4, latent_size, batch_size, nb_epochs, percentageTrain):
-        fParam.write(line)
-    fParam.close()
 
     # add a subfolder with the name of the histo and a folder with date/time
     folderNameBranch = folderName + branches[i] + '/' + timeFolder
@@ -213,7 +187,6 @@ for i in range(0, loopMaxValue):
     fHisto.write('<b>folderName : </b>{:s}<br>\n'.format(folderNameBranch))
     fHisto.write('<br>\n')
     
-'''
     df_entries = []
     df_errors = []
     linOp = []
@@ -230,7 +203,11 @@ for i in range(0, loopMaxValue):
     train_loader = []
     test_loader = []
 
-    lossesValues = data_res + "/Losses/lossesValues_" + branches[i] + ".txt"
+    # add a subfolder for the losses
+    folderNameLosses = folderNameBranch + '/Losses/'
+    checkFolder(folderNameLosses)
+
+    lossesValues = folderNameLosses + "/lossesValues_" + branches[i] + ".txt"
     print("loss values file : %s\n" % lossesValues)
     wLoss = open(lossesValues, 'w')
 
@@ -253,8 +230,14 @@ for i in range(0, loopMaxValue):
     fHisto.write('nb of columns for histo {:s} after extraction : [{:3d}, {:3d}]<br>\n'.format(branches[i], Nrows, Ncols))
 
     fHisto.write('<br>\n')
-    trainName = data_res + "/TrainTestLOADER/multi_train_loader_" + branches[i] + "_{:03d}".format(nbFiles) + ".pth"
-    testName = data_res + "/TrainTestLOADER/multi_test_loader_" + branches[i] + "_{:03d}".format(nbFiles) + ".pth"
+
+    # add a subfolder for the losses
+    folderNameLoader = folderNameBranch + '/TrainTestLOADER/'
+    checkFolder(folderNameLoader)
+
+    trainName = folderNameLoader + "multi_train_loader_" + branches[i] + "_{:03d}".format(nbFiles) + ".pth"
+    testName = folderNameLoader + "multi_test_loader_" + branches[i] + "_{:03d}".format(nbFiles) + ".pth"
+
     if (useTrainLoader == 1):
         print('load %s.' % trainName)
         fHisto.write('load {:s} and {:s}<br>\n'.format(trainName, testName))
@@ -329,12 +312,13 @@ for i in range(0, loopMaxValue):
     LatentValues_Test = []
 
     # Ready for calculation
-    encoderName = folderName + "/mono_encoder_{:01d}_".format(nbLayer) + branches[i] + "_{:03d}".format(nbFiles) + ".pth"
-    decoderName = folderName + "/mono_decoder_{:01d}_".format(nbLayer) + branches[i] + "_{:03d}".format(nbFiles) + ".pth"
+    encoderName = folderNameLoader + "/mono_encoder_{:01d}_".format(nbLayer) + branches[i] + "_{:03d}".format(nbFiles) + ".pth"
+    decoderName = folderNameLoader + "/mono_decoder_{:01d}_".format(nbLayer) + branches[i] + "_{:03d}".format(nbFiles) + ".pth"
     fHisto.write('encoderName : {:s}.<br>\n'.format(encoderName))
     fHisto.write('decoderName : {:s}.<br>\n'.format(decoderName))
     fHisto.write('<br>\n')
 
+'''
     lossesPictureName = folderName + '/loss_plots_' + branches[i] + "_{:03d}".format(nbFiles) + '.png'
     if ( useEncoder == 1):
         fHisto.write('Using encoder/decoder<br>\n')
