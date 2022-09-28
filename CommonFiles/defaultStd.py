@@ -6,6 +6,7 @@ iDisplay = 9
 useTrainLoader = 1
 useEncoder = 0
 saveEncoder = 1
+TimeFolderRef='20220928-110120'
 
 # xxx parameters
 hidden_size_1 = 401 # 400 # 400 #300 # 250 # 78

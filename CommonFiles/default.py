@@ -21,7 +21,7 @@ nbFiles = 200
 #nbFiles = 950
 #folder = 'Extraction_20h/' # 950
 
-folder = 'TMP_Extraction_25/' # 200
+folder = 'TMP_Extraction_25/'#'DEV_01/' # 200
 
 # nb of bins for sampling
 nbins = 100 

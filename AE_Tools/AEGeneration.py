@@ -154,7 +154,7 @@ timeFolder = time.strftime("%Y%m%d-%H%M%S")
 
 folderName = data_res + createAEfolderName(hidden_size_1, hidden_size_2, hidden_size_3, hidden_size_4, useHL3, useHL4, latent_size) # , timeFolder, nbFiles, branches[i]
 checkFolder(folderName)
-print('\n{:s}'.format(folderName))
+print('\nComplete folder name : {:s}'.format(folderName))
 
 # export parameters of the layers
 exportParameters = folderName + '/parameters.html'
@@ -170,6 +170,7 @@ for i in range(0, loopMaxValue):
     # add a subfolder with the name of the histo and a folder with date/time
     folderNameBranch = folderName + branches[i] + '/' + timeFolder
     checkFolder(folderNameBranch)
+    print('\nfolderNameBranch : {:s}'.format(folderNameBranch))
 
     resumeHisto = folderNameBranch + '/histo_' + '{:s}'.format(str(branches[i]))
     resumeHisto += '.html'
@@ -206,6 +207,7 @@ for i in range(0, loopMaxValue):
     # add a subfolder for the losses
     folderNameLosses = folderNameBranch + '/Losses/'
     checkFolder(folderNameLosses)
+    print('\nfolderNameLosses : {:s}'.format(folderNameLosses))
 
     lossesValues = folderNameLosses + "/lossesValues_" + branches[i] + ".txt"
     print("loss values file : %s\n" % lossesValues)
@@ -234,16 +236,32 @@ for i in range(0, loopMaxValue):
     # add a subfolder for the losses
     folderNameLoader = folderNameBranch + '/TrainTestLOADER/'
     checkFolder(folderNameLoader)
+    print('\nfolderNameLoader : {:s}'.format(folderNameLoader))
 
     trainName = folderNameLoader + "multi_train_loader_" + branches[i] + "_{:03d}".format(nbFiles) + ".pth"
     testName = folderNameLoader + "multi_test_loader_" + branches[i] + "_{:03d}".format(nbFiles) + ".pth"
 
     if (useTrainLoader == 1):
+        tmpPath = folderName + branches[i] + '/' + TimeFolderRef + '/TrainTestLOADER/'
+        trainName = tmpPath + "multi_train_loader_" + branches[i] + "_{:03d}".format(nbFiles) + ".pth"
+        testName = tmpPath + "multi_test_loader_" + branches[i] + "_{:03d}".format(nbFiles) + ".pth"
         print('load %s.' % trainName)
-        fHisto.write('load {:s} and {:s}<br>\n'.format(trainName, testName))
-        fHisto.write('<br>\n')
-        train_loader = torch.load(trainName)
-        test_loader = torch.load(testName)
+        print('load %s.' % testName)
+        if not os.path.isfile(trainName):
+            print('%s does not exist' % trainName)
+            fHisto.write('{:s} does not exist. exiting.<br>\n'.format(trainName))
+            exit()
+        else:
+            encoder = torch.load(trainName)
+            train_loader = torch.load(trainName)
+        if not os.path.isfile(testName):
+            print('%s does not exist' % testName)
+            fHisto.write('{:s} does not exist. exiting.<br>\n'.format(testName))
+            exit()
+        else:
+            fHisto.write('load {:s} and {:s}<br>\n'.format(trainName, testName))
+            fHisto.write('<br>\n')
+            test_loader = torch.load(testName)
         print('load OK.')
     else:
         fHisto.write('creating train[test]_loader<br>\n')

@@ -3,7 +3,7 @@
 
 if [ "$1" == "" ] 
 then
-	echo "zee_Extract.sh has no argument"
+	echo "generateAE.sh has no argument"
 	exit
 fi
 
