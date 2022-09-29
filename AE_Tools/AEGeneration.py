@@ -14,7 +14,7 @@
 import datetime, time
 import sys, os
 #from turtle import title
-import imp, importlib
+import importlib
 import importlib.machinery
 import importlib.util
 
@@ -46,11 +46,6 @@ from torch.nn.functional import normalize
 #seaborn.set_palette('colorblind')
 
 print("\nAE Generation")
-
-#blu = imp.load_source(filePaths, commonPath+filePaths)
-#print('DATA_SOURCE : %s' % blu.DATA_SOURCE)
-#resultPath = blu.RESULTFOLDER # checkFolderName(blu.RESULTFOLDER)
-#print('result path : {:s}'.format(resultPath))
 
 # Import module
 loader = importlib.machinery.SourceFileLoader( filePaths, commonPath+filePaths )
@@ -170,7 +165,7 @@ for i in range(0, loopMaxValue):
     # add a subfolder with the name of the histo and a folder with date/time
     folderNameBranch = folderName + branches[i] + '/' + timeFolder
     checkFolder(folderNameBranch)
-    print('\nfolderNameBranch : {:s}'.format(folderNameBranch))
+    print('\n===== folderNameBranch : {:s} ====='.format(folderNameBranch))
 
     resumeHisto = folderNameBranch + '/histo_' + '{:s}'.format(str(branches[i]))
     resumeHisto += '.html'
@@ -336,8 +331,12 @@ for i in range(0, loopMaxValue):
     fHisto.write('decoderName : {:s}.<br>\n'.format(decoderName))
     fHisto.write('<br>\n')
 
-'''
-    lossesPictureName = folderName + '/loss_plots_' + branches[i] + "_{:03d}".format(nbFiles) + '.png'
+    # add a subfolder for the pictures
+    folderNamePict = folderNameBranch + '/Pictures/'
+    checkFolder(folderNamePict)
+    print('\nfolderNamePict : {:s}'.format(folderNamePict))
+
+    lossesPictureName = folderNamePict + '/loss_plots_' + branches[i] + "_{:03d}".format(nbFiles) + '.png'
     if ( useEncoder == 1):
         fHisto.write('Using encoder/decoder<br>\n')
         if not os.path.isfile(encoderName):
@@ -367,12 +366,13 @@ for i in range(0, loopMaxValue):
             #print('epoch : %03d : tr_lo = %e : te_lo = %e : r = %e' % (epoch, train_loss, test_loss, r))
             history_da['train_loss'].append(train_loss)
             history_da['test_loss'].append(test_loss)
-'''
-'''bo1 = train_loss < epsilon #deja commenté
+
+        '''bo1 = train_loss < epsilon #deja commenté
             bo2 = test_loss < epsilon#deja commenté
             if (bo1 and bo2):#deja commenté
                 break'''#deja commenté
-'''        r = (train_loss - test_loss) / (train_loss + test_loss)
+
+        r = (train_loss - test_loss) / (train_loss + test_loss)
         print('epoch : %03d : tr_lo = %e : te_lo = %e : r = %e' % (epoch, train_loss, test_loss, r))
         fHisto.write('epoch : {:03d} : train_loss = {:e} : test_loss = {:e}<br>\n'.format(epoch, train_loss, test_loss))
         #print('epoch : %03d : tr_lo = %e : te_lo = %e' % (epoch, train_loss, test_loss))
@@ -398,8 +398,8 @@ for i in range(0, loopMaxValue):
         x_Test = []
         y_Test = []
         title='Train/Test latent picture in 2 dim'
-        pictureName = folderName + '/traintestLatentPicture_' + branches[i] + '.png'
-        #pictureName2 = folderName + '/traintestLatentPicture2_' + branches[i] + '.png'
+        pictureName = folderNamePict + '/traintestLatentPicture_' + branches[i] + '.png'
+        #pictureName2 = folderNamePict + '/traintestLatentPicture2_' + branches[i] + '.png'
         for ind in range(0, len(LatentValues_Train)):
             #print('Train ', ind, LatentValues_Train[ind])
             x_Train.append(LatentValues_Train[ind][0])
@@ -411,6 +411,7 @@ for i in range(0, loopMaxValue):
             x_Test.append(LatentValues_Test[ind][0][0])
             y_Test.append(LatentValues_Test[ind][0][1])
             labels_Test.append(i)
+        print('createLatentPictureTrainTest call')
         createLatentPictureTrainTest(x_Train,y_Train,x_Test,y_Test, pictureName, title)
         #createLatentPictureTrainTest(x_Test,y_Test,x_Test,y_Test, pictureName2, title)
 
@@ -429,12 +430,12 @@ for i in range(0, loopMaxValue):
     fHisto.write('Using {:s} for prediction<br>\n'.format(encoderName))
     fHisto.write('<br>\n')
 
-    predLossesValues = folderName + "/predLossesValues_" + branches[i] + ".txt"
+    predLossesValues = folderNameBranch + "/predLossesValues_" + branches[i] + ".txt"
     print("loss values file : %s" % predLossesValues)
     wPred = open(predLossesValues, 'w')
 
     # export the y_pred_new values
-    predValues = folderName + "/predValues_" + branches[i] + ".txt"
+    predValues = folderNameBranch + "/predValues_" + branches[i] + ".txt"
     print("values file : %s" % predValues)
     wPredVal = open(predValues, 'w')
 
@@ -453,13 +454,7 @@ for i in range(0, loopMaxValue):
         torch_tensor_new = torch.tensor(df_new.values)
 
         # normalize the tensor
-'''
-'''        if '_pfx' in branch:#deja commenté
-            print('pfx')#deja commenté
-            torch_tensor_entries_n = torch_tensor_new#deja commenté
-        else:#deja commenté
-            torch_tensor_entries_n = normalize(torch_tensor_new, p=2.0)'''#deja commenté
-'''        torch_tensor_entries_n = normalize(torch_tensor_new, p=2.0)
+        torch_tensor_entries_n = normalize(torch_tensor_new, p=2.0)
         test_loader_n = data.DataLoader(torch_tensor_entries_n)
 
         encoder = torch.load(encoderName)
@@ -488,7 +483,7 @@ for i in range(0, loopMaxValue):
         #print(torch_tensor_entries_n)
         #print(y_pred_new)
 
-        pictureName = folderName + '/predicted_new_curves_' + branches[i] + '_' + rel[6:] + '_multi.png'
+        pictureName = folderNamePict + '/predicted_new_curves_' + branches[i] + '_' + rel[6:] + '_multi.png'
         ### WARNING rel is the same for all comparisons !!!
         creatPredPictLinLog(branches[i], Ncols, torch_tensor_entries_n, y_pred_new, new_loss, rel[6:], pictureName)
 
@@ -531,19 +526,18 @@ for i in range(0, loopMaxValue):
         fHisto.write("</td></tr>\n")
     fHisto.write("\n</table>\n")
     fHisto.write("</td>")
-    pictureName = folderName + '/comparison_loss_values_' + branches[i] + '.png'
-    pictureName = folderName + '/comparison_loss_values_' + branches[i] + '.png'
+    pictureName = folderNamePict + '/comparison_loss_values_' + branches[i] + '.png'
     title = r"$\bf{" + branches[i] + "}$" + ' : Comparison of the losses values as function of releases.'
     createCompLossesPicture(labels,val, pictureName, title)
 
     title='Latent ReleasesVsTrain comparison in 2 dim'
-    pictureName = folderName + '/LatentReleasesVsTrainPicture_' + branches[i] + '.svg'
+    pictureName = folderNamePict + '/LatentReleasesVsTrainPicture_' + branches[i] + '.png' # '.svg'
     for ind, text in enumerate(labels):
         #print(text, latentVal[ind])
         x.append(latentVal[ind][0])
         y.append(latentVal[ind][1])
     createLatentPicture(labels,x,y, pictureName, title)
-    pictureName = folderName + '/compLatentReleasesVsTrainPicture_' + branches[i] + '.png'
+    pictureName = folderNamePict + '/compLatentReleasesVsTrainPicture_' + branches[i] + '.png'
     createCompLatentPictureTrainTest(labels, x_Train,y_Train,x,y, pictureName, title)
     
     wPred.close()
@@ -570,7 +564,7 @@ for i in range(0, loopMaxValue):
         fHisto.write('{0:20s}'.format(elem[0][6:]))
         fHisto.write("</td><td>")
         #fHisto.write('{:e}'.format(elem[1]))
-        pictureName2 = folderName + '/predicted_new_curves_' + branches[i] + '_' + elem[0][6:] + '_multi.png'
+        pictureName2 = folderNamePict + '/predicted_new_curves_' + branches[i] + '_' + elem[0][6:] + '_multi.png'
         pictureName2 = 'https://cms-egamma.web.cern.ch/validation/Electrons/Store/AutoEncoders/' + '/' + pictureName2
         #fHisto.write('{:s}'.format(pictureName2))
         fHisto.write('<a href=\"' + pictureName2 + '\"><img width=\"250\" height=\"125\" border=\"0\" align=\"middle\" src=\"' + pictureName2 + '\"></a>')
@@ -579,7 +573,7 @@ for i in range(0, loopMaxValue):
     fHisto.write("</td></tr>")
 
     fHisto.write('</table>')
-'''
+
 fHisto.close()
 print('end')
 
