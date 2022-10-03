@@ -14,6 +14,9 @@
 from genericpath import exists
 import os,sys
 import time
+import importlib
+import importlib.machinery
+import importlib.util
 
 #import seaborn # only with cmsenv on cca.in2p3.fr
 

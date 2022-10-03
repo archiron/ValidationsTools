@@ -71,7 +71,7 @@ elif [[ "$Choice" == "PBS" ]]
     source /pbs/home/c/chiron/private/ValidationsTools/ValidationsTools/bin/activate 
     cd $LOG_SOURCE
     #eval `scramv1 runtime -sh`
-    sbatch -L sps -n 2 --mem=8000 -J $JobName -o $output generateAE.sh $LOG_SOURCE $LOG_AE_SOURCE $COMMON_SOURCE $FileName
+    sbatch -L sps -n 4 --mem=16000 -J $JobName -o $output generateAE.sh $LOG_SOURCE $LOG_AE_SOURCE $COMMON_SOURCE $FileName
     deactivate
 fi
 

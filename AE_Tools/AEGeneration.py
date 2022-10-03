@@ -13,7 +13,6 @@
 
 import datetime, time
 import sys, os
-#from turtle import title
 import importlib
 import importlib.machinery
 import importlib.util
@@ -103,9 +102,9 @@ def createAutoEncoderRef(nbFiles, nbBranches, device, lr, epsilon, hidden_size_1
 
 df = []
 
-H_da = []
-n_loss = []
-o_loss = []
+#H_da = []
+#n_loss = []
+#o_loss = []
 y_pred_n = []
 y_pred_o = []
 
@@ -129,7 +128,6 @@ data_dir = folder + '/{:03d}'.format(nbFiles)
 print('data_dir path : {:s}'.format(data_dir))
 data_res = data_dir + '/AE_RESULTS/'
 print('data_res path : {:s}'.format(data_res))
-#data_img = '/IMAGES/'
 
 for branch in branches: # [0:8]
     fileName = resultPath + "/histo_" + branch + '_{:03d}'.format(nbFiles) + ".txt"
