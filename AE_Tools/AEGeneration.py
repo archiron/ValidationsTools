@@ -67,6 +67,9 @@ from autoEncoders import *
 from controlFunctions import *
 from graphicAutoEncoderFunctions import *
 
+from DecisionBox import *
+DB = DecisionBox()
+
 def createAutoEncoderRef(nbFiles, nbBranches, device, lr, epsilon, hidden_size_1, hidden_size_2, hidden_size_3, hidden_size_4, latent_size, batch_size, nb_epochs, percentageTrain):
     Text = []
     Text.append(' <h1><center><b><font color=\'blue\'>AutoEncoder with {:d} files.</font></b></center></h1> <br>\n'.format(nbFiles))
@@ -101,6 +104,8 @@ def createAutoEncoderRef(nbFiles, nbBranches, device, lr, epsilon, hidden_size_1
     return Text
 
 df = []
+arrayKSValues = []
+rels = []
 
 #H_da = []
 #n_loss = []
@@ -115,7 +120,7 @@ cleanBranches(branches) # remove some histo wich have a pbm with KS.
 histoKeysNames = getKeysName(tp_1, source)
 #print(len(histoKeysNames))
     
-nbBranches = len(branches) # [0:8]
+nbBranches = 10 # len(branches) # [0:8]
 print('there is {:03d} datasets'.format(nbBranches))
 
 # get list of generated ROOT files
@@ -133,6 +138,49 @@ for branch in branches: # [0:8]
     fileName = resultPath + "/histo_" + branch + '_{:03d}'.format(nbFiles) + ".txt"
     #print(fileName)
     df.append(pd.read_csv(fileName))
+
+# get list of added ROOT files
+rootFolderName = workPath + '/' + blo.DATA_SOURCE # '/pbs/home/c/chiron/private/KS_Tools/GenExtract/DATA/NewFiles'
+rootFilesList = getListFiles(rootFolderName, 'root')
+print('there is ' + '{:03d}'.format(len(rootFilesList)) + ' added ROOT files')
+for item in rootFilesList:
+    #print('%s' % item)
+    b = (item.split('__')[2]).split('-')
+    rels.append([b[0], b[0][6:]])
+sortedRels = sorted(rels, key = lambda x: x[0]) # gives an array with releases sorted
+for elem in sortedRels:
+    print(elem)
+
+# get list of text files
+pathKSFiles = data_dir
+print('KS path : %s' % pathKSFiles)
+KSlistFiles = []
+tmp = getListFiles(pathKSFiles, 'txt')
+for elem in tmp:
+    if (elem[5:10] == '_diff'): # to keep only histo_differences_KScurves files
+        KSlistFiles.append(elem)
+print(KSlistFiles, len(KSlistFiles))
+    
+for item in KSlistFiles:
+    print('file : %s' % item)
+    aa = item[26:-9]
+    fileName = pathKSFiles + '/' + item
+    file1 = open(fileName, 'r')
+    bb = file1.readlines()
+    for elem in bb:
+        tmp = []
+        cc = elem.split(' : ')
+        tmp = [cc[0], aa, float(cc[1][:-1])]
+        arrayKSValues.append(tmp)
+sortedArrayKSValues = sorted(arrayKSValues, key = lambda x: x[0]) # gives an array with releases sorted
+#for elem in sortedArrayKSValues:
+#    print(elem)
+
+if (len(KSlistFiles) != len(rootFilesList)):
+    print('you must have the same number of KS files than releases')
+    exit()
+else:
+    print('we have the same number of KS files than releases')
 
 #load data from branchesHistos_NewFiles.txt file ..
 fileName = data_dir + "/branchesHistos_NewFiles.txt"
@@ -439,6 +487,7 @@ for i in range(0, loopMaxValue):
 
     lossesVal = []
     latentVal = []
+    LinesPred = []
     for elem in linOp:
         #print(elem)
         rel, hName,line = elem.rstrip().split(',', 2)
@@ -491,6 +540,7 @@ for i in range(0, loopMaxValue):
             N=len(val)
             for nn in range(0,N):
                 text2write += ',' + str(val[nn])
+        LinesPred.append(text2write)
         text2write += '\n'
         wPredVal.write(text2write)
 
@@ -543,6 +593,105 @@ for i in range(0, loopMaxValue):
     wPredVal.close()
     print('end of %s' % branches[i])
     
+    KSLoss = []
+    for elem in sortedArrayKSValues:
+        if elem[0] == branches[i]:
+            #print(elem,elem[1], elem[2])
+            KSLoss.append([elem[1], elem[2]])
+    sortedKSLoss = sorted(KSLoss, key = lambda x: x[0]) # gives an array with releases sorted
+    #print('sortedKSLoss : ', sortedKSLoss)
+    if (len(sortedKSLoss) > 0):
+        print('sortedKSLoss OK')
+    else:
+        print('sortedKSLoss KO')
+        continue
+
+    labels = []
+    Val1 = []
+    Val2 = []
+    print('arr ok')
+    for j in range(0, len(sortedRels)):
+        #print(j, sortedRels[j], [sortedArrLoss[j][1], sortedKSLoss[j][1]])
+        Val1.append(sortedLossesVal[j][1])
+        Val2.append(sortedKSLoss[j][1])
+        labels.append(sortedRels[j][1])
+    '''#print(Val1)
+    #print(Val2)
+    #print(labels)'''
+
+    #print(branches[i])
+    fileName = folderNamePict + 'compLossesValuesVsKS_' + branches[i] + '.png'
+    title = r"$\bf{" + branches[i] + "}$" + ' : Losses values vs KS values as function of releases.'
+    createCompLossesPicture2Axis(labels, Val1, Val2, fileName, title)
+    
+    # extract the values of originals curves from Lines
+    LinesOrig = []
+    for l in Lines:
+        l_split = l.split(',')[1]
+        #print(l_split)
+        if ( l_split == branches[i] ):
+            LinesOrig.append(l)
+    #for l in range(0,len(LinesOrig)):
+    #    print('{:02d}/{:02d} : {:s}'.format(l,12,LinesOrig[l]))
+
+    print('len LinesPred : {}'.format(len(LinesPred)))
+    print('len LinesOrig : {}'.format(len(LinesOrig)))
+
+    labels = sortedRels
+    labels1 = []
+    val1 = []
+    for ll in labels:
+        predKSValues = data_dir + "/histo_differences_KScurve_" + ll[1] + "__{:03d}".format(nbFiles) + "_v2.txt"
+        print("values file : %s" % predKSValues)
+        wPredKSVal = open(predKSValues, 'r')
+        LinesKSVal = wPredKSVal.readlines()
+        #for l in range(0,len(LinesKSVal)):
+        #    print('{:02d}/{:02d} : {:s}'.format(l,259,LinesKSVal[l]))
+        wPredKSVal.close()
+        labels1.append(ll[1])
+        for l in range(0, len(LinesKSVal)):
+            l_pred = LinesKSVal[l][:-1].split(' : ')
+            if ( l_pred[0] == branches[i] ):
+                val1.append(float(l_pred[1]))
+    #print('labels1 ', labels1)
+    #print(val1)
+    #print('')
+
+    labels2 = []
+    val2 = []
+    tmp2 = []
+    # create the curves for each release
+    for l in range(0, len(LinesPred)):
+        l_pred = LinesPred[l][:-1].split(',')
+        #relise_p = l_pred[0]
+        l_orig = LinesOrig[l][:-1].split(',')
+        relise_o = l_pred[0]
+        #print(relise_p, relise_o) # , rels[l]
+        l_pred = np.asarray(l_pred[2:])
+        l_pred = l_pred.astype(np.float64)
+        l_orig = np.asarray(l_orig[2:])
+        l_orig = l_orig.astype(np.float64)
+        diff_max, _, l_diff = DB.diffMAXKS3(l_pred, l_orig)
+        tmp2.append([relise_o[6:], diff_max])
+        #print(l_diff)
+    #print(tmp2)
+    for l in labels1:
+        for m in tmp2:
+            if (l == m[0]):
+                labels2.append(l)
+                val2.append(m[1])
+    #print('labels2 ', labels2)
+    #print(val2)
+
+    if (len(val1) > 0):
+        pictureName = folderNamePict + 'comparison_KSvsAE_' + branches[i] + '_{:03d}'.format(nbFiles) +'.png' # 
+        #print(pictureName)
+        title = r"$\bf{" + branches[i] + "}$" + ' : Comparison of KS vs AE values as function of releases.'
+        #print(title)
+        createCompKSvsAEPicture(labels2, val1, val2, pictureName, title)
+        pictureName = folderNamePict + 'comparison_KSvsAE_2Axis_' + branches[i] + '_{:03d}'.format(nbFiles) +'.png' # 
+        createCompKSvsAEPicture2Axis(labels2, val1, val2, pictureName, title)
+
     #pictureName = os.getcwd() + '/' + pictureName
     pictureName = 'https://cms-egamma.web.cern.ch/validation/Electrons/Store/AutoEncoders/' + '/' + pictureName
     histoPath = 'https://cms-egamma.web.cern.ch/validation/Electrons/Store/AutoEncoders/' + '/' + resumeHisto

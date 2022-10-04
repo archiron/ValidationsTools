@@ -23,12 +23,6 @@ cd $1
 cd -
 
 #cd $2
-#echo "executing $2/AEGeneration.py $3 $4"
-#python3 $2/AEGeneration.py $3 $4
-#echo " "
-echo "executing $2/lossValuesVsKS.py $3 $4"
-python3 $2/lossValuesVsKS.py $3 $4
-#echo " "
-#echo "executing $2/zeeKSvsAEComp.py $3 $4"
-#python3 $2/zeeKSvsAEComp.py $3 $4
+echo "executing $2/AEGeneration.py $3 $4"
+python3 $2/AEGeneration.py $3 $4
 
