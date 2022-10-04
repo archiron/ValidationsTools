@@ -120,7 +120,7 @@ cleanBranches(branches) # remove some histo wich have a pbm with KS.
 histoKeysNames = getKeysName(tp_1, source)
 #print(len(histoKeysNames))
     
-nbBranches = 10 # len(branches) # [0:8]
+nbBranches = len(branches) # [0:8]
 print('there is {:03d} datasets'.format(nbBranches))
 
 # get list of generated ROOT files
