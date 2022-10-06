@@ -47,6 +47,7 @@ Common_path = sys.argv[2]
 sys.path.append(Common_path)
 
 from default import *
+from rootValues import NB_EVTS
 from controlFunctions import *
 from graphicFunctions import getHisto, getHistoConfEntry, fill_Snew2, fill_Snew
 from sources import *
@@ -60,6 +61,9 @@ branches = getBranches(tp_1, source)
 cleanBranches(branches) # remove some histo wich have a pbm with KS.
 
 print("func_ExtractNewFilesVaues")
+resultPath += '/' + str(NB_EVTS)
+resultPath = checkFolderName(resultPath)
+print('resultPath : {:s}'.format(resultPath))
 
 # these line for daltonians !
 #seaborn.set_palette('colorblind')
@@ -70,6 +74,9 @@ print(dataPath)
 
 # get list of generated ROOT files
 rootFilesList_0 = getListFiles(resultPath, 'root')
+if (len(rootFilesList_0) ==0 ):
+    print('there is no generated ROOT files')
+    exit()
 print('there is ' + '{:03d}'.format(len(rootFilesList_0)) + ' generated ROOT files')
 nbFiles = change_nbFiles(len(rootFilesList_0), nbFiles)
 folder += '{:03d}'.format(nbFiles)
