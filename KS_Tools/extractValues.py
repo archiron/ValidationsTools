@@ -48,6 +48,7 @@ Common_path = sys.argv[2]
 sys.path.append(Common_path)
 
 from default import *
+from rootValues import NB_EVTS
 from controlFunctions import *
 from graphicFunctions import getHisto, getHistoConfEntry
 
@@ -58,7 +59,10 @@ branches = getBranches(tp_1, source)
 cleanBranches(branches) # remove some histo wich have a pbm with KS.
 
 print("func_Extract")
-resultPath = checkFolderName(resultPath)    
+resultPath += '/' + str(NB_EVTS)
+resultPath = checkFolderName(resultPath)
+print('resultPath : {:s}'.format(resultPath))
+
 wr = []
 histos = {}
 
@@ -69,6 +73,9 @@ for leaf in branches:
     histos[leaf] = []
     
 fileList = getListFiles(resultPath) # get the list of the root files in the folderName folder
+if (len(fileList) ==0 ):
+    print('there is no generated ROOT files')
+    exit()
 fileList.sort()
 print('there is %d generated ROOT files' % len(fileList))
 fileList = fileList[0:nbFiles]
@@ -133,7 +140,7 @@ for leaf in branches:
     wr[i_leaf].write('evol,Mean,MeanError,StdDev,nbBins,name,')
     wr[i_leaf].write(str(histos[leaf][0][nb_max]))
     wr[i_leaf].write('\n')
-    #'''
+    
     for i_file in range(0, len(fileList)):
         texttoWrite = str(i_file) + ','
         wr[i_leaf].write(texttoWrite) 
@@ -146,7 +153,6 @@ for leaf in branches:
         wr[i_leaf].write(texttoWrite) 
     wr[i_leaf].close()
     i_leaf +=1
-    #'''
 
 print("Fin !")
 
