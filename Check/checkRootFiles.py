@@ -65,6 +65,7 @@ sys.path.append(commonPath)
 sys.path.append(dataPath)
 
 import default as dfo
+from rootValues import NB_EVTS
 from controlFunctions import *
 from graphicFunctions import getHisto, getHistoConfEntry, fill_Snew, fill_Snew2
 from DecisionBox import DecisionBox
@@ -72,7 +73,10 @@ from default import *
 from sources import *
 
 #folder = resultPath + checkFolderName(dfo.folder)
-folder = checkFolderName(dfo.folder)
+resultPath += '/' + str(NB_EVTS)
+resultPath = checkFolderName(resultPath)
+print('resultPath : {:s}'.format(resultPath))
+folder = resultPath + checkFolderName(dfo.folder)
 resultPath = checkFolderName(resultPath)
 dataPath = checkFolderName(dataPath)
 

@@ -22,6 +22,7 @@ cd $1
 #cd $2
 echo "executing $2/extractValues.py"
 python3 $2/extractValues.py $3 $4 $5
+echo " "
 echo "executing $2/extractNewFilesValues.py $3 $4 $5"
 python3 $2/extractNewFilesValues.py $3 $4 $5
 

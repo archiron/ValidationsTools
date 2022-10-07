@@ -24,6 +24,7 @@ cd $1
 #cd $2
 echo "executing $4/checkRootFiles.py"
 python3 $4/checkRootFiles.py $3 $4 $5
+echo " "
 echo "executing $4/checkMapDiff.py"
 python3 $4/checkMapDiff.py $3 $4 $5
 

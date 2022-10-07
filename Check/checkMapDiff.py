@@ -72,6 +72,7 @@ sys.path.append(dataPath)
 
 import default as dfo
 from default import *
+from rootValues import NB_EVTS
 from controlFunctions import *
 from graphicFunctions import getHisto, getHistoConfEntry, fill_Snew, fill_Snew2
 from DecisionBox import DecisionBox
@@ -80,6 +81,9 @@ from sources import *
 # these line for daltonians !
 #seaborn.set_palette('colorblind')
 
+resultPath += '/' + str(NB_EVTS)
+resultPath = checkFolderName(resultPath)
+print('resultPath : {:s}'.format(resultPath))
 folder = resultPath + checkFolderName(dfo.folder)
 resultPath = checkFolderName(resultPath)
 dataPath = checkFolderName(dataPath)
