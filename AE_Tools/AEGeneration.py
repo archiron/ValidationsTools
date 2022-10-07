@@ -62,6 +62,7 @@ sys.path.append(commonPath)
 
 import default as dfo
 from default import *
+from rootValues import NB_EVTS
 from defaultStd import *
 from autoEncoders import *
 from controlFunctions import *
@@ -122,6 +123,10 @@ histoKeysNames = getKeysName(tp_1, source)
     
 nbBranches = len(branches) # [0:8]
 print('there is {:03d} datasets'.format(nbBranches))
+
+resultPath += '/' + str(NB_EVTS)
+resultPath = checkFolderName(resultPath)
+print('resultPath : {:s}'.format(resultPath))
 
 # get list of generated ROOT files
 rootFilesList_0 = getListFiles(resultPath, 'root')

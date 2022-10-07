@@ -15,7 +15,7 @@
 
 from genericpath import exists
 import os,sys
-import imp, importlib
+import importlib
 import importlib.machinery
 import importlib.util
 import time
@@ -52,11 +52,6 @@ else:
 
 print('statpValue')
 
-#blu = imp.load_source(filePaths, commonPath+filePaths)
-#print('DATA_SOURCE : %s' % blu.DATA_SOURCE)
-#resultPath = blu.RESULTFOLDER # checkFolderName(blu.RESULTFOLDER)
-#print('result path : {:s}'.format(resultPath))
-
 # Import module
 loader = importlib.machinery.SourceFileLoader( filePaths, commonPath+filePaths )
 spec = importlib.util.spec_from_loader( filePaths, loader )
@@ -73,9 +68,13 @@ sys.path.append(commonPath)
 
 import default as df
 from default import *
-from graphicFunctions import createHistoPicture
+from rootValues import NB_EVTS
 from controlFunctions import *
+from graphicFunctions import createHistoPicture
 
+resultPath += '/' + str(NB_EVTS)
+resultPath = checkFolderName(resultPath)
+print('resultPath : {:s}'.format(resultPath))
 resultPath = checkFolderName(resultPath)
 folder = resultPath + checkFolderName(df.folder)
 
