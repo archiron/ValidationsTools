@@ -31,10 +31,6 @@ argv.remove( '-b-' )
 
 from ROOT import *
 
-#ROOT.gSystem.Load("libFWCoreFWLite.so")
-#ROOT.gSystem.Load("libDataFormatsFWLite.so")
-#ROOT.FWLiteEnabler.enable()
-
 if len(sys.argv) > 1:
     print(sys.argv)
     print("step 4 - arg. 0 :", sys.argv[0]) # name of the script
@@ -72,6 +68,8 @@ from rootValues import NB_EVTS
 from controlFunctions import *
 from graphicFunctions import createHistoPicture
 
+######## ===== COMMON LINES ===== ########
+######## ===== COMMON LINES ===== ########
 resultPath += '/' + str(NB_EVTS)
 resultPath = checkFolderName(resultPath)
 print('resultPath : {:s}'.format(resultPath))

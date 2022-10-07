@@ -26,10 +26,6 @@ argv.remove( '-b-' )
 
 from ROOT import *
 
-#ROOT.gSystem.Load("libFWCoreFWLite.so")
-#ROOT.gSystem.Load("libDataFormatsFWLite.so")
-#ROOT.FWLiteEnabler.enable()
-
 sys.path.append('../ChiLib')
 
 def changeDirectory(rootFile, path):

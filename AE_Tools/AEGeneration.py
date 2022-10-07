@@ -114,11 +114,15 @@ rels = []
 y_pred_n = []
 y_pred_o = []
 
+# get the branches for ElectronMcSignalHistos.txt
+######## ===== COMMON LINES ===== ########
 branches = []
 source = Chilib_path + "/HistosConfigFiles/ElectronMcSignalHistos.txt"
 branches = getBranches(tp_1, source)
 cleanBranches(branches) # remove some histo wich have a pbm with KS.
-histoKeysNames = getKeysName(tp_1, source)
+######## ===== COMMON LINES ===== ########
+
+#histoKeysNames = getKeysName(tp_1, source) # unused
 #print(len(histoKeysNames))
     
 nbBranches = len(branches) # [0:8]

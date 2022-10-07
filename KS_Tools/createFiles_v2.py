@@ -83,10 +83,12 @@ resultPath = checkFolderName(resultPath)
 folder = resultPath + checkFolderName(dfo.folder)
 
 # get the branches for ElectronMcSignalHistos.txt
+######## ===== COMMON LINES ===== ########
 branches = []
 source = Chilib_path + "/HistosConfigFiles/ElectronMcSignalHistos.txt"
 branches = getBranches(tp_1, source)
 cleanBranches(branches) # remove some histo wich have a pbm with KS.
+######## ===== COMMON LINES ===== ########
 
 DB = DecisionBox()
 rels = []

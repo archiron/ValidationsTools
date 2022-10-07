@@ -27,10 +27,6 @@ argv.remove( '-b-' )
 
 from ROOT import *
 
-#ROOT.gSystem.Load("libFWCoreFWLite.so")
-#ROOT.gSystem.Load("libDataFormatsFWLite.so")
-#ROOT.FWLiteEnabler.enable()
-
 if len(sys.argv) > 1:
     print(sys.argv)
     print("step 4 - arg. 0 :", sys.argv[0]) # name of the script
@@ -53,10 +49,12 @@ from controlFunctions import *
 from graphicFunctions import getHisto, getHistoConfEntry
 
 # get the branches for ElectronMcSignalHistos.txt
-source = Chilib_path + "/HistosConfigFiles/ElectronMcSignalHistos.txt"
+######## ===== COMMON LINES ===== ########
 branches = []
+source = Chilib_path + "/HistosConfigFiles/ElectronMcSignalHistos.txt"
 branches = getBranches(tp_1, source)
 cleanBranches(branches) # remove some histo wich have a pbm with KS.
+######## ===== COMMON LINES ===== ########
 
 print("func_Extract")
 resultPath += '/' + str(NB_EVTS)
