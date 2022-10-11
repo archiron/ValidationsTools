@@ -42,6 +42,18 @@ It can be launched with : .  extractValues_init.sh and create into the RESULTFO
 <br>All ROOT files are read, and then for each histo, the values of the histo curve is stored into an array, ROOT file after ROOT file.<br>
 Once we have all the ROOT files read, the array is stored into a text file dedicated to this histo.<br>
 
+### Checking ROOT files :
+. checkRootFiles_init.sh
+
+### Create some files and pictures
+. createFiles_init.sh
+
+### Comparing pValues for all added ROOT files :
+. KScompare_init.sh
+
+### Generating AE pictures :
+. generateAE_init.sh
+
 # Notes
 
 RESULTFOLDER : path where you want the created ROOT files are located. It also contain the text files for each histo.
