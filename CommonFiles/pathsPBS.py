@@ -15,7 +15,7 @@
 # be careful to not forget the '/' at the end of the path
 LOG_SOURCE="ZEE_Flow/"
 LOG_OUTPUT="/sps/cms/chiron/TEMP/"
-RESULTFOLDER="/sps/cms/chiron/CMSSW_12_1_0_pre5-16c-13/"
+RESULTFOLDER="/sps/cms/chiron/Validations/"
 LOG_KS_SOURCE="KS_Tools/"
 LIB_SOURCE="ChiLib/"
 COMMON_SOURCE="CommonFiles/"

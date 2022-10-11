@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-iDisplay = 9
-
-useTrainLoader = 1
+useTrainLoader = 0
 useEncoder = 0
 saveEncoder = 1
 TimeFolderRef='20220928-110120'

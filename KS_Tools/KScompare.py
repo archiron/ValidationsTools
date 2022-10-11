@@ -119,16 +119,20 @@ for item in rootFilesList:
     h1 = getHisto(f_root, tp_1)
     for i in range(0, N_histos): # 1 N_histos histo for debug
         histo_1 = h1.Get(branches[i])
-        d = getHistoConfEntry(histo_1)
-        s_tmp = fill_Snew2(d, histo_1)
-        #s_tmp = fill_Snew(histo_1)
-        if (s_tmp.min() < 0.):
-            print('pbm whith histo %s, min < 0' % branches[i])
-        elif (np.floor(s_tmp.sum()) == 0.):
-            print('pbm whith histo %s, sum = 0' % branches[i])
+        if (histo_1):
+            print('%s OK' % branches[i])
+            d = getHistoConfEntry(histo_1)
+            s_tmp = fill_Snew2(d, histo_1)
+            #s_tmp = fill_Snew(histo_1)
+            if (s_tmp.min() < 0.):
+                print('pbm whith histo %s, min < 0' % branches[i])
+            elif (np.floor(s_tmp.sum()) == 0.):
+                print('pbm whith histo %s, sum = 0' % branches[i])
+            else:
+                nbHistos += 1
+                tmp_branch.append(branches[i])
         else:
-            nbHistos += 1
-            tmp_branch.append(branches[i])
+            print('%s KO' % branches[i])
     nb_ttl_histos.append(nbHistos)
     tmp_branches.append(tmp_branch)
 

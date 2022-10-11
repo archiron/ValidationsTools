@@ -15,7 +15,7 @@
 # be careful to not forget the '/' at the end of the path
 LOG_SOURCE="ZEE_FLOW/"
 LOG_OUTPUT="ZEE_FLOW/TEMP"
-RESULTFOLDER="HGCAL/TEST_12_1_0_pre5bb"
+RESULTFOLDER="Validations"
 LOG_KS_SOURCE="KS_Tools/"
 LIB_SOURCE="ChiLib/"
 COMMON_SOURCE="CommonFiles/"

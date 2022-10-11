@@ -69,11 +69,10 @@ from controlFunctions import *
 from graphicFunctions import createHistoPicture
 
 ######## ===== COMMON LINES ===== ########
-######## ===== COMMON LINES ===== ########
 resultPath += '/' + str(NB_EVTS)
 resultPath = checkFolderName(resultPath)
 print('resultPath : {:s}'.format(resultPath))
-resultPath = checkFolderName(resultPath)
+######## ===== COMMON LINES ===== ########
 folder = resultPath + checkFolderName(df.folder)
 
 # get list of generated ROOT files

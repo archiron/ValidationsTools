@@ -50,18 +50,19 @@ from sources import *
 
 import numpy as np
 
-# get the branches for ElectronMcSignalHistos.txt
 ######## ===== COMMON LINES ===== ########
+# get the branches for ElectronMcSignalHistos.txt
 branches = []
 source = Chilib_path + "/HistosConfigFiles/ElectronMcSignalHistos.txt"
 branches = getBranches(tp_1, source)
 cleanBranches(branches) # remove some histo wich have a pbm with KS.
-######## ===== COMMON LINES ===== ########
 
-print("func_ExtractNewFilesValues")
 resultPath += '/' + str(NB_EVTS)
 resultPath = checkFolderName(resultPath)
 print('resultPath : {:s}'.format(resultPath))
+######## ===== COMMON LINES ===== ########
+
+print("func_ExtractNewFilesValues")
 
 # these line for daltonians !
 #seaborn.set_palette('colorblind')

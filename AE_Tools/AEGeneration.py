@@ -16,6 +16,7 @@ import sys, os
 import importlib
 import importlib.machinery
 import importlib.util
+from pathlib import Path
 
 #import seaborn # only with cmsenv on cca.in2p3.fr
 
@@ -145,8 +146,11 @@ print('data_res path : {:s}'.format(data_res))
 
 for branch in branches: # [0:8]
     fileName = resultPath + "/histo_" + branch + '_{:03d}'.format(nbFiles) + ".txt"
-    #print(fileName)
-    df.append(pd.read_csv(fileName))
+    if Path(fileName).exists():
+        print('{:s} exist'.format(fileName))
+        df.append(pd.read_csv(fileName))
+    else:
+        print('{:s} does not exist'.format(fileName))
 
 # get list of added ROOT files
 rootFolderName = workPath + '/' + blo.DATA_SOURCE # '/pbs/home/c/chiron/private/KS_Tools/GenExtract/DATA/NewFiles'
@@ -463,8 +467,8 @@ for i in range(0, loopMaxValue):
         
         for ind in range(0, len(LatentValues_Test)):
             #print('Test ', ind, LatentValues_Test[ind][0])
-            x_Test.append(LatentValues_Test[ind][0][0])
-            y_Test.append(LatentValues_Test[ind][0][1])
+            x_Test.append(LatentValues_Test[ind][0].numpy()[0])
+            y_Test.append(LatentValues_Test[ind][0].numpy()[1])
             labels_Test.append(i)
         print('createLatentPictureTrainTest call')
         createLatentPictureTrainTest(x_Train,y_Train,x_Test,y_Test, pictureName, title)
