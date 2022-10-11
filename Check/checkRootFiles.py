@@ -127,18 +127,22 @@ for elem in fileList:
         s_new = np.asarray(s_new)
         s_new = s_new[1:-1]
         '''
-        s_new = fill_Snew(histo_1)
-        Ntot_h1 = histo_1.GetEntries()
+        if (histo_1):
+            print('%s OK' % branches[i])
+            s_new = fill_Snew(histo_1)
+            Ntot_h1 = histo_1.GetEntries()
         
-        # print min/max for the new curve
-        #print('min : %f - max : %f' % (s_new.min(), s_new.max()))
-        if (s_new.min() < 0.):
-            print('pbm whith histo %s, min < 0' % branches[i])
-        elif (np.floor(s_new.sum()) == 0.):
-            print('pbm whith histo %s, sum = 0' % branches[i])
+            # print min/max for the new curve
+            #print('min : %f - max : %f' % (s_new.min(), s_new.max()))
+            if (s_new.min() < 0.):
+                print('pbm whith histo %s, min < 0' % branches[i])
+            elif (np.floor(s_new.sum()) == 0.):
+                print('pbm whith histo %s, sum = 0' % branches[i])
+            else:
+                nbHistosPass1 += 1
+                tmp_branch.append(branches[i])
         else:
-            nbHistosPass1 += 1
-            tmp_branch.append(branches[i])
+            print('%s KO' % branches[i])
 
     nb_ttl_histos.append(nbHistosPass1)
     tmp_branches.append(tmp_branch)
@@ -173,25 +177,29 @@ for item in rootFilesList:
     for i in range(0, N_histos): # 1 N_histos histo for debug
         #print('\n' + branches[i]) # print histo name
         histo_1 = h1.Get(branches[i])
-        '''
-        s_new = []
-        for entry in histo_1:
-            s_new.append(entry)
-        s_new = np.asarray(s_new)
-        s_new = s_new[1:-1]
-        '''
-        s_new = fill_Snew(histo_1)
-        Ntot_h1 = histo_1.GetEntries()
+        if (histo_1):
+            print('%s OK' % branches[i])
+            '''
+            s_new = []
+            for entry in histo_1:
+                s_new.append(entry)
+            s_new = np.asarray(s_new)
+            s_new = s_new[1:-1]
+            '''
+            s_new = fill_Snew(histo_1)
+            Ntot_h1 = histo_1.GetEntries()
 
-        # print min/max for the new curve
-        #print('min : %f - max : %f' % (s_new.min(), s_new.max()))
-        if (s_new.min() < 0.):
-            print('pbm whith histo %s, min < 0' % branches[i])
-        elif (np.floor(s_new.sum()) == 0.):
-            print('pbm whith histo %s, sum = 0' % branches[i])
+            # print min/max for the new curve
+            #print('min : %f - max : %f' % (s_new.min(), s_new.max()))
+            if (s_new.min() < 0.):
+                print('pbm whith histo %s, min < 0' % branches[i])
+            elif (np.floor(s_new.sum()) == 0.):
+                print('pbm whith histo %s, sum = 0' % branches[i])
+            else:
+                nbHistosPass1 += 1
+                tmp_branch.append(branches[i])
         else:
-            nbHistosPass1 += 1
-            tmp_branch.append(branches[i])
+            print('%s KO' % branches[i])
 
     nb_ttl_histos.append(nbHistosPass1)
     tmp_branches.append(tmp_branch)
@@ -225,41 +233,45 @@ for elem in fileList:
     for i in range(0, N_histos): # 1 N_histos histo for debug
         #print('\n' + branches[i]) # print histo name
         histo_1 = h1.Get(branches[i])
+        if (histo_1):
+            print('%s OK' % branches[i])
             
-        d = getHistoConfEntry(histo_1)
-        #print("d = {}".format(d))
+            d = getHistoConfEntry(histo_1)
+            #print("d = {}".format(d))
 
-        '''
-        s_new = []
-        ii = 0
-        if (d==1):
-            for entry in histo_1:
-                s_new.append(entry)
+            '''
+            s_new = []
+            ii = 0
+            if (d==1):
+                for entry in histo_1:
+                    s_new.append(entry)
+            else:
+                for entry in histo_1:
+                    if ((histo_1.GetBinEntries(ii) == 0.) and (entry == 0.)):
+                        s_new.append(0.)
+                    elif ((histo_1.GetBinEntries(ii) == 0.) and (entry != 0.)):
+                        s_new.append(1.e38)
+                        print('========================================',ii,entry,histo_1.GetBinEntries(ii))
+                    else:
+                        s_new.append(entry/histo_1.GetBinEntries(ii))
+                    ii+=1
+            s_new = np.asarray(s_new)
+            s_new = s_new[1:-1]
+            '''
+            s_new = fill_Snew2(d, histo_1)
+            Ntot_h1 = histo_1.GetEntries()
+            
+            # print min/max for the new curve
+            #print('min : %f - max : %f' % (s_new.min(), s_new.max()))
+            if (s_new.min() < 0.):
+                print('pbm whith histo %s, min < 0' % branches[i])
+            elif (np.floor(s_new.sum()) == 0.):
+                print('pbm whith histo %s, sum = 0' % branches[i])
+            else:
+                nbHistosPass2 += 1
+                tmp_branch.append(branches[i])
         else:
-            for entry in histo_1:
-                if ((histo_1.GetBinEntries(ii) == 0.) and (entry == 0.)):
-                    s_new.append(0.)
-                elif ((histo_1.GetBinEntries(ii) == 0.) and (entry != 0.)):
-                    s_new.append(1.e38)
-                    print('========================================',ii,entry,histo_1.GetBinEntries(ii))
-                else:
-                    s_new.append(entry/histo_1.GetBinEntries(ii))
-                ii+=1
-        s_new = np.asarray(s_new)
-        s_new = s_new[1:-1]
-        '''
-        s_new = fill_Snew2(d, histo_1)
-        Ntot_h1 = histo_1.GetEntries()
-        
-        # print min/max for the new curve
-        #print('min : %f - max : %f' % (s_new.min(), s_new.max()))
-        if (s_new.min() < 0.):
-            print('pbm whith histo %s, min < 0' % branches[i])
-        elif (np.floor(s_new.sum()) == 0.):
-            print('pbm whith histo %s, sum = 0' % branches[i])
-        else:
-            nbHistosPass2 += 1
-            tmp_branch.append(branches[i])
+            print('%s KO' % branches[i])
 
     nb_ttl_histos.append(nbHistosPass2)
     tmp_branches.append(tmp_branch)
@@ -294,41 +306,45 @@ for item in rootFilesList:
     for i in range(0, N_histos): # 1 N_histos histo for debug
         #print('\n' + branches[i]) # print histo name
         histo_1 = h1.Get(branches[i])
+        if (histo_1):
+            print('%s OK PASS 2' % branches[i])
 
-        d = getHistoConfEntry(histo_1)
-        #print("d = {}".format(d))
+            d = getHistoConfEntry(histo_1)
+            #print("d = {}".format(d))
 
-        '''
-        s_new = []
-        ii = 0
-        if (d==1):
-            for entry in histo_1:
-                s_new.append(entry)
+            '''
+            s_new = []
+            ii = 0
+            if (d==1):
+                for entry in histo_1:
+                    s_new.append(entry)
+            else:
+                for entry in histo_1:
+                    if ((histo_1.GetBinEntries(ii) == 0.) and (entry == 0.)):
+                        s_new.append(0.)
+                    elif ((histo_1.GetBinEntries(ii) == 0.) and (entry != 0.)):
+                        s_new.append(1.e38)
+                        print('========================================',ii,entry,histo_1.GetBinEntries(ii))
+                    else:
+                        s_new.append(entry/histo_1.GetBinEntries(ii))
+                    ii+=1
+            s_new = np.asarray(s_new)
+            s_new = s_new[1:-1]
+            '''
+            s_new = fill_Snew2(d, histo_1)
+            Ntot_h1 = histo_1.GetEntries()
+            
+            # print min/max for the new curve
+            #print('min : %f - max : %f' % (s_new.min(), s_new.max()))
+            if (s_new.min() < 0.):
+                print('pbm whith histo %s, min < 0' % branches[i])
+            elif (np.floor(s_new.sum()) == 0.):
+                print('pbm whith histo %s, sum = 0' % branches[i])
+            else:
+                nbHistosPass2 += 1
+                tmp_branch.append(branches[i])
         else:
-            for entry in histo_1:
-                if ((histo_1.GetBinEntries(ii) == 0.) and (entry == 0.)):
-                    s_new.append(0.)
-                elif ((histo_1.GetBinEntries(ii) == 0.) and (entry != 0.)):
-                    s_new.append(1.e38)
-                    print('========================================',ii,entry,histo_1.GetBinEntries(ii))
-                else:
-                    s_new.append(entry/histo_1.GetBinEntries(ii))
-                ii+=1
-        s_new = np.asarray(s_new)
-        s_new = s_new[1:-1]
-        '''
-        s_new = fill_Snew2(d, histo_1)
-        Ntot_h1 = histo_1.GetEntries()
-        
-        # print min/max for the new curve
-        #print('min : %f - max : %f' % (s_new.min(), s_new.max()))
-        if (s_new.min() < 0.):
-            print('pbm whith histo %s, min < 0' % branches[i])
-        elif (np.floor(s_new.sum()) == 0.):
-            print('pbm whith histo %s, sum = 0' % branches[i])
-        else:
-            nbHistosPass2 += 1
-            tmp_branch.append(branches[i])
+            print('%s KO PASS 2' % branches[i])
 
     nb_ttl_histos.append(nbHistosPass2)
     tmp_branches.append(tmp_branch)
@@ -356,84 +372,88 @@ if (ind_reference == -1):
 print('reference ind. : %d' % ind_reference)
 
 for i in range(0, N_histos): # 1 N_histos histo for debug
-    name = resultPath + "histo_" + branches[i] + '_{:03d}'.format(nbFiles) + ".txt"
-    print('\n%d - %s' %(i, name))
-    df = pd.read_csv(name)
-    #print('\n' + branches[i]) # print histo name
-
     histo_1 = h1.Get(branches[i])
-    s_new = []
-    for entry in histo_1:
-        s_new.append(entry)
-    s_new = np.asarray(s_new)
-    s_new = s_new[1:-1]
-    Ntot_h1 = histo_1.GetEntries()
-    #print('nb of entries : {:f}'.format(Ntot_h1))
+    if (histo_1):
+        print('%s OK PASS 3' % branches[i])
+        name = resultPath + "histo_" + branches[i] + '_{:03d}'.format(nbFiles) + ".txt"
+        print('\n%d - %s' %(i, name))
+        df = pd.read_csv(name)
+        #print('\n' + branches[i]) # print histo name
 
-    # check the values data
-    #print(df.head(5))
-    cols = df.columns.values
-    n_cols = len(cols)
-    #print('nb of columns for histos : %d' % n_cols)
-    cols_entries = cols[6::2]
-    df_entries = df[cols_entries]
-    #print(df_entries.head(15))#
+        s_new = []
+        for entry in histo_1:
+            s_new.append(entry)
+        s_new = np.asarray(s_new)
+        s_new = s_new[1:-1]
+        Ntot_h1 = histo_1.GetEntries()
+        #print('nb of entries : {:f}'.format(Ntot_h1))
 
-    # nbBins (GetEntries())
-    df_GetEntries = df['nbBins']
+        # check the values data
+        #print(df.head(5))
+        cols = df.columns.values
+        n_cols = len(cols)
+        #print('nb of columns for histos : %d' % n_cols)
+        cols_entries = cols[6::2]
+        df_entries = df[cols_entries]
+        #print(df_entries.head(15))#
 
-    # get nb of columns & rows for histos
-    (Nrows, Ncols) = df_entries.shape
-    #print('[Nrows, Ncols] : [%d, %d]' % (Nrows, Ncols))
-    df_entries = df_entries.iloc[:, 1:Ncols-1]
-    (Nrows, Ncols) = df_entries.shape
-    print('[Nrows, Ncols] : [%d, %d]' % (Nrows, Ncols))
+        # nbBins (GetEntries())
+        df_GetEntries = df['nbBins']
 
-    # create the datas for the p-Value graph
-    # by comparing all curves between them. (KS 1)
-    nb1 = 0
-    totalDiff = []
-    for k in range(0,Nrows-1):
-        for l in range(k+1, Nrows):
-            nb1 += 1
-            series0 = df_entries.iloc[k,:]
-            series1 = df_entries.iloc[l,:]     
-            sum0 = df_GetEntries[k]
-            sum1 = df_GetEntries[l]
-            totalDiff.append(DB.diffMAXKS(series0, series1, sum0, sum1)[0]) # 9000, 9000
+        # get nb of columns & rows for histos
+        (Nrows, Ncols) = df_entries.shape
+        #print('[Nrows, Ncols] : [%d, %d]' % (Nrows, Ncols))
+        df_entries = df_entries.iloc[:, 1:Ncols-1]
+        (Nrows, Ncols) = df_entries.shape
+        print('[Nrows, Ncols] : [%d, %d]' % (Nrows, Ncols))
 
-    print('ttl nb1 of couples 1 : %d' % nb1)
+        # create the datas for the p-Value graph
+        # by comparing all curves between them. (KS 1)
+        nb1 = 0
+        totalDiff = []
+        for k in range(0,Nrows-1):
+            for l in range(k+1, Nrows):
+                nb1 += 1
+                series0 = df_entries.iloc[k,:]
+                series1 = df_entries.iloc[l,:]     
+                sum0 = df_GetEntries[k]
+                sum1 = df_GetEntries[l]
+                totalDiff.append(DB.diffMAXKS(series0, series1, sum0, sum1)[0]) # 9000, 9000
 
-    # create the datas for the p-Value graph
-    # by comparing 1 curve with the others.
-    # Get a random histo as reference (KS 2)
-    series_reference = df_entries.iloc[ind_reference,:]
-    nbBins_reference = df_GetEntries[ind_reference]
-    #print('nb bins reference : %d' % nbBins_reference)
-    nb2 = 0
-    totalDiff2 = []
-    for k in range(0,Nrows-0):
-        if (k != ind_reference):
-            nb2 += 1
-            series0 = df_entries.iloc[k,:]
-            sum0 = df_GetEntries[k]
-            totalDiff2.append(DB.diffMAXKS(series0, series_reference, sum0, nbBins_reference)[0]) # 9000, 9000
+        print('ttl nb1 of couples 1 : %d' % nb1)
 
-    print('ttl nb of couples 2 : %d' % nb2)
+        # create the datas for the p-Value graph
+        # by comparing 1 curve with the others.
+        # Get a random histo as reference (KS 2)
+        series_reference = df_entries.iloc[ind_reference,:]
+        nbBins_reference = df_GetEntries[ind_reference]
+        #print('nb bins reference : %d' % nbBins_reference)
+        nb2 = 0
+        totalDiff2 = []
+        for k in range(0,Nrows-0):
+            if (k != ind_reference):
+                nb2 += 1
+                series0 = df_entries.iloc[k,:]
+                sum0 = df_GetEntries[k]
+                totalDiff2.append(DB.diffMAXKS(series0, series_reference, sum0, nbBins_reference)[0]) # 9000, 9000
+
+        print('ttl nb of couples 2 : %d' % nb2)
+            
+        # create the datas for the p-Value graph
+        # by comparing the new curve with the others.
+        # Get the new as reference (KS 3)
         
-    # create the datas for the p-Value graph
-    # by comparing the new curve with the others.
-    # Get the new as reference (KS 3)
-    
-    nb3 = 0
-    totalDiff3 = []
-    for k in range(0,Nrows-0):
-        nb3 += 1
-        series0 = df_entries.iloc[k,:]
-        sum0 = df_GetEntries[k]
-        totalDiff3.append(DB.diffMAXKS(series0, s_new, sum0, Ntot_h1)[0])
+        nb3 = 0
+        totalDiff3 = []
+        for k in range(0,Nrows-0):
+            nb3 += 1
+            series0 = df_entries.iloc[k,:]
+            sum0 = df_GetEntries[k]
+            totalDiff3.append(DB.diffMAXKS(series0, s_new, sum0, Ntot_h1)[0])
 
-    print('ttl nb of couples 3 : %d' % nb3)
+        print('ttl nb of couples 3 : %d' % nb3)
+    else:
+        print('%s KO PASS 3' % branches[i])
 
 
 
