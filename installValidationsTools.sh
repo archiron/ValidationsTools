@@ -16,6 +16,7 @@ git clone https://github.com/archiron/ChiLib_CMS_Validation ChiLib
 cd ZEE_Flow
 chmod 755 *.sh
 echo "installing $Release"
+source /cvmfs/cms.cern.ch/cmsset_default.sh
 cmsrel $Release $Release
 cd $Release/src
 mkdir Kolmogorov
