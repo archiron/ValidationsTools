@@ -164,6 +164,9 @@ nbFiles = change_nbFiles(len(rootFilesList_0), nbFiles)
 folder += '{:03d}'.format(nbFiles)
 folder = checkFolderName(folder)
 checkFolder(folder)
+folderKS = folder + 'KS'
+folderKS =checkFolderName(folderKS)
+checkFolder(folderKS)
 
 #print('-')
 #for elem in rels:
@@ -353,7 +356,7 @@ for elem in sortedRels:
                 series0 = df_entries.iloc[k,:]
                 curves = DB.funcKS(series0)
                 plt.plot(curves)
-            fig.savefig(folder + '/cumulative_curve_' + branches[i] + "_" + rel + '_v2.png')
+            fig.savefig(folderKS + '/cumulative_curve_' + branches[i] + "_" + rel + '_v2.png')
             fig.clf()
         
             # ================================ #
@@ -408,7 +411,7 @@ for elem in sortedRels:
             ymi, yMa = plt_diff_KS1.get_ylim()
             plt_diff_KS1.vlines(x1, ymi, 0.9*yMa, color=color1, linewidth=4)
             fig = plt_diff_KS1.get_figure()
-            fig.savefig(folder + '/KS-ttlDiff_1_' + branches[i] + '_v2.png')
+            fig.savefig(folderKS + '/KS-ttlDiff_1_' + branches[i] + '_v2.png')
             fig.clf()
             count, division = np.histogram(seriesTotalDiff1[~np.isnan(seriesTotalDiff1)], bins=nbins)
             div_min = np.amin(division)
@@ -463,7 +466,7 @@ for elem in sortedRels:
             ymi, yMa = plt_diff_KS2.get_ylim()
             plt_diff_KS2.vlines(x2, ymi, 0.9*yMa, color=color2, linewidth=4)
             fig = plt_diff_KS2.get_figure()
-            fig.savefig(folder + '/KS-ttlDiff_2_' + branches[i] + '_v2.png')
+            fig.savefig(folderKS + '/KS-ttlDiff_2_' + branches[i] + '_v2.png')
             fig.clf()
             count, division = np.histogram(seriesTotalDiff2, bins=nbins)
             div_min = np.amin(division)
@@ -518,7 +521,7 @@ for elem in sortedRels:
             ymi, yMa = plt_diff_KS3.get_ylim()
             plt_diff_KS3.vlines(x3, ymi, 0.9*yMa, color=color3, linewidth=4)
             fig = plt_diff_KS3.get_figure()
-            fig.savefig(folder + '/KS-ttlDiff_3_' + branches[i] + '_v2.png')
+            fig.savefig(folderKS + '/KS-ttlDiff_3_' + branches[i] + '_v2.png')
             fig.clf()
             count, division = np.histogram(seriesTotalDiff3, bins=nbins)
             div_min = np.amin(division)

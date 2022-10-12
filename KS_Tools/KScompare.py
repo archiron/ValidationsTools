@@ -161,6 +161,10 @@ folder += '{:03d}'.format(nbFiles)
 folder = checkFolderName(folder)
 print('folder après check : %s' % folder)
 checkFolder(folder)
+folderKS = folder + 'KS'
+folderKS =checkFolderName(folderKS)
+print('folder KS après check : %s' % folderKS)
+checkFolder(folderKS)
 
 tic = time.time()
 
@@ -218,11 +222,6 @@ print(df1.head(5))
 print()
 print(df2.head(5))
     
-folder += 'KS'
-folder =checkFolderName(folder)
-print('folder après check : %s' % folder)
-checkFolder(folder)
-
 labels = list(df1)[1:]
 print(labels)
 (N_histos, _) = df1.shape
@@ -234,7 +233,7 @@ for ind in df1.index:
     print(branch)
     val = list(a[1:])
     #print(val)
-    pictureName = folder + 'comparison_KS_values_' + branch + '_{:03d}'.format(nbFiles) +'.png' # 
+    pictureName = folderKS + 'comparison_KS_values_' + branch + '_{:03d}'.format(nbFiles) +'.png' # 
     print(pictureName)
     title = r"$\bf{" + branch + "}$" + ' : Comparison of KS diff values as function of releases.'
     createCompLossesPicture(labels,val, pictureName, title)
@@ -248,7 +247,7 @@ for ind in df2.index:
     print(branch)
     val = list(a[1:])
     #print(val)
-    pictureName = folder + 'comparison_pValues_' + branch + '_{:03d}'.format(nbFiles) +'.png' # 
+    pictureName = folderKS + 'comparison_pValues_' + branch + '_{:03d}'.format(nbFiles) +'.png' # 
     print(pictureName)
     title = r"$\bf{" + branch + "}$" + ' : Comparison of KS pValues as function of releases.'
     createCompPValuesPicture(labels,val, pictureName, title)

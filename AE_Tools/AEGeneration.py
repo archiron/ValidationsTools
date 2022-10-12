@@ -12,7 +12,7 @@
 ################################################################################
 
 import datetime, time
-import sys, os
+import sys, os,shutil
 import importlib
 import importlib.machinery
 import importlib.util
@@ -218,7 +218,7 @@ for line in createAutoEncoderRef(nbFiles, nbBranches, device, lr, epsilon, hidde
     fParam.write(line)
 fParam.close()
 
-loopMaxValue = nbBranches # nbBranches
+loopMaxValue = 3 # nbBranches # nbBranches
 for i in range(0, loopMaxValue):
 
     # add a subfolder with the name of the histo and a folder with date/time
@@ -394,6 +394,9 @@ for i in range(0, loopMaxValue):
     folderNamePict = folderNameBranch + '/Pictures/'
     checkFolder(folderNamePict)
     print('\nfolderNamePict : {:s}'.format(folderNamePict))
+
+    source_dest = folderNamePict + "/ElectronMcSignalHistos.txt"
+    shutil.copy2(source, source_dest)
 
     lossesPictureName = folderNamePict + '/loss_plots_' + branches[i] + "_{:03d}".format(nbFiles) + '.png'
     if ( useEncoder == 1):
