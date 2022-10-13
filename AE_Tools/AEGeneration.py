@@ -12,7 +12,7 @@
 ################################################################################
 
 import datetime, time
-import sys, os,shutil
+import sys, os
 import importlib
 import importlib.machinery
 import importlib.util
@@ -394,9 +394,6 @@ for i in range(0, loopMaxValue):
     folderNamePict = folderNameBranch + '/Pictures/'
     checkFolder(folderNamePict)
     print('\nfolderNamePict : {:s}'.format(folderNamePict))
-
-    source_dest = folderNamePict + "/ElectronMcSignalHistos.txt"
-    shutil.copy2(source, source_dest)
 
     lossesPictureName = folderNamePict + '/loss_plots_' + branches[i] + "_{:03d}".format(nbFiles) + '.png'
     if ( useEncoder == 1):

@@ -11,7 +11,7 @@
 #                                                                              
 ################################################################################
 
-import os,sys
+import os,sys,shutil
 import importlib
 import importlib.machinery
 import importlib.util
@@ -167,6 +167,9 @@ checkFolder(folder)
 folderKS = folder + 'KS'
 folderKS =checkFolderName(folderKS)
 checkFolder(folderKS)
+
+source_dest = folder + "/ElectronMcSignalHistos.txt"
+shutil.copy2(source, source_dest)
 
 #print('-')
 #for elem in rels:
