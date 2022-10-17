@@ -218,7 +218,7 @@ for line in createAutoEncoderRef(nbFiles, nbBranches, device, lr, epsilon, hidde
     fParam.write(line)
 fParam.close()
 
-loopMaxValue = 3 # nbBranches # nbBranches
+loopMaxValue = nbBranches # nbBranches
 for i in range(0, loopMaxValue):
 
     # add a subfolder with the name of the histo and a folder with date/time
