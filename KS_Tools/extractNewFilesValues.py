@@ -50,19 +50,18 @@ from sources import *
 
 import numpy as np
 
-######## ===== COMMON LINES ===== ########
 # get the branches for ElectronMcSignalHistos.txt
+######## ===== COMMON LINES ===== ########
 branches = []
 source = Chilib_path + "/HistosConfigFiles/ElectronMcSignalHistos.txt"
 branches = getBranches(tp_1, source)
 cleanBranches(branches) # remove some histo wich have a pbm with KS.
-
-resultPath += '/' + str(NB_EVTS)
-resultPath = checkFolderName(resultPath)
-print('resultPath : {:s}'.format(resultPath))
 ######## ===== COMMON LINES ===== ########
 
 print("func_ExtractNewFilesValues")
+resultPath += '/' + str(NB_EVTS)
+resultPath = checkFolderName(resultPath)
+print('resultPath : {:s}'.format(resultPath))
 
 # these line for daltonians !
 #seaborn.set_palette('colorblind')
@@ -116,17 +115,21 @@ for i in range(0, N_histos): # 1 histo for debug
         print(fil + '/' + branches[i]) # print histo name
         histo_1 = h1.Get(branches[i])
 
-        d = getHistoConfEntry(histo_1)
-        #print("d = {}".format(d))
+        if (histo_1):
+            print('%s OK' % branches[i])
+            d = getHistoConfEntry(histo_1)
+            #print("d = {}".format(d))
 
-        texttoWrite = fil + "," + branches[i] + ","
-        s_new = fill_Snew2(d, histo_1)
+            texttoWrite = fil + "," + branches[i] + ","
+            s_new = fill_Snew2(d, histo_1)
         
-        for elem in s_new:
-            texttoWrite += str(elem) + ","
-        texttoWrite = texttoWrite[:-1] # remove last char
-        texttoWrite += '\n'
-        wKS_.write(texttoWrite)
+            for elem in s_new:
+                texttoWrite += str(elem) + ","
+            texttoWrite = texttoWrite[:-1] # remove last char
+            texttoWrite += '\n'
+            wKS_.write(texttoWrite)
+        else:
+            print('%s KO' % branches[i])
 
 wKS_.close()
 toc = time.time()
