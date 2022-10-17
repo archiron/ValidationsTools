@@ -699,17 +699,21 @@ for i in range(0, loopMaxValue):
     if (len(val1) > 0):
         pictureName = folderNamePict + 'comparison_KSvsAE_' + branches[i] + '_{:03d}'.format(nbFiles) +'.png' # 
         #print(pictureName)
+        #pictureName = pictureName.replace('/data_CMS/cms/chiron/Validations', 'https://llrvalidation.in2p3.fr')
+        print(pictureName)
         title = r"$\bf{" + branches[i] + "}$" + ' : Comparison of KS vs AE values as function of releases.'
         #print(title)
         createCompKSvsAEPicture(labels2, val1, val2, pictureName, title)
-        pictureName = folderNamePict + 'comparison_KSvsAE_2Axis_' + branches[i] + '_{:03d}'.format(nbFiles) +'.png' # 
+        pictureName = folderNamePict + 'comparison_KSvsAE_2Axis_' + branches[i] + '_{:03d}'.format(nbFiles) +'.png' # give a name whith data_CMS/cms/chiron/Validations/1000/DEV_01//004/AE_RESULTS/
+        #pictureName = pictureName.replace('/data_CMS/cms/chiron/Validations', 'https://llrvalidation.in2p3.fr')
         createCompKSvsAEPicture2Axis(labels2, val1, val2, pictureName, title)
 
     #pictureName = os.getcwd() + '/' + pictureName
-    pictureName = 'https://cms-egamma.web.cern.ch/validation/Electrons/Store/AutoEncoders/' + '/' + pictureName
-    histoPath = 'https://cms-egamma.web.cern.ch/validation/Electrons/Store/AutoEncoders/' + '/' + resumeHisto
+    pictureName = pictureName.replace('/data_CMS/cms/chiron/Validations', 'https://llrvalidation.in2p3.fr')
+    histoPath = 'https://llrvalidation.in2p3.fr/' + '/' + resumeHisto
     fHisto.write('<td><a href=\"' + pictureName + '\"><img width=\"450\" height=\"250\" border=\"0\" align=\"middle\" src=\"' + pictureName + '\"></a></td>')
-    lossPath = 'https://cms-egamma.web.cern.ch/validation/Electrons/Store/AutoEncoders/' + '/' + lossesPictureName
+    lossPath = lossesPictureName.replace('/data_CMS/cms/chiron/Validations', 'https://llrvalidation.in2p3.fr')
+    fHisto.write('<br>')
     fHisto.write('<td><a href=\"' + lossPath + '\"><img width=\"450\" height=\"250\" border=\"0\" align=\"middle\" src=\"' + lossPath + '\"></a></td>')
     fHisto.write("</tr>\n")
 
@@ -724,8 +728,8 @@ for i in range(0, loopMaxValue):
         fHisto.write('{0:20s}'.format(elem[0][6:]))
         fHisto.write("</td><td>")
         #fHisto.write('{:e}'.format(elem[1]))
-        pictureName2 = folderNamePict + '/predicted_new_curves_' + branches[i] + '_' + elem[0][6:] + '_multi.png'
-        pictureName2 = 'https://cms-egamma.web.cern.ch/validation/Electrons/Store/AutoEncoders/' + '/' + pictureName2
+        pictureName2 = folderNamePict + '/predicted_new_curves_' + branches[i] + '_' + elem[0][6:] + '_multi.png' # folderNamePict + 
+        pictureName2 = pictureName2.replace('/data_CMS/cms/chiron/Validations', 'https://llrvalidation.in2p3.fr')
         #fHisto.write('{:s}'.format(pictureName2))
         fHisto.write('<a href=\"' + pictureName2 + '\"><img width=\"250\" height=\"125\" border=\"0\" align=\"middle\" src=\"' + pictureName2 + '\"></a>')
         fHisto.write("</td></tr>\n")
