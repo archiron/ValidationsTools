@@ -105,7 +105,7 @@ def createAutoEncoderRef(nbFiles, nbBranches, device, lr, epsilon, hidden_size_1
     Text.append('<br>\n')
     return Text
 
-df = []
+#df = []
 arrayKSValues = []
 rels = []
 
@@ -121,6 +121,7 @@ branches = []
 source = Chilib_path + "/HistosConfigFiles/ElectronMcSignalHistos.txt"
 branches = getBranches(tp_1, source)
 cleanBranches(branches) # remove some histo wich have a pbm with KS.
+#branches = ['h_recEleNum', 'h_recCoreNum', 'h_ele_vertexPtVsEta_pfx']
 ######## ===== COMMON LINES ===== ########
 
 #histoKeysNames = getKeysName(tp_1, source) # unused
@@ -144,13 +145,13 @@ print('data_dir path : {:s}'.format(data_dir))
 data_res = data_dir + '/AE_RESULTS/'
 print('data_res path : {:s}'.format(data_res))
 
-for branch in branches: # [0:8]
+'''for branch in branches: # [0:8]
     fileName = resultPath + "/histo_" + branch + '_{:03d}'.format(nbFiles) + ".txt"
     if Path(fileName).exists():
         print('{:s} exist'.format(fileName))
         df.append(pd.read_csv(fileName))
     else:
-        print('{:s} does not exist'.format(fileName))
+        print('{:s} does not exist'.format(fileName))'''
 
 # get list of added ROOT files
 rootFolderName = workPath + '/' + blo.DATA_SOURCE # '/pbs/home/c/chiron/private/KS_Tools/GenExtract/DATA/NewFiles'
@@ -218,9 +219,21 @@ for line in createAutoEncoderRef(nbFiles, nbBranches, device, lr, epsilon, hidde
     fParam.write(line)
 fParam.close()
 
-loopMaxValue = nbBranches # nbBranches
+loopMaxValue = nbBranches #25 # nbBranches
 for i in range(0, loopMaxValue):
+    print('{:s}\n'.format(branches[i]))
+    df = []
+    fileName = resultPath + "/histo_" + branches[i] + '_{:03d}'.format(nbFiles) + ".txt"
+    if Path(fileName).exists():
+        print('{:s} exist'.format(fileName))
+        df = pd.read_csv(fileName)
+    else:
+        print('{:s} does not exist'.format(fileName))
+        continue
 
+    #if i < 19:#'_pfx' in branches[i]:
+        #print('{:s} is pfx, continue.'.format(branches[i]))
+    #    continue
     # add a subfolder with the name of the histo and a folder with date/time
     folderNameBranch = folderName + branches[i] + '/' + timeFolder
     checkFolder(folderNameBranch)
@@ -267,10 +280,10 @@ for i in range(0, loopMaxValue):
     print("loss values file : %s\n" % lossesValues)
     wLoss = open(lossesValues, 'w')
 
-    tmp = df[i]
-    cols = df[i].columns.values
+    tmp = df #[i]
+    cols = df.columns.values#df[i].columns.values
     n_cols = len(cols)
-    #print('nb of columns for histo {:s} : {:d}'.format(branches[i], n_cols))
+    print('nb of columns for histo[{:d}] {:s} : {:d}'.format(i, branches[i], n_cols))#TOTO
     #fHisto.write('nb of columns for histo {:s} : {:d}<br>\n'.format(branches[i], n_cols))
     cols_entries = cols[6::2]
     cols_errors = cols[7::2]
@@ -284,6 +297,7 @@ for i in range(0, loopMaxValue):
     (Nrows, Ncols) = df_entries.shape
     print('after : \t[Nrows, Ncols] : [%3d, %3d] for %s' % (Nrows, Ncols, branches[i]))
     fHisto.write('nb of columns for histo {:s} after extraction : [{:3d}, {:3d}]<br>\n'.format(branches[i], Nrows, Ncols))
+    print(df_entries)#TOTO
 
     fHisto.write('<br>\n')
 
@@ -502,18 +516,23 @@ for i in range(0, loopMaxValue):
     latentVal = []
     LinesPred = []
     for elem in linOp:
-        #print(elem)
+        print(elem) #TOTO
         rel, hName,line = elem.rstrip().split(',', 2)
-        #print(rel,hName,line)
+        print(rel,hName,line)
         new = line.rstrip().split(',')
         new = np.asarray(new).astype(float)
-
+        print(new)#TOTO
         df_new = pd.DataFrame(new).T # otherwise, one column with 50 rows instead of 1 line with 50 columns
 
         # creating torch tensor from df_entries/errors
         torch_tensor_new = torch.tensor(df_new.values)
 
         # normalize the tensor
+        '''if '_pfx' in branches[i]:
+            print('pfx')
+            torch_tensor_entries_n = torch_tensor_new
+        else:
+            torch_tensor_entries_n = normalize(torch_tensor_new, p=2.0)'''
         torch_tensor_entries_n = normalize(torch_tensor_new, p=2.0)
         test_loader_n = data.DataLoader(torch_tensor_entries_n)
 
@@ -533,6 +552,9 @@ for i in range(0, loopMaxValue):
                 decoder=decoder,device=device,
                 dataloader=test_loader_n,
                 loss_fn=loss_fn)
+        print(new_loss)#TOTO
+        print(y_pred_new)#TOTO
+        print(latent_out)#TOTO
 
         # Compute and print loss
         #print('new loss value : %e for %s' % (new_loss, rel))
@@ -628,9 +650,9 @@ for i in range(0, loopMaxValue):
         Val1.append(sortedLossesVal[j][1])
         Val2.append(sortedKSLoss[j][1])
         labels.append(sortedRels[j][1])
-    '''#print(Val1)
+    #print(Val1)
     #print(Val2)
-    #print(labels)'''
+    #print(labels)
 
     #print(branches[i])
     fileName = folderNamePict + 'compLossesValuesVsKS_' + branches[i] + '.png'
