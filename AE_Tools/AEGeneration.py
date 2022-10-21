@@ -283,7 +283,7 @@ for i in range(0, loopMaxValue):
     tmp = df #[i]
     cols = df.columns.values#df[i].columns.values
     n_cols = len(cols)
-    print('nb of columns for histo[{:d}] {:s} : {:d}'.format(i, branches[i], n_cols))#TOTO
+    #print('nb of columns for histo[{:d}] {:s} : {:d}'.format(i, branches[i], n_cols))
     #fHisto.write('nb of columns for histo {:s} : {:d}<br>\n'.format(branches[i], n_cols))
     cols_entries = cols[6::2]
     cols_errors = cols[7::2]
@@ -297,7 +297,7 @@ for i in range(0, loopMaxValue):
     (Nrows, Ncols) = df_entries.shape
     print('after : \t[Nrows, Ncols] : [%3d, %3d] for %s' % (Nrows, Ncols, branches[i]))
     fHisto.write('nb of columns for histo {:s} after extraction : [{:3d}, {:3d}]<br>\n'.format(branches[i], Nrows, Ncols))
-    print(df_entries)#TOTO
+    #print(df_entries)
 
     fHisto.write('<br>\n')
 
@@ -516,12 +516,12 @@ for i in range(0, loopMaxValue):
     latentVal = []
     LinesPred = []
     for elem in linOp:
-        print(elem) #TOTO
+        #print(elem)
         rel, hName,line = elem.rstrip().split(',', 2)
-        print(rel,hName,line)
+        #print(rel,hName,line)
         new = line.rstrip().split(',')
         new = np.asarray(new).astype(float)
-        print(new)#TOTO
+        #print(new)
         df_new = pd.DataFrame(new).T # otherwise, one column with 50 rows instead of 1 line with 50 columns
 
         # creating torch tensor from df_entries/errors
@@ -552,9 +552,9 @@ for i in range(0, loopMaxValue):
                 decoder=decoder,device=device,
                 dataloader=test_loader_n,
                 loss_fn=loss_fn)
-        print(new_loss)#TOTO
-        print(y_pred_new)#TOTO
-        print(latent_out)#TOTO
+        #print(new_loss)
+        #print(y_pred_new)
+        #print(latent_out)
 
         # Compute and print loss
         #print('new loss value : %e for %s' % (new_loss, rel))
@@ -656,7 +656,7 @@ for i in range(0, loopMaxValue):
 
     #print(branches[i])
     fileName = folderNamePict + 'compLossesValuesVsKS_' + branches[i] + '.png'
-    title = r"$\bf{" + branches[i] + "}$" + ' : Losses values vs KS values as function of releases.'
+    title = r"$\bf{" + branches[i] + "}$" + ' : Losses values vs KS pValues as function of releases.'
     createCompLossesPicture2Axis(labels, Val1, Val2, fileName, title)
     
     # extract the values of originals curves from Lines
@@ -723,12 +723,12 @@ for i in range(0, loopMaxValue):
         #print(pictureName)
         #pictureName = pictureName.replace('/data_CMS/cms/chiron/Validations', 'https://llrvalidation.in2p3.fr')
         print(pictureName)
-        title = r"$\bf{" + branches[i] + "}$" + ' : Comparison of KS vs AE values as function of releases.'
+        title = r"$\bf{" + branches[i] + "}$" + ' : KS diff. max. values vs AE losses values as function of releases.'
         #print(title)
         createCompKSvsAEPicture(labels2, val1, val2, pictureName, title)
         pictureName = folderNamePict + 'comparison_KSvsAE_2Axis_' + branches[i] + '_{:03d}'.format(nbFiles) +'.png' # give a name whith data_CMS/cms/chiron/Validations/1000/DEV_01//004/AE_RESULTS/
         #pictureName = pictureName.replace('/data_CMS/cms/chiron/Validations', 'https://llrvalidation.in2p3.fr')
-        createCompKSvsAEPicture2Axis(labels2, val1, val2, pictureName, title)
+        createCompKSvsAEPicture2Axis(labels2, val1, val2, pictureName, title) # same as above with 2 vert. axis instead of one.
 
     #pictureName = os.getcwd() + '/' + pictureName
     pictureName = pictureName.replace('/data_CMS/cms/chiron/Validations', 'https://llrvalidation.in2p3.fr')
