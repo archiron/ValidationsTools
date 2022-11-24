@@ -22,7 +22,8 @@ cd $1
 #eval `scramv1 runtime -sh`
 cd -
 
-#cd $2
-echo "executing $2/AEGeneration.py $3 $4"
-python3 $2/AEGeneration.py $3 $4
+#echo "executing $2/AEGeneration.py $3 $4"
+#python3 $2/AEGeneration.py $3 $4
+echo "executing $2/resumeAE.py $3 $4"
+python3 $2/resumeAE.py $3 $4
 

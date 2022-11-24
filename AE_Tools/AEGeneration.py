@@ -596,7 +596,7 @@ for i in range(0, loopMaxValue):
 
     fHisto.write('<table border="1" bordercolor=green cellpadding="2">' + '\n')
     fHisto.write("<tr><td>\n")
-    fHisto.write('new loss value</td><td>Release</td>')
+    fHisto.write('Release</td><td>new loss value</td>')
     for elem in sortedLossesVal:
         r = np.abs((elem[1]-mn)/(elem[1]+mn))
         #print('{:^{width}} : '.format(elem[0], width=20) + '{:1.4e}'.format(r))
