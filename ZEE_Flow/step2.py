@@ -2,7 +2,7 @@
 # using: 
 # Revision: 1.19 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
-# with command line options: step2 --conditions auto:phase1_2021_realistic --datatier GEN-SIM-DIGI-RAW --era Run3 --eventcontent FEVTDEBUGHLT --filein file:step1.root --fileout file:step2.root --geometry DB:Extended --nStreams 2 --nThreads 8 --no_exec --number 10 --python_filename step_2_cfg.py --step DIGI:pdigi_valid,L1,DIGI2RAW,HLT:@relval2021
+# with command line options: step2 --conditions auto:phase1_2022_realistic --datatier GEN-SIM-DIGI-RAW --era Run3 --eventcontent FEVTDEBUGHLT --filein file:step1.root --fileout file:step2.root --geometry DB:Extended --nStreams 2 --nThreads 8 --no_exec --number 10 --python_filename step_2_cfg.py --step DIGI:pdigi_valid,L1,DIGI2RAW,HLT:@relval2022
 import FWCore.ParameterSet.Config as cms
 import os, sys
 
@@ -10,13 +10,15 @@ from Configuration.Eras.Era_Run3_cff import Run3
 
 if len(sys.argv) > 1:
     print(sys.argv)
-    print("step 1 - arg. 0 :", sys.argv[0])
-    print("step 1 - arg. 1 :", sys.argv[1])
-    print("step 1 - arg. 2 :", sys.argv[2])
-    print("step 1 - arg. 3 :", sys.argv[3])
-    print("step 1 - arg. 4 :", sys.argv[4])
+    print("step 1 - arg. 0 :", sys.argv[0]) # command : cmsRun
+    print("step 1 - arg. 1 :", sys.argv[1]) # name of the script
+    print("step 1 - arg. 2 :", sys.argv[2]) # index
+    print("step 1 - arg. 3 :", sys.argv[3]) # path of the script ($LOG_SOURCE)
+    print("step 1 - arg. 4 :", sys.argv[4]) # nb of evts
+    print("step 1 - arg. 5 :", sys.argv[5]) # path of output
     ind = int(sys.argv[2])
     max_number = int(sys.argv[4])
+    outputPath = sys.argv[5]
 else:
     print("step 1 - rien")
     ind = 0
@@ -51,7 +53,7 @@ process.maxEvents = cms.untracked.PSet(
 process.source = cms.Source("PoolSource",
     dropDescendantsOfDroppedBranches = cms.untracked.bool(False),
     #fileNames = cms.untracked.vstring('file:step1.root'),
-    fileNames = cms.untracked.vstring('file:step1_' + '%0004d'%max_number + '_' + '%003d'%ind + '.root'),
+    fileNames = cms.untracked.vstring('file:' + outputPath + '/step1_' + '%0004d'%max_number + '_' + '%003d'%ind + '.root'),
     inputCommands = cms.untracked.vstring(
         'keep *',
         'drop *_genParticles_*_*',
@@ -79,6 +81,7 @@ process.options = cms.untracked.PSet(
     IgnoreCompletely = cms.untracked.vstring(),
     Rethrow = cms.untracked.vstring(),
     SkipEvent = cms.untracked.vstring(),
+    accelerators = cms.untracked.vstring('*'),
     allowUnscheduled = cms.obsolete.untracked.bool,
     canDeleteEarly = cms.untracked.vstring(),
     deleteNonConsumedUnscheduledModules = cms.untracked.bool(True),
@@ -118,7 +121,7 @@ process.FEVTDEBUGHLToutput = cms.OutputModule("PoolOutputModule",
         filterName = cms.untracked.string('')
     ),
     #fileName = cms.untracked.string('file:step2.root'),
-    fileName = cms.untracked.string('file:step2_' + '%0004d'%max_number + '_' + '%003d'%ind + '.root'),
+    fileName = cms.untracked.string('file:' + outputPath + '/step2_' + '%0004d'%max_number + '_' + '%003d'%ind + '.root'),
     outputCommands = process.FEVTDEBUGHLTEventContent.outputCommands,
     splitLevel = cms.untracked.int32(0)
 )
@@ -128,7 +131,7 @@ process.FEVTDEBUGHLToutput = cms.OutputModule("PoolOutputModule",
 # Other statements
 process.mix.digitizers = cms.PSet(process.theDigitizersValid)
 from Configuration.AlCa.GlobalTag import GlobalTag
-process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase1_2021_realistic', '')
+process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase1_2022_realistic', '')
 
 # Path and EndPath definitions
 process.digitisation_step = cms.Path(process.pdigi_valid)
@@ -138,8 +141,10 @@ process.endjob_step = cms.EndPath(process.endOfProcess)
 process.FEVTDEBUGHLToutput_step = cms.EndPath(process.FEVTDEBUGHLToutput)
 
 # Schedule definition
-process.schedule = cms.Schedule(process.digitisation_step,process.L1simulation_step,process.digi2raw_step)
-process.schedule.extend(process.HLTSchedule)
+# process.schedule imported from cff in HLTrigger.Configuration
+process.schedule.insert(0, process.digitisation_step)
+process.schedule.insert(1, process.L1simulation_step)
+process.schedule.insert(2, process.digi2raw_step)
 process.schedule.extend([process.endjob_step,process.FEVTDEBUGHLToutput_step])
 from PhysicsTools.PatAlgos.tools.helpers import associatePatAlgosToolsTask
 associatePatAlgosToolsTask(process)
@@ -147,8 +152,6 @@ associatePatAlgosToolsTask(process)
 #Setup FWK for multithreaded
 process.options.numberOfThreads = 2
 process.options.numberOfStreams = 2
-process.options.numberOfConcurrentLuminosityBlocks = 0
-process.options.eventSetup.numberOfConcurrentIOVs = 1
 
 # customisation of the process.
 

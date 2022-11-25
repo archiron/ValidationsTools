@@ -2,7 +2,7 @@
 # This file is called . createROOTFiles.sh
 
 JobName="createROOTFiles_serial_job_test" # for slurm
-output="createROOTFiles_%j.log" # for slurm
+output="/sps/cms/chiron/TEMP/createROOTFiles_%j.log" # for slurm
 
 declare -a readarray
 
@@ -98,7 +98,7 @@ elif [[ "$Choice" == "PBS" ]]
     eval `scramv1 runtime -sh`
     for i in $(eval echo "{$Nbegin..$Nend}")
     do
-      sbatch -L sps -n 8 --mem=8000 -J $JobName -o $output createROOTFiles.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER
+      sbatch -L sps -n 8 --mem=16000 -t 4-0:0:0 -J $JobName -o $output createROOTFiles.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER
     done
 fi
 

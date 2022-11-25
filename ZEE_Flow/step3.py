@@ -2,22 +2,23 @@
 # using: 
 # Revision: 1.19 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
-# with command line options: step3 --conditions auto:phase1_2021_realistic --datatier GEN-SIM-RECO,MINIAODSIM,NANOAODSIM,DQMIO --era Run3,run3_nanoAOD_devel --eventcontent RECOSIM,MINIAODSIM,NANOEDMAODSIM,DQM --filein file:step2.root --fileout file:step3.root --geometry DB:Extended --nStreams 2 --nThreads 8 --no_exec --number 10 --python_filename step_3_cfg.py --step RAW2DIGI,L1Reco,RECO,RECOSIM,EI,PAT,NANO,VALIDATION:@standardValidation+@miniAODValidation,DQM:@standardDQM+@ExtraHLT+@miniAODDQM+@nanoAODDQM
+# with command line options: step3 --conditions auto:phase1_2022_realistic --datatier GEN-SIM-RECO,MINIAODSIM,NANOAODSIM,DQMIO --era Run3 --eventcontent RECOSIM,MINIAODSIM,NANOEDMAODSIM,DQM --filein file:step2.root --fileout file:step3.root --geometry DB:Extended --nStreams 2 --nThreads 8 --no_exec --number 10 --python_filename step_3_cfg.py --step RAW2DIGI,L1Reco,RECO,RECOSIM,PAT,NANO,VALIDATION:@standardValidation+@miniAODValidation,DQM:@standardDQM+@ExtraHLT+@miniAODDQM+@nanoAODDQM
 import FWCore.ParameterSet.Config as cms
 import os, sys
 
 from Configuration.Eras.Era_Run3_cff import Run3
-from Configuration.Eras.Modifier_run3_nanoAOD_devel_cff import run3_nanoAOD_devel
 
 if len(sys.argv) > 1:
     print(sys.argv)
-    print("step 1 - arg. 0 :", sys.argv[0])
-    print("step 1 - arg. 1 :", sys.argv[1])
-    print("step 1 - arg. 2 :", sys.argv[2])
-    print("step 1 - arg. 3 :", sys.argv[3])
-    print("step 1 - arg. 4 :", sys.argv[4])
+    print("step 1 - arg. 0 :", sys.argv[0]) # command : cmsRun
+    print("step 1 - arg. 1 :", sys.argv[1]) # name of the script
+    print("step 1 - arg. 2 :", sys.argv[2]) # index
+    print("step 1 - arg. 3 :", sys.argv[3]) # path of the script ($LOG_SOURCE)
+    print("step 1 - arg. 4 :", sys.argv[4]) # nb of evts
+    print("step 1 - arg. 5 :", sys.argv[5]) # path of output
     ind = int(sys.argv[2])
     max_number = int(sys.argv[4])
+    outputPath = sys.argv[5]
 else:
     print("step 1 - rien")
     ind = 0
@@ -26,7 +27,7 @@ else:
 
 max_skipped = ind * max_number
 
-process = cms.Process('RECO',Run3,run3_nanoAOD_devel)
+process = cms.Process('RECO',Run3)
 
 # import of standard configurations
 process.load('Configuration.StandardSequences.Services_cff')
@@ -40,7 +41,6 @@ process.load('Configuration.StandardSequences.RawToDigi_cff')
 process.load('Configuration.StandardSequences.L1Reco_cff')
 process.load('Configuration.StandardSequences.Reconstruction_cff')
 process.load('Configuration.StandardSequences.RecoSim_cff')
-process.load('CommonTools.ParticleFlow.EITopPAG_cff')
 process.load('PhysicsTools.PatAlgos.slimming.metFilterPaths_cff')
 process.load('Configuration.StandardSequences.PATMC_cff')
 process.load('PhysicsTools.NanoAOD.nano_cff')
@@ -57,7 +57,7 @@ process.maxEvents = cms.untracked.PSet(
 # Input source
 process.source = cms.Source("PoolSource",
     #fileNames = cms.untracked.vstring('file:step2.root'),
-    fileNames = cms.untracked.vstring('file:step2_' + '%0004d'%max_number + '_' + '%003d'%ind + '.root'),
+    fileNames = cms.untracked.vstring('file:' + outputPath + '/step2_' + '%0004d'%max_number + '_' + '%003d'%ind + '.root'),
     secondaryFileNames = cms.untracked.vstring()
 )
 
@@ -66,6 +66,7 @@ process.options = cms.untracked.PSet(
     IgnoreCompletely = cms.untracked.vstring(),
     Rethrow = cms.untracked.vstring(),
     SkipEvent = cms.untracked.vstring(),
+    accelerators = cms.untracked.vstring('*'),
     allowUnscheduled = cms.obsolete.untracked.bool,
     canDeleteEarly = cms.untracked.vstring(),
     deleteNonConsumedUnscheduledModules = cms.untracked.bool(True),
@@ -83,7 +84,7 @@ process.options = cms.untracked.PSet(
     numberOfConcurrentLuminosityBlocks = cms.untracked.uint32(0),
     numberOfConcurrentRuns = cms.untracked.uint32(1),
     numberOfStreams = cms.untracked.uint32(0),
-    numberOfThreads = cms.untracked.uint32(2),
+    numberOfThreads = cms.untracked.uint32(1),
     printDependencies = cms.untracked.bool(False),
     sizeOfStackForThreadsInKB = cms.optional.untracked.uint32,
     throwIfIllegalParameter = cms.untracked.bool(True),
@@ -105,7 +106,7 @@ process.RECOSIMoutput = cms.OutputModule("PoolOutputModule",
         filterName = cms.untracked.string('')
     ),
     #fileName = cms.untracked.string('file:step3.root'),
-    fileName = cms.untracked.string('file:step3_' + '%0004d'%max_number + '_' + '%003d'%ind + '.root'),
+    fileName = cms.untracked.string('file:' + outputPath + '/step3_' + '%0004d'%max_number + '_' + '%003d'%ind + '.root'),
     outputCommands = process.RECOSIMEventContent.outputCommands,
     splitLevel = cms.untracked.int32(0)
 )
@@ -121,7 +122,7 @@ process.MINIAODSIMoutput = cms.OutputModule("PoolOutputModule",
     eventAutoFlushCompressedSize = cms.untracked.int32(-900),
     fastCloning = cms.untracked.bool(False),
     #fileName = cms.untracked.string('file:step3_inMINIAODSIM.root'),
-    fileName = cms.untracked.string('file:step3_inMINIAODSIM_' + '%0004d'%max_number + '_' + '%003d'%ind + '.root'),
+    fileName = cms.untracked.string('file:' + outputPath + '/step3_inMINIAODSIM_' + '%0004d'%max_number + '_' + '%003d'%ind + '.root'),
     outputCommands = process.MINIAODSIMEventContent.outputCommands,
     overrideBranchesSplitLevel = cms.untracked.VPSet(
         cms.untracked.PSet(
@@ -189,7 +190,7 @@ process.NANOEDMAODSIMoutput = cms.OutputModule("PoolOutputModule",
         filterName = cms.untracked.string('')
     ),
     #fileName = cms.untracked.string('file:step3_inNANOEDMAODSIM.root'),
-    fileName = cms.untracked.string('file:step3_inNANOEDMAODSIM_' + '%0004d'%max_number + '_' + '%003d'%ind + '.root'),
+    fileName = cms.untracked.string('file:' + outputPath + '/step3_inNANOEDMAODSIM_' + '%0004d'%max_number + '_' + '%003d'%ind + '.root'),
     outputCommands = process.NANOAODSIMEventContent.outputCommands
 )
 
@@ -199,7 +200,7 @@ process.DQMoutput = cms.OutputModule("DQMRootOutputModule",
         filterName = cms.untracked.string('')
     ),
     #fileName = cms.untracked.string('file:step3_inDQM.root'),
-    fileName = cms.untracked.string('file:step3_inDQM_' + '%0004d'%max_number + '_' + '%003d'%ind + '.root'),
+    fileName = cms.untracked.string('file:' + outputPath + '/step3_inDQM_' + '%0004d'%max_number + '_' + '%003d'%ind + '.root'),
     outputCommands = process.DQMEventContent.outputCommands,
     splitLevel = cms.untracked.int32(0)
 )
@@ -212,14 +213,13 @@ process.mix.digitizers = cms.PSet()
 for a in process.aliases: delattr(process, a)
 process.RandomNumberGeneratorService.restoreStateLabel=cms.untracked.string("randomEngineStateProducer")
 from Configuration.AlCa.GlobalTag import GlobalTag
-process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase1_2021_realistic', '')
+process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase1_2022_realistic', '')
 
 # Path and EndPath definitions
 process.raw2digi_step = cms.Path(process.RawToDigi)
 process.L1Reco_step = cms.Path(process.L1Reco)
 process.reconstruction_step = cms.Path(process.reconstruction)
 process.recosim_step = cms.Path(process.recosim)
-process.eventinterpretaion_step = cms.Path(process.EIsequence)
 process.Flag_BadChargedCandidateFilter = cms.Path(process.BadChargedCandidateFilter)
 process.Flag_BadChargedCandidateSummer16Filter = cms.Path(process.BadChargedCandidateSummer16Filter)
 process.Flag_BadPFMuonDzFilter = cms.Path(process.BadPFMuonDzFilter)
@@ -268,7 +268,7 @@ process.NANOEDMAODSIMoutput_step = cms.EndPath(process.NANOEDMAODSIMoutput)
 process.DQMoutput_step = cms.EndPath(process.DQMoutput)
 
 # Schedule definition
-process.schedule = cms.Schedule(process.raw2digi_step,process.L1Reco_step,process.reconstruction_step,process.recosim_step,process.eventinterpretaion_step,process.Flag_HBHENoiseFilter,process.Flag_HBHENoiseIsoFilter,process.Flag_CSCTightHaloFilter,process.Flag_CSCTightHaloTrkMuUnvetoFilter,process.Flag_CSCTightHalo2015Filter,process.Flag_globalTightHalo2016Filter,process.Flag_globalSuperTightHalo2016Filter,process.Flag_HcalStripHaloFilter,process.Flag_hcalLaserEventFilter,process.Flag_EcalDeadCellTriggerPrimitiveFilter,process.Flag_EcalDeadCellBoundaryEnergyFilter,process.Flag_ecalBadCalibFilter,process.Flag_goodVertices,process.Flag_eeBadScFilter,process.Flag_ecalLaserCorrFilter,process.Flag_trkPOGFilters,process.Flag_chargedHadronTrackResolutionFilter,process.Flag_muonBadTrackFilter,process.Flag_BadChargedCandidateFilter,process.Flag_BadPFMuonFilter,process.Flag_BadPFMuonDzFilter,process.Flag_hfNoisyHitsFilter,process.Flag_BadChargedCandidateSummer16Filter,process.Flag_BadPFMuonSummer16Filter,process.Flag_trkPOG_manystripclus53X,process.Flag_trkPOG_toomanystripclus53X,process.Flag_trkPOG_logErrorTooManyClusters,process.Flag_METFilters,process.nanoAOD_step,process.prevalidation_step,process.prevalidation_step1,process.validation_step,process.validation_step1,process.dqmoffline_step,process.dqmoffline_1_step,process.dqmoffline_2_step,process.dqmoffline_3_step,process.dqmofflineOnPAT_step,process.dqmofflineOnPAT_1_step,process.dqmofflineOnPAT_2_step,process.dqmofflineOnPAT_3_step,process.RECOSIMoutput_step,process.MINIAODSIMoutput_step,process.NANOEDMAODSIMoutput_step,process.DQMoutput_step)
+process.schedule = cms.Schedule(process.raw2digi_step,process.L1Reco_step,process.reconstruction_step,process.recosim_step,process.Flag_HBHENoiseFilter,process.Flag_HBHENoiseIsoFilter,process.Flag_CSCTightHaloFilter,process.Flag_CSCTightHaloTrkMuUnvetoFilter,process.Flag_CSCTightHalo2015Filter,process.Flag_globalTightHalo2016Filter,process.Flag_globalSuperTightHalo2016Filter,process.Flag_HcalStripHaloFilter,process.Flag_hcalLaserEventFilter,process.Flag_EcalDeadCellTriggerPrimitiveFilter,process.Flag_EcalDeadCellBoundaryEnergyFilter,process.Flag_ecalBadCalibFilter,process.Flag_goodVertices,process.Flag_eeBadScFilter,process.Flag_ecalLaserCorrFilter,process.Flag_trkPOGFilters,process.Flag_chargedHadronTrackResolutionFilter,process.Flag_muonBadTrackFilter,process.Flag_BadChargedCandidateFilter,process.Flag_BadPFMuonFilter,process.Flag_BadPFMuonDzFilter,process.Flag_hfNoisyHitsFilter,process.Flag_BadChargedCandidateSummer16Filter,process.Flag_BadPFMuonSummer16Filter,process.Flag_trkPOG_manystripclus53X,process.Flag_trkPOG_toomanystripclus53X,process.Flag_trkPOG_logErrorTooManyClusters,process.Flag_METFilters,process.nanoAOD_step,process.prevalidation_step,process.prevalidation_step1,process.validation_step,process.validation_step1,process.dqmoffline_step,process.dqmoffline_1_step,process.dqmoffline_2_step,process.dqmoffline_3_step,process.dqmofflineOnPAT_step,process.dqmofflineOnPAT_1_step,process.dqmofflineOnPAT_2_step,process.dqmofflineOnPAT_3_step,process.RECOSIMoutput_step,process.MINIAODSIMoutput_step,process.NANOEDMAODSIMoutput_step,process.DQMoutput_step)
 process.schedule.associate(process.patTask)
 from PhysicsTools.PatAlgos.tools.helpers import associatePatAlgosToolsTask
 associatePatAlgosToolsTask(process)
@@ -276,8 +276,6 @@ associatePatAlgosToolsTask(process)
 #Setup FWK for multithreaded
 process.options.numberOfThreads = 8
 process.options.numberOfStreams = 2
-process.options.numberOfConcurrentLuminosityBlocks = 0
-process.options.eventSetup.numberOfConcurrentIOVs = 1
 
 # customisation of the process.
 

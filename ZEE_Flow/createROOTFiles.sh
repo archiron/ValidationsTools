@@ -34,16 +34,16 @@ cd -
 cmsRun $2/step1.py $1 $2 $3 $4
 
 cmsRun $2/step2.py $1 $2 $3 $4
-rm $name1
+rm $4/$name1
 cmsRun $2/step3.py $1 $2 $3 $4
-rm $name2
+rm $4/$name2
 
 cmsRun $2/step4.py $1 $2 $3 $4
-rm $name31
-rm $name32
-rm $name33
-rm $name34
+rm $4/$name31
+rm $4/$name32
+rm $4/$name33
+rm $4/$name34
 
 #cp *.root $4
-mv DQM*.root $4
+#mv DQM*.root $4
 

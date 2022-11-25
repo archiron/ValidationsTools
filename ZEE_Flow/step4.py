@@ -2,22 +2,23 @@
 # using: 
 # Revision: 1.19 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
-# with command line options: step4 --conditions auto:phase1_2021_realistic --era Run3,run3_nanoAOD_devel --filein file:step3_inDQM.root --fileout file:step4.root --filetype DQM --geometry DB:Extended --mc --nStreams 2 --no_exec --number 10 --python_filename step_4_cfg.py --scenario pp --step HARVESTING:@standardValidation+@standardDQM+@ExtraHLT+@miniAODValidation+@miniAODDQM+@nanoAODDQM
+# with command line options: step4 --conditions auto:phase1_2022_realistic --era Run3 --filein file:step3_inDQM.root --fileout file:step4.root --filetype DQM --geometry DB:Extended --mc --nStreams 2 --no_exec --number 10 --python_filename step_4_cfg.py --scenario pp --step HARVESTING:@standardValidation+@standardDQM+@ExtraHLT+@miniAODValidation+@miniAODDQM+@nanoAODDQM
 import FWCore.ParameterSet.Config as cms
 import os, sys
 
 from Configuration.Eras.Era_Run3_cff import Run3
-from Configuration.Eras.Modifier_run3_nanoAOD_devel_cff import run3_nanoAOD_devel
 
 if len(sys.argv) > 1:
     print(sys.argv)
-    print("step 1 - arg. 0 :", sys.argv[0])
-    print("step 1 - arg. 1 :", sys.argv[1])
-    print("step 1 - arg. 2 :", sys.argv[2])
-    print("step 1 - arg. 3 :", sys.argv[3])
-    print("step 1 - arg. 4 :", sys.argv[4])
+    print("step 1 - arg. 0 :", sys.argv[0]) # command : cmsRun
+    print("step 1 - arg. 1 :", sys.argv[1]) # name of the script
+    print("step 1 - arg. 2 :", sys.argv[2]) # index
+    print("step 1 - arg. 3 :", sys.argv[3]) # path of the script ($LOG_SOURCE)
+    print("step 1 - arg. 4 :", sys.argv[4]) # nb of evts
+    print("step 1 - arg. 5 :", sys.argv[5]) # path of output
     ind = int(sys.argv[2])
     max_number = int(sys.argv[4])
+    outputPath = sys.argv[5]
 else:
     print("step 1 - rien")
     ind = 0
@@ -33,7 +34,7 @@ print('CMSSWBASE : %s' %CMSSWBASE)
 print('CMSSWRELEASEBASE : %s' %CMSSWRELEASEBASE)
 print('CMSSWVERSION : %s' %CMSSWVERSION)
 
-process = cms.Process('HARVESTING',Run3,run3_nanoAOD_devel)
+process = cms.Process('HARVESTING',Run3)
 
 # import of standard configurations
 process.load('Configuration.StandardSequences.Services_cff')
@@ -55,7 +56,7 @@ process.maxEvents = cms.untracked.PSet(
 # Input source
 process.source = cms.Source("DQMRootSource",
     #fileNames = cms.untracked.vstring('file:step3_inDQM.root')
-    fileNames = cms.untracked.vstring('file:step3_inDQM_' + '%0004d'%max_number + '_' + '%003d'%ind + '.root'),
+    fileNames = cms.untracked.vstring('file:' + outputPath + '/step3_inDQM_' + '%0004d'%max_number + '_' + '%003d'%ind + '.root'),
 )
 
 process.options = cms.untracked.PSet(
@@ -63,6 +64,7 @@ process.options = cms.untracked.PSet(
     IgnoreCompletely = cms.untracked.vstring(),
     Rethrow = cms.untracked.vstring('ProductNotFound'),
     SkipEvent = cms.untracked.vstring(),
+    accelerators = cms.untracked.vstring('*'),
     allowUnscheduled = cms.obsolete.untracked.bool,
     canDeleteEarly = cms.untracked.vstring(),
     deleteNonConsumedUnscheduledModules = cms.untracked.bool(True),
@@ -100,7 +102,7 @@ process.configurationMetadata = cms.untracked.PSet(
 
 # Other statements
 from Configuration.AlCa.GlobalTag import GlobalTag
-process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase1_2021_realistic', '')
+process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase1_2022_realistic', '')
 
 # Path and EndPath definitions
 process.alcaHarvesting = cms.Path()
@@ -117,12 +119,14 @@ process.DQMHarvestMiniAOD_step = cms.Path(process.DQMHarvestMiniAOD)
 process.DQMHarvestNanoAOD_step = cms.Path(process.DQMHarvestNanoAOD)
 part3 = '/RECO_' + '%0004d'%max_number + '_' + '%003d'%ind
 process.dqmSaver.workflow = '/Global/' + 'CMSSW_X_Y_Z' + part3
+process.dqmSaver.dirName = outputPath #+ '/'
 process.dqmsave_step = cms.Path(process.DQMSaver)
 
 # Schedule definition
 process.schedule = cms.Schedule(process.validationHarvesting,process.dqmHarvesting,process.dqmHarvestingExtraHLT,process.validationHarvestingMiniAOD,process.DQMHarvestMiniAOD_step,process.DQMHarvestNanoAOD_step,process.dqmsave_step)
 from PhysicsTools.PatAlgos.tools.helpers import associatePatAlgosToolsTask
 associatePatAlgosToolsTask(process)
+
 
 
 # Customisation from command line
