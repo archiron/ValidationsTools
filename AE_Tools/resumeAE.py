@@ -78,7 +78,7 @@ pValues2 = pd.DataFrame()
 pValues3 = pd.DataFrame()
 diff1 = []
 rels = []
-histos = []
+histos1 = []
 
 # get the branches for ElectronMcSignalHistos.txt
 ######## ===== COMMON LINES ===== ########
@@ -108,7 +108,7 @@ print('data_res path : {:s}'.format(data_res))
 
 t = datetime.datetime.today()
 timeFolder = time.strftime("%Y%m%d-%H%M%S")
-timeFolder = '20221108-101911'
+timeFolder = '20221102-154453/'
 
 ####### Loss prediction #######
 folderName = data_res + createAEfolderName(hidden_size_1, hidden_size_2, hidden_size_3, hidden_size_4, useHL3, useHL4, latent_size) # , timeFolder, nbFiles, branches[i]
@@ -122,15 +122,20 @@ for i in range(0, loopMaxValue):
     fileName = "/predLossesValues_" + branches[i] + ".txt"
     Name = folderName + '/' + branches[i] + '/' + timeFolder + fileName
     if Path(Name).exists():
-        print('{:s} exist'.format(Name))
+        #print('{:s} exist'.format(Name))
         df = pd.read_csv(Name, header=None)
-        print(df.head())
-        print('end of %s' % branches[i])
+        #print(df.head())
+        #print('end of %s' % branches[i])
         rels = df[1].to_numpy()
         arrayValues[branches[i]] = df[0]
     else:
         print('{:s} does not exist'.format(Name))
         continue
+print('branches : {:d}'.format(len(branches)))
+branch = {}
+for i in range(0, loopMaxValue):
+    branch[branches[i]] = i
+#print(branch)
 
 ####### Pictures creation #######
 folderPictures = folderName + '/Pictures/' + timeFolder
@@ -168,11 +173,11 @@ for i in range(0, loopMaxValue):
     fileName = "/histo_pValues_" + miniRel + "_v2.txt"
     Name = folderKS + fileName
     if Path(Name).exists():
-        print('{:s} exist'.format(Name))
+        #print('{:s} exist'.format(Name))
         df = pd.read_csv(Name, header=None)
-        print(df.head())
-        print('end of %s' % sortedRels[i])
-        histos = df[0].to_numpy()
+        #print(df.head())
+        #print('end of %s' % sortedRels[i])
+        histos1 = df[0].to_numpy()
         pValues1[sortedRels[i]] = df[1]
         pValues2[sortedRels[i]] = df[2]
         pValues3[sortedRels[i]] = df[3]
@@ -180,7 +185,7 @@ for i in range(0, loopMaxValue):
         print('{:s} does not exist'.format(Name))
         continue
 
-print(histos)
+print('histos1 : {:d}'.format(len(histos1)))
 print(pValues1.head())
 #print(pValues2.head())
 #print(pValues3.head())
@@ -190,14 +195,14 @@ aa1 = pValues1.to_numpy().transpose()
 aa2 = pValues2.to_numpy().transpose()
 aa3 = pValues3.to_numpy().transpose()
 
-for ind in range(0,loopMaxValue):
+'''for ind in range(0,loopMaxValue):
     fileName = folderPictures + '/Summary_pV1_releaseEvolution.png'
     createComplexPicture2(sortedRels, aa1, ['nb of values', 'pValues 1'], fileName, histos)
     fileName = folderPictures + '/Summary_pV2_releaseEvolution.png'
     createComplexPicture2(sortedRels, aa2, ['nb of values', 'pValues 2'], fileName, histos)
     fileName = folderPictures + '/Summary_pV3_releaseEvolution.png'
     createComplexPicture2(sortedRels, aa3, ['nb of values', 'pValues 3'], fileName, histos)
-
+'''
 
 ####### Differences #######
 folderKS = data_dir #+ '/KS/'
@@ -208,7 +213,7 @@ print('\KS folder name : {:s}'.format(folderKS))
 differences = pd.DataFrame()
 loopMaxValue = len(sortedRels)
 for i in range(0, loopMaxValue):
-    histos = []
+    histos2 = []
     diff1 = []
     print('{:s}\n'.format(sortedRels[i]))
     miniRel = sortedRels[i].strip()
@@ -216,24 +221,95 @@ for i in range(0, loopMaxValue):
     fileName = "/histo_differences_KScurve_" + miniRel + "__950_v2.txt"
     Name = folderKS + fileName
     if Path(Name).exists():
-        print('{:s} exist'.format(Name))
+        #print('{:s} exist'.format(Name))
         diff_file = open(Name, 'r')
         lines = diff_file.readlines()
-        print('end of %s' % sortedRels[i])
+        #print('end of %s' % sortedRels[i])
         for elem in lines:
             a, b = elem.split(' : ')
             #print(a, b)
-            histos.append(a)
+            histos2.append(a)
             diff1.append(float(b))
         differences[sortedRels[i]] = diff1
     else:
         print('{:s} does not exist'.format(Name))
         continue
+    #print('{:d} : histos2 : {:d}'.format(i, len(histos2)))
+print('histos2 : {:d}'.format(len(histos2)))
+branch2 = {}
+for i in range(0, len(histos2)):
+    branch2[histos2[i]] = branch[histos2[i]]
+#print(branch2)
 print(differences.head())
 aa1 = differences.to_numpy().transpose()
 
 fileName = folderPictures + '/Summary_differences_releaseEvolution.png'
-createComplexPicture2(sortedRels, aa1, ['nb of values', 'differences'], fileName, histos)
+print('creation pf {:s}'.format(fileName))
+createComplexPicture2(sortedRels, aa1, ['nb of values', 'differences'], fileName, histos2)
+
+#print('branch : ', len(branch))
+#print('branch2 : ', len(branch2))
+
+fileName = folderPictures + '/Summary_LossesVsDifferences_releaseEvolution.png'
+print('creation pf {:s}'.format(fileName))
+createComplexPicture3(sortedRels, aa, aa1, ['nb of values', 'values'], fileName, branch, branch2)
+
+print('=== Dynamic export ===')
+# compute the difference between histo1 & histo2
+branch3 = list(set(branch) - set(branch2))
+#for elem in branch3:
+#    print('branch3 : ', elem)
+print(len(branch))
+print(len(branch2))
+print(len(branch3))
+print(type(branch))
+print(type(branch2))
+print(type(branch3))
+#for k,v in branch2.items():
+#    print(k,v)
+
+# export datas intos files for dynamic preview
+releasesFileName = folderPictures + '/Releases.txt' # releases
+histos1FileName = folderPictures + '/histos1.txt' # losses histos
+histos2FileName = folderPictures + '/histos2.txt' # differences histos
+print(releasesFileName)
+print(histos1FileName)
+print(histos2FileName)
+file1 = open(releasesFileName, 'w')
+file2 = open(histos1FileName, 'w')
+file3 = open(histos2FileName, 'w')
+N = len(sortedRels)
+for i in range(0, N):
+    tmp1 = {}
+    j = 0
+    for k,v in branch2.items():
+        #print(v, k, aa1[i][j])#
+        tmp1[k] = aa1[i][j]
+        j += 1
+    for j in range(0, len(branch3)):
+        #print(j,branch3[j])
+        tmp1[branch3[j]] = 'null'
+    file1.write(sortedRels[i] + '\n')
+    lossesFileName = folderPictures + 'losses_' + '{:s}'.format(sortedRels[i].strip()) + '.txt'
+    differencesFileName = folderPictures + 'differences_' + '{:s}'.format(sortedRels[i].strip()) + '.txt'
+    print(lossesFileName)
+    print(differencesFileName)
+    file4 = open(lossesFileName, 'w')
+    file5 = open(differencesFileName, 'w')
+    for elem in aa[i]:
+        file4.write(str(elem) + '\n')
+    for elem in branch:#aa1[i]:
+        print(elem, tmp1[elem])
+        file5.write(str(tmp1[elem]) + '\n')
+    file4.close()
+    file5.close()
+file1.close()
+for elem in branch:
+    file2.write(elem + '\n')
+for elem in branch2:
+    file3.write(elem + '\n')
+file2.close()
+file3.close()
 
 print('end')
 
