@@ -9,6 +9,12 @@
 #                                                                              
 # Arnaud Chiron-Turlay LLR - arnaud.chiron@llr.in2p3.fr                        
 #                                                                              
+#  module use /opt/exp_soft/vo.gridcl.fr/software/modules/
+#  module use /opt/exp_soft/vo.llr.in2p3.fr/modulefiles_el7
+#  module load torch/1.5.0-py37-nocuda
+# into the AE_Tools folder, launch :
+#  python3 resumeAE.py ~/PYTHON/ValidationsTools/CommonFiles/ pathsLLR.py
+
 ################################################################################
 
 import datetime, time
@@ -252,64 +258,11 @@ createComplexPicture2(sortedRels, aa1, ['nb of values', 'differences'], fileName
 
 fileName = folderPictures + '/Summary_LossesVsDifferences_releaseEvolution.png'
 print('creation pf {:s}'.format(fileName))
+'''print('len aa : ')
+print(aa.shape)
+print('len aa1 : ')
+print(aa1.shape)'''
 createComplexPicture3(sortedRels, aa, aa1, ['nb of values', 'values'], fileName, branch, branch2)
-
-print('=== Dynamic export ===')
-# compute the difference between histo1 & histo2
-branch3 = list(set(branch) - set(branch2))
-#for elem in branch3:
-#    print('branch3 : ', elem)
-print(len(branch))
-print(len(branch2))
-print(len(branch3))
-print(type(branch))
-print(type(branch2))
-print(type(branch3))
-#for k,v in branch2.items():
-#    print(k,v)
-
-# export datas intos files for dynamic preview
-releasesFileName = folderPictures + '/Releases.txt' # releases
-histos1FileName = folderPictures + '/histos1.txt' # losses histos
-histos2FileName = folderPictures + '/histos2.txt' # differences histos
-print(releasesFileName)
-print(histos1FileName)
-print(histos2FileName)
-file1 = open(releasesFileName, 'w')
-file2 = open(histos1FileName, 'w')
-file3 = open(histos2FileName, 'w')
-N = len(sortedRels)
-for i in range(0, N):
-    tmp1 = {}
-    j = 0
-    for k,v in branch2.items():
-        #print(v, k, aa1[i][j])#
-        tmp1[k] = aa1[i][j]
-        j += 1
-    for j in range(0, len(branch3)):
-        #print(j,branch3[j])
-        tmp1[branch3[j]] = 'null'
-    file1.write(sortedRels[i] + '\n')
-    lossesFileName = folderPictures + 'losses_' + '{:s}'.format(sortedRels[i].strip()) + '.txt'
-    differencesFileName = folderPictures + 'differences_' + '{:s}'.format(sortedRels[i].strip()) + '.txt'
-    print(lossesFileName)
-    print(differencesFileName)
-    file4 = open(lossesFileName, 'w')
-    file5 = open(differencesFileName, 'w')
-    for elem in aa[i]:
-        file4.write(str(elem) + '\n')
-    for elem in branch:#aa1[i]:
-        print(elem, tmp1[elem])
-        file5.write(str(tmp1[elem]) + '\n')
-    file4.close()
-    file5.close()
-file1.close()
-for elem in branch:
-    file2.write(elem + '\n')
-for elem in branch2:
-    file3.write(elem + '\n')
-file2.close()
-file3.close()
 
 print('end')
 
