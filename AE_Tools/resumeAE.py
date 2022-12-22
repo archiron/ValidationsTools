@@ -102,8 +102,9 @@ resultPath = checkFolderName(resultPath)
 print('resultPath : {:s}'.format(resultPath))
 
 # get list of generated ROOT files
-rootFilesList_0 = getListFiles(resultPath, 'root')
-print('there is ' + '{:03d}'.format(len(rootFilesList_0)) + ' generated ROOT files')
+rootPath = '/data_CMS/cms/chiron/ROOT_Files/CMSSW_12_5_0_pre4/'
+rootFilesList_0 = getListFiles(rootPath, 'root')
+print('there is ' + '{:04d}'.format(len(rootFilesList_0)) + ' generated ROOT files')
 nbFiles = change_nbFiles(len(rootFilesList_0), nbFiles)
 
 folder = resultPath + checkFolderName(dfo.folder)
@@ -113,11 +114,17 @@ data_res = data_dir + '/AE_RESULTS/'
 print('data_res path : {:s}'.format(data_res))
 
 t = datetime.datetime.today()
+tic= time.time()
 timeFolder = time.strftime("%Y%m%d-%H%M%S")
-timeFolder = '20221102-154453/'
+#timeFolder = '20221108-101911/' #3 DEV_2
+#timeFolder = '20221108-101702/' #4 DEV_2
+timeFolder = '20221102-154453/' #5 DEV_2
+timeFolder = '20221219-121255/' #3 DEV_3
+timeFolder = '20221219-133455/' #4 DEV_3
 
 ####### Loss prediction #######
-folderName = data_res + createAEfolderName(hidden_size_1, hidden_size_2, hidden_size_3, hidden_size_4, useHL3, useHL4, latent_size) # , timeFolder, nbFiles, branches[i]
+AEfolderName = createAEfolderName(hidden_size_1, hidden_size_2, hidden_size_3, hidden_size_4, useHL3, useHL4, latent_size)
+folderName = data_res + AEfolderName # , timeFolder, nbFiles, branches[i]
 checkFolder(folderName)
 print('\nComplete folder name : {:s}'.format(folderName))
 
@@ -201,19 +208,18 @@ aa1 = pValues1.to_numpy().transpose()
 aa2 = pValues2.to_numpy().transpose()
 aa3 = pValues3.to_numpy().transpose()
 
-'''for ind in range(0,loopMaxValue):
+for ind in range(0,loopMaxValue):
     fileName = folderPictures + '/Summary_pV1_releaseEvolution.png'
-    createComplexPicture2(sortedRels, aa1, ['nb of values', 'pValues 1'], fileName, histos)
+    createComplexPicture2(sortedRels, aa1, ['nb of values', 'pValues 1'], fileName, histos1)
     fileName = folderPictures + '/Summary_pV2_releaseEvolution.png'
-    createComplexPicture2(sortedRels, aa2, ['nb of values', 'pValues 2'], fileName, histos)
+    createComplexPicture2(sortedRels, aa2, ['nb of values', 'pValues 2'], fileName, histos1)
     fileName = folderPictures + '/Summary_pV3_releaseEvolution.png'
-    createComplexPicture2(sortedRels, aa3, ['nb of values', 'pValues 3'], fileName, histos)
-'''
+    createComplexPicture2(sortedRels, aa3, ['nb of values', 'pValues 3'], fileName, histos1)
 
 ####### Differences #######
 folderKS = data_dir #+ '/KS/'
 checkFolder(folderKS)
-folderPictures = folderKS + '/KS/'
+folderPictures = folderKS + '/KS/' + AEfolderName + '/' + timeFolder
 checkFolder(folderPictures)
 print('\KS folder name : {:s}'.format(folderKS))
 differences = pd.DataFrame()
@@ -224,7 +230,7 @@ for i in range(0, loopMaxValue):
     print('{:s}\n'.format(sortedRels[i]))
     miniRel = sortedRels[i].strip()
     miniRel = miniRel[6:]
-    fileName = "/histo_differences_KScurve_" + miniRel + "__950_v2.txt"
+    fileName = "/histo_differences_KScurve_" + miniRel + "__" + str(nbFiles) + "_v2.txt"
     Name = folderKS + fileName
     if Path(Name).exists():
         #print('{:s} exist'.format(Name))
@@ -258,11 +264,67 @@ createComplexPicture2(sortedRels, aa1, ['nb of values', 'differences'], fileName
 
 fileName = folderPictures + '/Summary_LossesVsDifferences_releaseEvolution.png'
 print('creation pf {:s}'.format(fileName))
-'''print('len aa : ')
-print(aa.shape)
-print('len aa1 : ')
-print(aa1.shape)'''
 createComplexPicture3(sortedRels, aa, aa1, ['nb of values', 'values'], fileName, branch, branch2)
+
+print('=== Dynamic export ===')
+# compute the difference between histo1 & histo2
+branch3 = list(set(branch) - set(branch2))
+#for elem in branch3:
+#    print('branch3 : ', elem)
+print(len(branch))
+print(len(branch2))
+print(len(branch3))
+print(type(branch))
+print(type(branch2))
+print(type(branch3))
+#for k,v in branch2.items():
+#    print(k,v)
+
+# export datas intos files for dynamic preview
+releasesFileName = folderPictures + '/Releases.txt' # releases
+histos1FileName = folderPictures + '/histos1.txt' # losses histos
+histos2FileName = folderPictures + '/histos2.txt' # differences histos
+print(releasesFileName)
+print(histos1FileName)
+print(histos2FileName)
+file1 = open(releasesFileName, 'w')
+file2 = open(histos1FileName, 'w')
+file3 = open(histos2FileName, 'w')
+N = len(sortedRels)
+for i in range(0, N):
+    tmp1 = {}
+    j = 0
+    for k,v in branch2.items():
+        #print(v, k, aa1[i][j])#
+        tmp1[k] = aa1[i][j]
+        j += 1
+    for j in range(0, len(branch3)):
+        #print(j,branch3[j])
+        tmp1[branch3[j]] = 'null'
+    file1.write(sortedRels[i] + '\n')
+    lossesFileName = folderPictures + 'losses_' + '{:s}'.format(sortedRels[i].strip()) + '.txt'
+    differencesFileName = folderPictures + 'differences_' + '{:s}'.format(sortedRels[i].strip()) + '.txt'
+    print(lossesFileName)
+    print(differencesFileName)
+    file4 = open(lossesFileName, 'w')
+    file5 = open(differencesFileName, 'w')
+    for elem in aa[i]:
+        file4.write(str(elem) + '\n')
+    for elem in branch:#aa1[i]:
+        print(elem, tmp1[elem])
+        file5.write(str(tmp1[elem]) + '\n')
+    file4.close()
+    file5.close()
+file1.close()
+for elem in branch:
+    file2.write(elem + '\n')
+for elem in branch2:
+    file3.write(elem + '\n')
+file2.close()
+file3.close()
+
+toc = time.time()
+print('Done in {:.4f} seconds'.format(toc-tic))
 
 print('end')
 
