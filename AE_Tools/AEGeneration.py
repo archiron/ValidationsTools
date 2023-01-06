@@ -105,13 +105,9 @@ def createAutoEncoderRef(nbFiles, nbBranches, device, lr, epsilon, hidden_size_1
     Text.append('<br>\n')
     return Text
 
-#df = []
 arrayKSValues = []
 rels = []
 
-#H_da = []
-#n_loss = []
-#o_loss = []
 y_pred_n = []
 y_pred_o = []
 
@@ -124,9 +120,6 @@ cleanBranches(branches) # remove some histo wich have a pbm with KS.
 #branches = ['h_recEleNum', 'h_recCoreNum', 'h_ele_vertexPtVsEta_pfx']
 ######## ===== COMMON LINES ===== ########
 
-#histoKeysNames = getKeysName(tp_1, source) # unused
-#print(len(histoKeysNames))
-    
 nbBranches = len(branches) # [0:8]
 print('there is {:03d} datasets'.format(nbBranches))
 
@@ -135,7 +128,9 @@ resultPath = checkFolderName(resultPath)
 print('resultPath : {:s}'.format(resultPath))
 
 # get list of generated ROOT files
-rootFilesList_0 = getListFiles(resultPath, 'root')
+rootPath = "/data_CMS/cms/chiron/ROOT_Files/CMSSW_12_5_0_pre4/"
+print('rootPath : {:s}'.format(rootPath))
+rootFilesList_0 = getListFiles(rootPath, 'root')
 print('there is ' + '{:03d}'.format(len(rootFilesList_0)) + ' generated ROOT files')
 nbFiles = change_nbFiles(len(rootFilesList_0), nbFiles)
 
@@ -145,16 +140,9 @@ print('data_dir path : {:s}'.format(data_dir))
 data_res = data_dir + '/AE_RESULTS/'
 print('data_res path : {:s}'.format(data_res))
 
-'''for branch in branches: # [0:8]
-    fileName = resultPath + "/histo_" + branch + '_{:03d}'.format(nbFiles) + ".txt"
-    if Path(fileName).exists():
-        print('{:s} exist'.format(fileName))
-        df.append(pd.read_csv(fileName))
-    else:
-        print('{:s} does not exist'.format(fileName))'''
-
 # get list of added ROOT files
 rootFolderName = workPath + '/' + blo.DATA_SOURCE # '/pbs/home/c/chiron/private/KS_Tools/GenExtract/DATA/NewFiles'
+print('rootFolderName : {:s}'.format(rootFolderName))
 rootFilesList = getListFiles(rootFolderName, 'root')
 print('there is ' + '{:03d}'.format(len(rootFilesList)) + ' added ROOT files')
 for item in rootFilesList:
@@ -177,7 +165,8 @@ print(KSlistFiles, len(KSlistFiles))
     
 for item in KSlistFiles:
     print('file : %s' % item)
-    aa = item[26:-9]
+    #aa = item[26:-9]
+    aa = item.split('__')[0]
     fileName = pathKSFiles + '/' + item
     file1 = open(fileName, 'r')
     bb = file1.readlines()
@@ -187,8 +176,8 @@ for item in KSlistFiles:
         tmp = [cc[0], aa, float(cc[1][:-1])]
         arrayKSValues.append(tmp)
 sortedArrayKSValues = sorted(arrayKSValues, key = lambda x: x[0]) # gives an array with releases sorted
-#for elem in sortedArrayKSValues:
-#    print(elem)
+for elem in sortedArrayKSValues:
+    print("sortedArrayKSValues", elem)
 
 if (len(KSlistFiles) != len(rootFilesList)):
     print('you must have the same number of KS files than releases')
@@ -201,8 +190,15 @@ fileName = data_dir + "/branchesHistos_NewFiles.txt"
 print('%s' % fileName)
 file1 = open(fileName, 'r')
 Lines = file1.readlines()
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-print('device : {:s}'.format(str(device)))
+
+#device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+#print('device : {:s}'.format(str(device)))
+if torch.cuda.is_available():
+    device = torch.device("cuda:0")
+else:
+    device = torch.device("cpu")
+#device = torch.device("cpu")
+print('\n===\ndevice : {:s}\n===\n'.format(str(device)))
 
 t = datetime.datetime.today()
 timeFolder = time.strftime("%Y%m%d-%H%M%S")
@@ -210,6 +206,8 @@ timeFolder = time.strftime("%Y%m%d-%H%M%S")
 folderName = data_res + createAEfolderName(hidden_size_1, hidden_size_2, hidden_size_3, hidden_size_4, useHL3, useHL4, latent_size) # , timeFolder, nbFiles, branches[i]
 checkFolder(folderName)
 print('\nComplete folder name : {:s}'.format(folderName))
+
+tic = time.time()
 
 # export parameters of the layers
 exportParameters = folderName + '/parameters.html'
@@ -264,6 +262,7 @@ for i in range(0, loopMaxValue):
         hName = b.rstrip().split(',', 1)[0]
         if ( str(hName) == str(branches[i])):
             linOp.append(line)
+            print(line)
 
     torch_tensor_entries = []
     torch_tensor_entries_n = []
@@ -337,7 +336,7 @@ for i in range(0, loopMaxValue):
         fHisto.write('creating : {:s} OK.<br>\n'.format(testName))
         fHisto.write('<br>\n')
         # creating torch tensor from df_entries/errors
-        torch_tensor_entries = torch.tensor(df_entries.values)
+        torch_tensor_entries = torch.tensor(df_entries.values, device=device)
         print('max df')
         print(df_entries.values.max())
         MAXMax = df_entries.values.max()
@@ -366,7 +365,10 @@ for i in range(0, loopMaxValue):
         fHisto.write('save : {:s} OK.<br>\n'.format(testName))
         fHisto.write('<br>\n')
 
-    loss_fn=torch.nn.MSELoss()
+    if use_GPU:
+        loss_fn = torch.nn.MSELoss().cuda()
+    else:
+        loss_fn=torch.nn.MSELoss()
 
     #define the network
     fHisto.write('define the network (encoder/decoder)<br>\n')
@@ -433,17 +435,12 @@ for i in range(0, loopMaxValue):
             test_loss, d_out, latent_out=test_epoch_den(encoder=encoder, decoder=decoder,device=device,
                 dataloader=test_loader, loss_fn=loss_fn)
             L_out.append(d_out)
-            LatentValues_Train.append(encoded_out.detach().numpy())
+            LatentValues_Train.append(encoded_out) # .cpu().detach().numpy()
             LatentValues_Test.append(latent_out)
             #r = (train_loss - test_loss) / (train_loss + test_loss)
             #print('epoch : %03d : tr_lo = %e : te_lo = %e : r = %e' % (epoch, train_loss, test_loss, r))
             history_da['train_loss'].append(train_loss)
             history_da['test_loss'].append(test_loss)
-
-        '''bo1 = train_loss < epsilon #deja commenté
-            bo2 = test_loss < epsilon#deja commenté
-            if (bo1 and bo2):#deja commenté
-                break'''#deja commenté
 
         r = (train_loss - test_loss) / (train_loss + test_loss)
         print('epoch : %03d : tr_lo = %e : te_lo = %e : r = %e' % (epoch, train_loss, test_loss, r))
@@ -481,8 +478,8 @@ for i in range(0, loopMaxValue):
         
         for ind in range(0, len(LatentValues_Test)):
             #print('Test ', ind, LatentValues_Test[ind][0])
-            x_Test.append(LatentValues_Test[ind][0].numpy()[0])
-            y_Test.append(LatentValues_Test[ind][0].numpy()[1])
+            x_Test.append(LatentValues_Test[ind][0][0]) # .cpu().numpy()
+            y_Test.append(LatentValues_Test[ind][0][1]) # .cpu().numpy()
             labels_Test.append(i)
         print('createLatentPictureTrainTest call')
         createLatentPictureTrainTest(x_Train,y_Train,x_Test,y_Test, pictureName, title)
@@ -516,7 +513,7 @@ for i in range(0, loopMaxValue):
     latentVal = []
     LinesPred = []
     for elem in linOp:
-        #print(elem)
+        print('linOp : ', elem)
         rel, hName,line = elem.rstrip().split(',', 2)
         #print(rel,hName,line)
         new = line.rstrip().split(',')
@@ -525,14 +522,9 @@ for i in range(0, loopMaxValue):
         df_new = pd.DataFrame(new).T # otherwise, one column with 50 rows instead of 1 line with 50 columns
 
         # creating torch tensor from df_entries/errors
-        torch_tensor_new = torch.tensor(df_new.values)
+        torch_tensor_new = torch.tensor(df_new.values,device=device)
 
         # normalize the tensor
-        '''if '_pfx' in branches[i]:
-            print('pfx')
-            torch_tensor_entries_n = torch_tensor_new
-        else:
-            torch_tensor_entries_n = normalize(torch_tensor_new, p=2.0)'''
         torch_tensor_entries_n = normalize(torch_tensor_new, p=2.0)
         test_loader_n = data.DataLoader(torch_tensor_entries_n)
 
@@ -631,7 +623,7 @@ for i in range(0, loopMaxValue):
     KSLoss = []
     for elem in sortedArrayKSValues:
         if elem[0] == branches[i]:
-            #print(elem,elem[1], elem[2])
+            print(elem,elem[1], elem[2])
             KSLoss.append([elem[1], elem[2]])
     sortedKSLoss = sorted(KSLoss, key = lambda x: x[0]) # gives an array with releases sorted
     #print('sortedKSLoss : ', sortedKSLoss)
@@ -640,13 +632,20 @@ for i in range(0, loopMaxValue):
     else:
         print('sortedKSLoss KO')
         continue
+    
+    print('sortedLossesVal')
+    print(sortedLossesVal)
+    print('sortedKSLoss')
+    print(sortedKSLoss)
+    print('sortedRels')
+    print(sortedRels)
 
     labels = []
     Val1 = []
     Val2 = []
     print('arr ok')
     for j in range(0, len(sortedRels)):
-        #print(j, sortedRels[j], [sortedArrLoss[j][1], sortedKSLoss[j][1]])
+        print(j, sortedRels[j], [sortedLossesVal[j][1], sortedKSLoss[j][1]])
         Val1.append(sortedLossesVal[j][1])
         Val2.append(sortedKSLoss[j][1])
         labels.append(sortedRels[j][1])
@@ -761,5 +760,7 @@ for i in range(0, loopMaxValue):
     fHisto.write('</table>')
 
 fHisto.close()
+toc = time.time()
+print('Done in {:.4f} seconds for device : {:s}'.format((toc-tic), str(device)))
 print('end')
 
