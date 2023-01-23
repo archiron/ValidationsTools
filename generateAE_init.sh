@@ -56,6 +56,22 @@ echo "LOG_AE_SOURCE : $LOG_AE_SOURCE"
 echo "LIB_SOURCE : $LIB_SOURCE"
 echo "COMMON_SOURCE : $COMMON_SOURCE"
 
+readarray datasets -t array < ChiLib/HistosConfigFiles/ElectronMcSignalHistos.txt # $Chilib_path
+N2=${#datasets[@]}
+echo "nb lines in datasets= $N2"
+var=0
+for line in "${datasets[@]}"
+do
+  if [[ $line == *"ElectronMcSignalValidator/"* ]]; then
+    echo $line
+    arrLine=(${line//or/ })
+    echo "${arrLine[1]} - $var"
+    let "var++"
+  fi
+done
+let "var--"
+echo "nb datasets in datasets= $var"
+
 if [[ "$Choice" == "LLR" ]] 
   then
     echo "LLR"
@@ -67,28 +83,47 @@ if [[ "$Choice" == "LLR" ]]
     module load torch/1.5.0-py37-nocuda
     module load python/3.7.0
     cd $LOG_SOURCE
-    $options=-reserv # -short -long -reserv
-    #/opt/exp_soft/cms/t3/t3submit -8c $options generateAE.sh $LOG_SOURCE $LOG_AE_SOURCE $COMMON_SOURCE AEGeneration.py $FileName ''
-    #/opt/exp_soft/cms/t3/t3submit -8c $options generateAE.sh $LOG_SOURCE $LOG_AE_SOURCE $COMMON_SOURCE resumeAE.py $FileName ''
-    /opt/exp_soft/cms/t3/t3submit -8c $options generateAE.sh $LOG_SOURCE $LOG_AE_SOURCE $COMMON_SOURCE AEGen-V1.py $FileName 'even'
-    /opt/exp_soft/cms/t3/t3submit -8c $options generateAE.sh $LOG_SOURCE $LOG_AE_SOURCE $COMMON_SOURCE AEGen-V1.py $FileName 'odd'
-    /opt/exp_soft/cms/t3/t3submit -8c $options generateAE.sh $LOG_SOURCE $LOG_AE_SOURCE $COMMON_SOURCE AEGen-V1.py $FileName '' # odd + even
-    /opt/exp_soft/cms/t3/t3submit -8c $options generateAE.sh $LOG_SOURCE $LOG_AE_SOURCE $COMMON_SOURCE AEGen-V2.py $FileName ''
-    /opt/exp_soft/cms/t3/t3submit -8c $options generateAE.sh $LOG_SOURCE $LOG_AE_SOURCE $COMMON_SOURCE AEGen-V3.py $FileName 'cpu'
-    /opt/exp_soft/cms/t3/t3submit -8c $options generateAE.sh $LOG_SOURCE $LOG_AE_SOURCE $COMMON_SOURCE AEGen-V4.py $FileName 'cpu'
+    options="-reserv" # -short -long -reserv
+    #/opt/exp_soft/cms/t3/t3submit -8c $options generateAE.sh $LOG_AE_SOURCE $COMMON_SOURCE AEGeneration.py $FileName ''
+    #/opt/exp_soft/cms/t3/t3submit -8c $options generateAE.sh $LOG_AE_SOURCE $COMMON_SOURCE resumeAE.py $FileName ''
+    #/opt/exp_soft/cms/t3/t3submit -8c $options generateAE.sh $LOG_AE_SOURCE $COMMON_SOURCE AEGen-V1.py $FileName 'even'
+    #/opt/exp_soft/cms/t3/t3submit -8c $options generateAE.sh $LOG_AE_SOURCE $COMMON_SOURCE AEGen-V1.py $FileName 'odd'
+    #/opt/exp_soft/cms/t3/t3submit -8c $options generateAE.sh $LOG_AE_SOURCE $COMMON_SOURCE AEGen-V1.py $FileName 'both' # odd + even
+    #/opt/exp_soft/cms/t3/t3submit -8c $options generateAE.sh $LOG_AE_SOURCE $COMMON_SOURCE AEGen-V2.py $FileName ''
+    #/opt/exp_soft/cms/t3/t3submit -8c $options generateAE.sh $LOG_AE_SOURCE $COMMON_SOURCE AEGen-V3.py $FileName 'cpu'
+    #/opt/exp_soft/cms/t3/t3submit -8c $options generateAE.sh $LOG_AE_SOURCE $COMMON_SOURCE AEGen-V4.py $FileName 'cpu' # $LOG_SOURCE 
+    for line in "${datasets[@]}"
+    do
+      if [[ $line == *"ElectronMcSignalValidator/"* ]]; then
+        #echo $line
+        arrLine=(${line//or/ })
+        echo "${arrLine[1]}"
+        /opt/exp_soft/cms/t3/t3submit -8c $options generateAE.sh $LOG_AE_SOURCE $COMMON_SOURCE AEGen-V5.py $FileName $var ${arrLine[1]} 'cpu' # $LOG_SOURCE 
+      fi
+    done
 elif [[ "$Choice" == "PBS" ]] 
   then
     echo "PBS"
     module load Programming_Languages/python/3.9.1
     source /pbs/home/c/chiron/private/ValidationsTools/ValidationsTools/bin/activate 
     cd $LOG_SOURCE
-    #sbatch -L sps -n 4 --mem=16000 -t 4-0:0:0 -J $JobName -o $output generateAE.sh $LOG_SOURCE $LOG_AE_SOURCE $COMMON_SOURCE AEGeneration.py $FileName ''
-    #sbatch -L sps -n 4 --mem=16000 -t 4-0:0:0 -J $JobName -o $output generateAE.sh $LOG_SOURCE $LOG_AE_SOURCE $COMMON_SOURCE resumeAE.py $FileName ''
-    sbatch -L sps -n 4 --mem=16000 -t 4-0:0:0 -J $JobName -o $output generateAE.sh $LOG_SOURCE $LOG_AE_SOURCE $COMMON_SOURCE AEGen-V1.py $FileName 'even'
-    sbatch -L sps -n 4 --mem=16000 -t 4-0:0:0 -J $JobName -o $output generateAE.sh $LOG_SOURCE $LOG_AE_SOURCE $COMMON_SOURCE AEGen-V1.py $FileName 'odd'
-    sbatch -L sps -n 4 --mem=16000 -t 4-0:0:0 -J $JobName -o $output generateAE.sh $LOG_SOURCE $LOG_AE_SOURCE $COMMON_SOURCE AEGen-V2.py $FileName ''
-    sbatch -L sps -n 4 --mem=16000 -t 4-0:0:0 -J $JobName -o $output generateAE.sh $LOG_SOURCE $LOG_AE_SOURCE $COMMON_SOURCE AEGen-V3.py $FileName 'cpu'
-    sbatch -L sps -n 4 --mem=16000 -t 4-0:0:0 -J $JobName -o $output generateAE.sh $LOG_SOURCE $LOG_AE_SOURCE $COMMON_SOURCE AEGen-V4.py $FileName 'cpu'
+    #sbatch -L sps -n 4 --mem=16000 -t 4-0:0:0 -J $JobName -o $output generateAE.sh $LOG_AE_SOURCE $COMMON_SOURCE AEGeneration.py $FileName ''
+    #sbatch -L sps -n 4 --mem=16000 -t 4-0:0:0 -J $JobName -o $output generateAE.sh $LOG_AE_SOURCE $COMMON_SOURCE resumeAE.py $FileName ''
+    #sbatch -L sps -n 4 --mem=16000 -t 4-0:0:0 -J $JobName -o $output generateAE.sh $LOG_AE_SOURCE $COMMON_SOURCE AEGen-V1.py $FileName 'even'
+    #sbatch -L sps -n 4 --mem=16000 -t 4-0:0:0 -J $JobName -o $output generateAE.sh $LOG_AE_SOURCE $COMMON_SOURCE AEGen-V1.py $FileName 'odd'
+    #sbatch -L sps -n 4 --mem=16000 -t 4-0:0:0 -J $JobName -o $output generateAE.sh $LOG_AE_SOURCE $COMMON_SOURCE AEGen-V1.py $FileName 'both'
+    #sbatch -L sps -n 4 --mem=16000 -t 4-0:0:0 -J $JobName -o $output generateAE.sh $LOG_AE_SOURCE $COMMON_SOURCE AEGen-V2.py $FileName ''
+    #sbatch -L sps -n 4 --mem=16000 -t 4-0:0:0 -J $JobName -o $output generateAE.sh $LOG_AE_SOURCE $COMMON_SOURCE AEGen-V3.py $FileName 'cpu'
+    #sbatch -L sps -n 4 --mem=16000 -t 4-0:0:0 -J $JobName -o $output generateAE.sh $LOG_AE_SOURCE $COMMON_SOURCE AEGen-V4.py $FileName 'cpu' # $LOG_SOURCE 
+    for line in "${datasets[@]}"
+    do
+      if [[ $line == *"ElectronMcSignalValidator/"* ]]; then
+        #echo $line
+        arrLine=(${line//or/ })
+        echo "${arrLine[1]}"
+        sbatch -L sps -n 4 --mem=16000 -t 4-0:0:0 -J $JobName -o $output generateAE.sh $LOG_AE_SOURCE $COMMON_SOURCE AEGen-V5.py $FileName $var ${arrLine[1]} 'cpu' # $LOG_SOURCE 
+      fi
+    done
     deactivate
 fi
 

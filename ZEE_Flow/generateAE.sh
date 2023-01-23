@@ -7,16 +7,17 @@ then
 	exit
 fi
 
-echo "chemin START : $1"
-echo "chemin WORK : $2" # AE_SOURCE
-echo "chemin COMMON : $3"
-echo "script name : $4"
-echo "paths file : $5"
-echo "option : $6"
+echo "chemin WORK : $1" # AE_SOURCE
+echo "chemin COMMON : $2"
+echo "script name : $3"
+echo "paths file : $4"
+echo "nb datasets : $5"
+echo "dataset : $6"
+echo "option : $7"
 
 cd $1
 cd -
 
-echo "executing $2/$4 $3 $5 $6"
-python3 $2/$4 $3 $5 $6
+echo "executing $1/$3 $2 $4 $5 $6 $7"
+time python3 $1/$3 $2 $4 $5 $6 $7
 

@@ -356,7 +356,7 @@ def gFunction(arg):
     textHisto += '<br>\n'
 
     createLossPictures(branch, history_da, epoch+1, lossesPictureName)
-
+    
     wLoss = open(lossesValues, 'w')
     wLoss.write('HL_1 : %03d, HL_2 : %03d, LT : %03d :: tr_loss : %e, te_loss : %e\n' 
                 % (hidden_size_1, hidden_size_2, latent_size, train_loss, test_loss))
@@ -437,8 +437,8 @@ nbFiles = change_nbFiles(len(rootFilesList_0), nbFiles)
 folder = resultPath + checkFolderName(dfo.folder)
 data_dir = folder + '/{:03d}'.format(nbFiles)
 print('data_dir path : {:s}'.format(data_dir))
-data_res = data_dir + '/AE_RESULTS/'
-#data_res = '/pbs/home/c/chiron/public/TEMP/AE_RESULTS/'
+#data_res = data_dir + '/AE_RESULTS/'
+data_res = '/pbs/home/c/chiron/public/TEMP/AE_RESULTS/'
 print('data_res path : {:s}'.format(data_res))
 
 # get list of added ROOT files
