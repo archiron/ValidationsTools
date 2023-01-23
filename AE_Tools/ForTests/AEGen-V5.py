@@ -13,7 +13,6 @@
 
 import datetime, time
 import sys
-
 import importlib
 import importlib.machinery
 import importlib.util
@@ -357,7 +356,6 @@ print('\n===== folderNameBranch : {:s} ====='.format(folderNameBranch))
 resumeHisto = folderNameBranch + '/histo_' + '{:s}'.format(str(branch))
 resumeHisto += '.html'
 print(resumeHisto)
-#fHisto = open(resumeHisto, 'w')  # web page
 textHisto = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 3.2 Final//EN\">\n"
 textHisto += "<html>\n"
 textHisto += "<head>\n"
@@ -483,7 +481,6 @@ print('\nfolderNamePict : {:s}'.format(folderNamePict))
 lossesPictureName = folderNamePict + '/loss_plots_' + branch + "_{:03d}".format(nbFiles) + '_V1.png'
 textHisto += 'Calculating encoder/decoder<br>\n'
 for epoch in range(nb_epochs):
-    #print('epoch : {:02d}'.format(epoch))
     train_loss, encoded_out=train_epoch_den(encoder=encoder, decoder=decoder,device=device,
         dataloader=train_loader, loss_fn=loss_fn,optimizer=optim)
     test_loss, d_out, latent_out=test_epoch_den(encoder=encoder, decoder=decoder,device=device,
