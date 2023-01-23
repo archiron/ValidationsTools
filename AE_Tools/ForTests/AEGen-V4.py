@@ -171,18 +171,18 @@ def createAutoEncoderRef(nbFiles, nbBranches, device, lr, epsilon, hidden_size_1
 def gFunction(arg):
     #         0       1          2          3           4
     # arg = ((b, branches[b], nbFiles, folderName, timeFolder) for b in range(2, 4)
-    print('\n===\narg : ', arg)
+    #print('\n===\narg : ', arg)
 
     print('nb iter  : {:d}'.format(arg[0]))
     b = arg[0]
     branch = arg[1]
     nbFiles = arg[2]
-    print('{:s}\n'.format(branch))
-    print('nb Files : {:d}'.format(nbFiles))
+    #print('{:s}\n'.format(branch))
+    #print('nb Files : {:d}'.format(nbFiles))
     
     df = []
     fileName = resultPath + "/histo_" + branch + '_{:03d}'.format(nbFiles) + ".txt"
-    print('filename : {:s}'.format(fileName))
+    #print('filename : {:s}'.format(fileName))
 
     if Path(fileName).exists():
         print('{:s} exist'.format(fileName))
@@ -195,22 +195,21 @@ def gFunction(arg):
     timeFolder = arg[4]
     folderNameBranch = folderName + branch + '/' + timeFolder
     checkFolder(folderNameBranch)
-    print('\n===== folderNameBranch : {:s} ====='.format(folderNameBranch))
+    #print('\n===== folderNameBranch : {:s} ====='.format(folderNameBranch))
 
     resumeHisto = folderNameBranch + '/histo_' + '{:s}'.format(str(branch))
     resumeHisto += '_2.html'
-    print(resumeHisto)
-    fHisto = open(resumeHisto, 'w')  # web page
-    fHisto.write("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 3.2 Final//EN\">\n")
-    fHisto.write("<html>\n")
-    fHisto.write("<head>\n")
-    fHisto.write("<meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\" />\n")
-    fHisto.write("<title> Resume of ZEE_14 predictions"+ str(branch)+ " </title>\n")  # 
-    fHisto.write("</head>\n")
+    #print(resumeHisto)
+    textHisto = "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 3.2 Final//EN\">\n"
+    textHisto += "<html>\n"
+    textHisto += "<head>\n"
+    textHisto += "<meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\" />\n"
+    textHisto += "<title> Resume of ZEE_14 predictions"+ str(branch)+ " </title>\n"  # 
+    textHisto += "</head>\n"
 
-    fHisto.write(' <h1><center><b><font color=\'blue\'>{:s}</font></b></center></h1> <br>\n'.format(str(branch)))
-    fHisto.write('<b>folderName : </b>{:s}<br>\n'.format(folderNameBranch))
-    fHisto.write('<br>\n')
+    textHisto += ' <h1><center><b><font color=\'blue\'>{:s}</font></b></center></h1> <br>\n'.format(str(branch))
+    textHisto += '<b>folderName : </b>{:s}<br>\n'.format(folderNameBranch)
+    textHisto += '<br>\n'
 
     df_entries = []
 
@@ -223,11 +222,10 @@ def gFunction(arg):
     # add a subfolder for the losses
     folderNameLosses = folderNameBranch + '/Losses/'
     checkFolder(folderNameLosses)
-    print('\nfolderNameLosses : {:s}'.format(folderNameLosses))
+    #print('\nfolderNameLosses : {:s}'.format(folderNameLosses))
 
     lossesValues = folderNameLosses + "/lossesValues_" + branch + ".txt"
-    print("loss values file : %s\n" % lossesValues)
-    wLoss = open(lossesValues, 'w')
+    #print("loss values file : %s\n" % lossesValues)
 
     tmp = df 
     cols = df.columns.values
@@ -237,32 +235,32 @@ def gFunction(arg):
 
     # get nb of columns & rows for histos & remove over/underflow
     (Nrows, Ncols) = df_entries.shape
-    print('before : \t[Nrows, Ncols] : [%3d, %3d] for %s' % (Nrows, Ncols, branch))
+    #print('before : \t[Nrows, Ncols] : [%3d, %3d] for %s' % (Nrows, Ncols, branch))
     df_entries = df_entries.iloc[:, 1:Ncols-1]
     (Nrows, Ncols) = df_entries.shape
-    print('after : \t[Nrows, Ncols] : [%3d, %3d] for %s' % (Nrows, Ncols, branch))
-    fHisto.write('nb of columns for histo {:s} after extraction : [{:3d}, {:3d}]<br>\n'.format(branch, Nrows, Ncols))
+    #print('after : \t[Nrows, Ncols] : [%3d, %3d] for %s' % (Nrows, Ncols, branch))
+    textHisto += 'nb of columns for histo {:s} after extraction : [{:3d}, {:3d}]<br>\n'.format(branch, Nrows, Ncols)
 
-    fHisto.write('<br>\n')
+    textHisto += '<br>\n'
 
     # add a subfolder for the losses
     folderNameLoader = folderNameBranch + '/TrainTestLOADER/'
     checkFolder(folderNameLoader)
-    print('\nfolderNameLoader : {:s}'.format(folderNameLoader))
+    #print('\nfolderNameLoader : {:s}'.format(folderNameLoader))
 
     trainName = folderNameLoader + "multi_train_loader_" + branch + "_{:03d}".format(nbFiles) + ".pth"
     testName = folderNameLoader + "multi_test_loader_" + branch + "_{:03d}".format(nbFiles) + ".pth"
 
-    fHisto.write('creating train[test]_loader<br>\n')
-    fHisto.write('creating : {:s} OK.<br>\n'.format(trainName))
-    fHisto.write('creating : {:s} OK.<br>\n'.format(testName))
-    fHisto.write('<br>\n')
+    textHisto += 'creating train[test]_loader<br>\n'
+    textHisto += 'creating : {:s} OK.<br>\n'.format(trainName)
+    textHisto += 'creating : {:s} OK.<br>\n'.format(testName)
+    textHisto += '<br>\n'
     # creating torch tensor from df_entries
     torch_tensor_entries = torch.tensor(df_entries.values, device=device).float()
-    print('max df')
-    print(df_entries.values.max())
+    #print('max df')
+    #print(df_entries.values.max())
     MAXMax = df_entries.values.max()
-    print('MAXMax : %e' % MAXMax)
+    #print('MAXMax : %e' % MAXMax)
     if (MAXMax == 1.e38):
         print(colorText('ATTENTION, Kolossal PBM !!!', 'blue'))
     # normalize the tensor
@@ -270,22 +268,22 @@ def gFunction(arg):
 
     train_size=int(percentageTrain*len(torch_tensor_entries)) # in general torch_tensor_entries = 200
     test_size=len(torch_tensor_entries)-train_size
-    print('%d : train size : %d' % (b,train_size))
-    print('%d : test size  : %d' % (b,test_size))
-    fHisto.write('train size : {:d}<br>\n'.format(train_size))
-    fHisto.write('test size  : {:d}<br>\n'.format(test_size))
+    #print('%d : train size : %d' % (b,train_size))
+    #print('%d : test size  : %d' % (b,test_size))
+    textHisto += 'train size : {:d}<br>\n'.format(train_size)
+    textHisto += 'test size  : {:d}<br>\n'.format(test_size)
     train_tmp, test_tmp = data.random_split(torch_tensor_entries_n,[train_size,test_size])
 
     train_loader = data.DataLoader(train_tmp,batch_size=batch_size)
     test_loader = data.DataLoader(test_tmp,batch_size=batch_size)
 
-    print('saving ... %s' % trainName)
+    #print('saving ... %s' % trainName)
     torch.save(train_loader,trainName)
     torch.save(test_loader,testName)
-    print('save OK.\n')
-    fHisto.write('save : {:s} OK.<br>\n'.format(trainName))
-    fHisto.write('save : {:s} OK.<br>\n'.format(testName))
-    fHisto.write('<br>\n')
+    #print('save OK.\n')
+    textHisto += 'save : {:s} OK.<br>\n'.format(trainName)
+    textHisto += 'save : {:s} OK.<br>\n'.format(testName)
+    textHisto += '<br>\n'
 
     # load all data to device for gpu
     if use_GPU:
@@ -298,10 +296,10 @@ def gFunction(arg):
         loss_fn=torch.nn.MSELoss()
 
     #define the network
-    fHisto.write('define the network (encoder/decoder)<br>\n')
+    textHisto += 'define the network (encoder/decoder)<br>\n'
     encoder=Encoder2(device,latent_size,Ncols,hidden_size_1,hidden_size_2)
     decoder=Decoder2(device,latent_size,Ncols,hidden_size_1,hidden_size_2)
-    fHisto.write('using <b>2</b> layers encoder/decoder<br>\n')
+    textHisto += 'using <b>2</b> layers encoder/decoder<br>\n'
     nbLayer = 2
 
     encoder.to(device)
@@ -321,17 +319,17 @@ def gFunction(arg):
     # Ready for calculation
     encoderName = folderNameLoader + "/mono_encoder_{:01d}_".format(nbLayer) + branch + "_{:03d}".format(nbFiles) + ".pth"
     decoderName = folderNameLoader + "/mono_decoder_{:01d}_".format(nbLayer) + branch + "_{:03d}".format(nbFiles) + ".pth"
-    fHisto.write('encoderName : {:s}.<br>\n'.format(encoderName))
-    fHisto.write('decoderName : {:s}.<br>\n'.format(decoderName))
-    fHisto.write('<br>\n')
+    textHisto += 'encoderName : {:s}.<br>\n'.format(encoderName)
+    textHisto += 'decoderName : {:s}.<br>\n'.format(decoderName)
+    textHisto += '<br>\n'
 
     # add a subfolder for the pictures
     folderNamePict = folderNameBranch + '/Pictures/'
     checkFolder(folderNamePict)
-    print('\nfolderNamePict : {:s}'.format(folderNamePict))
+    #print('\nfolderNamePict : {:s}'.format(folderNamePict))
 
     lossesPictureName = folderNamePict + '/loss_plots_' + branch + "_{:03d}".format(nbFiles) + '_V3.png'
-    fHisto.write('Calculating encoder/decoder<br>\n')
+    textHisto += 'Calculating encoder/decoder<br>\n'
     for epoch in range(nb_epochs):
         #print('epoch : {:02d}'.format(epoch))
         train_loss, encoded_out=train_epoch_den(encoder=encoder, decoder=decoder,device=device,
@@ -346,23 +344,25 @@ def gFunction(arg):
 
     #r = (train_loss - test_loss) / (train_loss + test_loss)
     #print('epoch : %03d : tr_lo = %e : te_lo = %e : r = %e' % (epoch, train_loss, test_loss, r))
-    #fHisto.write('epoch : {:03d} : train_loss = {:e} : test_loss = {:e}<br>\n'.format(epoch, train_loss, test_loss))
+    #textHisto += 'epoch : {:03d} : train_loss = {:e} : test_loss = {:e}<br>\n'.format(epoch, train_loss, test_loss)
     if ( saveEncoder == 1 ): # warning encoder & decoder are needed for next computations
         torch.save(encoder,encoderName)
         torch.save(decoder,decoderName)
-        fHisto.write('save : {:s} OK.<br>\n'.format(encoderName))
-        fHisto.write('save : {:s} OK.<br>\n'.format(decoderName))
+        textHisto += 'save : {:s} OK.<br>\n'.format(encoderName)
+        textHisto += 'save : {:s} OK.<br>\n'.format(decoderName)
     else:
-        print('no save (saveEncoder = {:d}'.format(saveEncoder))
-        fHisto.write('no save (saveEncoder = {:d}.<br>\n'.format(saveEncoder))
-    fHisto.write('<br>\n')
-
-    wLoss.write('HL_1 : %03d, HL_2 : %03d, LT : %03d :: tr_loss : %e, te_loss : %e\n' 
-                % (hidden_size_1, hidden_size_2, latent_size, train_loss, test_loss))
+        #print('no save (saveEncoder = {:d}'.format(saveEncoder))
+        textHisto += 'no save (saveEncoder = {:d}.<br>\n'.format(saveEncoder)
+    textHisto += '<br>\n'
 
     createLossPictures(branch, history_da, epoch+1, lossesPictureName)
 
+    wLoss = open(lossesValues, 'w')
+    wLoss.write('HL_1 : %03d, HL_2 : %03d, LT : %03d :: tr_loss : %e, te_loss : %e\n' 
+                % (hidden_size_1, hidden_size_2, latent_size, train_loss, test_loss))
     wLoss.close()
+    fHisto = open(resumeHisto, 'w')  # web page
+    fHisto.write(textHisto)
     fHisto.close()
     return 
 
@@ -437,8 +437,8 @@ nbFiles = change_nbFiles(len(rootFilesList_0), nbFiles)
 folder = resultPath + checkFolderName(dfo.folder)
 data_dir = folder + '/{:03d}'.format(nbFiles)
 print('data_dir path : {:s}'.format(data_dir))
-#data_res = data_dir + '/AE_RESULTS/'
-data_res = '/pbs/home/c/chiron/public/TEMP/AE_RESULTS/'
+data_res = data_dir + '/AE_RESULTS/'
+#data_res = '/pbs/home/c/chiron/public/TEMP/AE_RESULTS/'
 print('data_res path : {:s}'.format(data_res))
 
 # get list of added ROOT files
@@ -516,7 +516,7 @@ for line in createAutoEncoderRef(nbFiles, nbBranches, device, lr, epsilon, hidde
     fParam.write(line)
 fParam.close()
 
-loopMaxValue = 6 #nbBranches #25 # nbBranches
+loopMaxValue = 50 #nbBranches #25 # nbBranches
 reste = loopMaxValue % 2
 if (reste == 1):
     loopMax = loopMaxValue - 1
@@ -530,12 +530,11 @@ time3 = time.time()
 n_cores = cpu_count()
 print('nb of cores : {:d}'.format(n_cores))
 
-output1 = list()
 with Pool(processes=4) as pool: # 
     #        0       1          2          3           4
     args = ((b, branches[b], nbFiles, folderName, timeFolder) for b in range(loopInit, loopMax)) #
     # issue tasks to the process pool
-    pool.imap(gFunction, args)
+    pool.imap_unordered(gFunction, args)
     # shutdown the process pool
     pool.close()
     # wait for all issued task to complete
