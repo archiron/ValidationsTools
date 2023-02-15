@@ -179,7 +179,7 @@ sortedRels = sorted(rels, key = lambda x: x[0]) # gives an array with releases s
 #LOG_SOURCE_WORK= #'/pbs/home/c/chiron/private/KS_Tools/GenExtract/DATA/NewFiles/'
 # get the "reference" root file datas
 f_ref = ROOT.TFile(rootFolderName + input_ref_file)
-print('we use the %s file as reference' % input_ref_file)
+print('we use the %s file as KS reference' % input_ref_file)
 
 if (ind_reference == -1): 
     ind_reference = np.random.randint(0, nbFiles)
@@ -393,7 +393,7 @@ for elem in sortedRels:
 
             # Kolmogoroff-Smirnov curve
             seriesTotalDiff1 = pd.DataFrame(totalDiff, columns=['KSDiff'])
-            KSDiffname1 = folder + '/KSDiffValues_1_' + branches[i] + "_" + rel + '_v2.txt' # csv imposed by pd.to_csv
+            KSDiffname1 = folder + '/KSDiffValues_1_' + branches[i] + '_v2.txt' # csv imposed by pd.to_csv
             df.to_csv(KSDiffname1)
             plt_diff_KS1 = seriesTotalDiff1.plot.hist(bins=nbins, title='KS diff. 1')
             print('\ndiffMin0/sTD.min 1 : %f/%f' % (diffMax0, seriesTotalDiff1.values.min()))
@@ -414,7 +414,7 @@ for elem in sortedRels:
             ymi, yMa = plt_diff_KS1.get_ylim()
             plt_diff_KS1.vlines(x1, ymi, 0.9*yMa, color=color1, linewidth=4)
             fig = plt_diff_KS1.get_figure()
-            fig.savefig(folderKS + '/KS-ttlDiff_1_' + branches[i] + '_v2.png')
+            fig.savefig(folderKS + '/KS-ttlDiff_1_' + branches[i] + "_" + rel + '_v2.png')
             fig.clf()
             count, division = np.histogram(seriesTotalDiff1[~np.isnan(seriesTotalDiff1)], bins=nbins)
             div_min = np.amin(division)
@@ -469,7 +469,7 @@ for elem in sortedRels:
             ymi, yMa = plt_diff_KS2.get_ylim()
             plt_diff_KS2.vlines(x2, ymi, 0.9*yMa, color=color2, linewidth=4)
             fig = plt_diff_KS2.get_figure()
-            fig.savefig(folderKS + '/KS-ttlDiff_2_' + branches[i] + '_v2.png')
+            fig.savefig(folderKS + '/KS-ttlDiff_2_' + branches[i] + "_" + rel + '_v2.png')
             fig.clf()
             count, division = np.histogram(seriesTotalDiff2, bins=nbins)
             div_min = np.amin(division)
@@ -524,7 +524,7 @@ for elem in sortedRels:
             ymi, yMa = plt_diff_KS3.get_ylim()
             plt_diff_KS3.vlines(x3, ymi, 0.9*yMa, color=color3, linewidth=4)
             fig = plt_diff_KS3.get_figure()
-            fig.savefig(folderKS + '/KS-ttlDiff_3_' + branches[i] + '_v2.png')
+            fig.savefig(folderKS + '/KS-ttlDiff_3_' + branches[i] + "_" + rel + '_v2.png')
             fig.clf()
             count, division = np.histogram(seriesTotalDiff3, bins=nbins)
             div_min = np.amin(division)
