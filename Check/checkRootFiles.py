@@ -128,7 +128,7 @@ for elem in fileList:
         s_new = s_new[1:-1]
         '''
         if (histo_1):
-            print('%s OK' % branches[i])
+            #print('%s OK' % branches[i])
             s_new = fill_Snew(histo_1)
             Ntot_h1 = histo_1.GetEntries()
         
@@ -170,7 +170,7 @@ for item in rootFilesList:
     tmp_branch = []
     nbHistosPass1 = 0
     
-    print('%s' % item)
+    #print('%s' % item)
     f_root = ROOT.TFile(rootFolderName + item)
     h1 = getHisto(f_root, tp_1)
 
@@ -178,7 +178,7 @@ for item in rootFilesList:
         #print('\n' + branches[i]) # print histo name
         histo_1 = h1.Get(branches[i])
         if (histo_1):
-            print('%s OK' % branches[i])
+            #print('%s OK' % branches[i])
             '''
             s_new = []
             for entry in histo_1:
@@ -234,7 +234,7 @@ for elem in fileList:
         #print('\n' + branches[i]) # print histo name
         histo_1 = h1.Get(branches[i])
         if (histo_1):
-            print('%s OK' % branches[i])
+            #print('%s OK' % branches[i])
             
             d = getHistoConfEntry(histo_1)
             #print("d = {}".format(d))
@@ -307,7 +307,7 @@ for item in rootFilesList:
         #print('\n' + branches[i]) # print histo name
         histo_1 = h1.Get(branches[i])
         if (histo_1):
-            print('%s OK PASS 2' % branches[i])
+            #print('%s OK PASS 2' % branches[i])
 
             d = getHistoConfEntry(histo_1)
             #print("d = {}".format(d))
@@ -374,9 +374,9 @@ print('reference ind. : %d' % ind_reference)
 for i in range(0, N_histos): # 1 N_histos histo for debug
     histo_1 = h1.Get(branches[i])
     if (histo_1):
-        print('%s OK PASS 3' % branches[i])
+        #print('%s OK PASS 3' % branches[i])
         name = resultPath + "histo_" + branches[i] + '_{:03d}'.format(nbFiles) + ".txt"
-        print('\n%d - %s' %(i, name))
+        #print('\n%d - %s' %(i, name))
         df = pd.read_csv(name)
         #print('\n' + branches[i]) # print histo name
 

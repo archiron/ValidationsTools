@@ -2,7 +2,7 @@
 # This file is called . reduceROOTSize.sh
 
 JobName="reduceROOT_serial_job_test" # for slurm
-output="reduceROOT_%j.log" # for slurm
+output="/sps/cms/chiron/TEMP/reduceROOT_%j.log" # for slurm
 
 declare -a readarray
 
@@ -89,7 +89,7 @@ elif [[ "$Choice" == "PBS" ]]
     module load Analysis/root/6.24.06
     for i in $(eval echo "{$Nbegin..$Nend}")
     do
-      sbatch -L sps -n 8 --mem=8000 -J $JobName -o $output reduceROOTSize.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER
+      sbatch -L sps -n 8 --mem=8000 -t 4-0:0:0 -J $JobName -o $output reduceROOTSize.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER
     done
 fi
 

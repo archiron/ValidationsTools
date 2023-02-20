@@ -2,7 +2,7 @@
 # This file is called . KSCompare_init.sh
 
 JobName="KSCompare_serial_job_test" # for slurm
-output="KSCompare_%j.log" # for slurm
+output="/sps/cms/chiron/TEMP/KSCompare_%j.log" # for slurm
 
 declare -a readarray
 
@@ -69,7 +69,7 @@ elif [[ "$Choice" == "PBS" ]]
     module load Compilers/gcc/9.3.1
     module load DataManagement/xrootd/4.8.1
     module load Analysis/root/6.24.06
-    sbatch -L sps -n 2 --mem=8000 -J $JobName -o $output KScompare.sh $LOG_SOURCE $LOG_KS_SOURCE $COMMON_SOURCE $FileName
+    sbatch -L sps -n 2 --mem=8000 -t 4-0:0:0 -J $JobName -o $output KScompare.sh $LOG_SOURCE $LOG_KS_SOURCE $COMMON_SOURCE $FileName
 fi
 
 echo "END"

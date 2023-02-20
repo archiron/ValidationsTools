@@ -23,6 +23,10 @@ cd $1
 #cd $2
 #echo "executing $2/createFiles.py $3 $4"
 #python3 $2/createFiles.py $3 $4
-echo "executing $2/createFiles_v2.py $3 $4"
-python3 $2/createFiles_v2.py $3 $4
+#echo "executing $2/createFiles_v2.py $3 $4"
+#python3 $2/createFiles_v2.py $3 $4
+echo "executing $2/createFiles_v3.py $3 $4"
+python3 $2/createFiles_v3.py $3 $4
+echo "executing $2/KShistos.py $3 $4"
+python3 $2/KShistos.py $3 $4
 

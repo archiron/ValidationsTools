@@ -4,11 +4,11 @@
 useTrainLoader = 0
 useEncoder = 0
 saveEncoder = 1
-TimeFolderRef='20220928-110120'
+TimeFolderRef='20221220-160319'
 
 # xxx parameters
-hidden_size_1 = 401 # 400 # 400 #300 # 250 # 78
-hidden_size_2 = 201 # 160 # 169 # 80 # 48 # 29
+hidden_size_1 = 401 # 401 # 400 # 400 #300 # 250 # 78
+hidden_size_2 = 201 # 201 # 160 # 169 # 80 # 48 # 29
 hidden_size_3 = 101 # 80
 hidden_size_4 = 51 # 100
 useHL3 = 1
@@ -34,5 +34,6 @@ percentageTrain = 0.95 ## 0.97 : 950 == 0.95 : 200
 
 ############################################
 # Layers : 400/160/10 (200)
+#          401/201/101/51 (950)
 ############################################
 

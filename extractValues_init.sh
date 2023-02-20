@@ -2,7 +2,7 @@
 # This file is called . extractValues_init.sh
 
 JobName="extractValues_serial_job_test" # for slurm
-output="extractValues_%j.log" # for slurm
+output="/sps/cms/chiron/TEMP/extractValues_%j.log" # for slurm
 
 declare -a readarray
 
@@ -69,7 +69,7 @@ elif [[ "$Choice" == "PBS" ]]
     module load Compilers/gcc/9.3.1
     module load DataManagement/xrootd/4.8.1
     module load Analysis/root/6.24.06
-    sbatch -L sps -n 8 --mem=8000 -J $JobName -o $output extractValues.sh $LOG_SOURCE $LOG_KS_SOURCE $LIB_SOURCE $COMMON_SOURCE $RESULTFOLDER
+    sbatch -L sps -n 8 --mem=8000 -t 4-0:0:0 -J $JobName -o $output extractValues.sh $LOG_SOURCE $LOG_KS_SOURCE $LIB_SOURCE $COMMON_SOURCE $RESULTFOLDER
 fi
 
 echo "END"

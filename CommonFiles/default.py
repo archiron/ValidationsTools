@@ -14,14 +14,11 @@
 #############################################################################
 # fixed data for zeeExtract for KS
 tp_1 = 'ElectronMcSignalValidator'
-nbFiles = 200
+nbFiles = 1000
 # be careful to not forget the '/' at the end of the path
 #folder = 'Extraction_18/' # 200
 
-#nbFiles = 950
-#folder = 'Extraction_20h/' # 950
-
-folder = 'DEV_01/'#'TMP_Extraction_25/' # 200
+folder = 'DEV_02/'#'TMP_Extraction_25/' # 200
 
 # nb of bins for sampling
 nbins = 100 

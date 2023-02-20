@@ -133,12 +133,12 @@ tic = time.time()
 for i in range(0, N_histos): # 1 histo for debug
     histo_1 = h1.Get(branches[i])
     if (histo_1):
-        print('%s OK' % branches[i])
+        #print('%s OK' % branches[i])
         name = resultPath + "histo_" + branches[i] + '_{:03d}'.format(nbFiles) + ".txt"
         print('\n%d - %s' %(i, name))
         df = pd.read_csv(name)
         
-        print(branches[i]) # print histo name
+        #print(branches[i]) # print histo name
     
         d = getHistoConfEntry(histo_1)
         #print("d = {}".format(d))
