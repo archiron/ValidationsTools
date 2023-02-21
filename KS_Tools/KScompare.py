@@ -176,8 +176,8 @@ for elem in sortedRels:
     rel = elem[1]
 
     # get the KS file datas
-    KS_diffName = folder + "/histo_differences_KScurve" + "_" + rel + "_" + '_{:03d}'.format(nbFiles) + "_v2.txt"
-    pValue_Name = folder + "/histo_pValues" + "_" + rel + "_v2.txt"
+    KS_diffName = folder + "/histo_differences_KScurve" + "_" + rel + "_" + '_{:03d}'.format(nbFiles) + ".txt"
+    pValue_Name = folder + "/histo_pValues" + "_" + rel + ".txt"
     if exists(KS_diffName):
         print('%s existe'%KS_diffName)
     else:

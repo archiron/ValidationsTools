@@ -646,7 +646,7 @@ labels = sortedRels
 labels1 = []
 val1 = []
 for ll in labels:
-    predKSValues = data_dir + "/histo_differences_KScurve_" + ll[1] + "__{:03d}".format(nbFiles) + "_v2.txt"
+    predKSValues = data_dir + "/histo_differences_KScurve_" + ll[1] + "__{:03d}".format(nbFiles) + ".txt"
     print("values file : %s" % predKSValues)
     wPredKSVal = open(predKSValues, 'r')
     LinesKSVal = wPredKSVal.readlines()

@@ -104,7 +104,7 @@ sortedRels = sorted(rels, key = lambda x: x[0]) # gives an array with releases s
 for elem in sortedRels:
     print(elem)
     rel = elem[1]
-    KS_pValues = folder + 'histo_pValues_' + rel + '_v2.txt'
+    KS_pValues = folder + 'histo_pValues_' + rel + '.txt'
     print("KSname 2 : %s" % KS_pValues)
     wKSp = open(KS_pValues, 'r')
 

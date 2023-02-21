@@ -176,8 +176,8 @@ for i in range(0, N_histos): # 1 N_histos histo for debug
 
     for elem in sortedRels:
         rel = elem[1]
-        KSDiffHistoName1 = folder + '/KSDiffHistoValues_1_' + branches[i] + "_" + rel + '_v3.txt'
-        KSDiffHistoName3 = folder + '/KSDiffHistoValues_3_' + branches[i] + "_" + rel + '_v3.txt'
+        KSDiffHistoName1 = folder + '/KSDiffHistoValues_1_' + branches[i] + "_" + rel + '.txt'
+        KSDiffHistoName3 = folder + '/KSDiffHistoValues_3_' + branches[i] + "_" + rel + '.txt'
         #print('KSDiffHistoName 1 : {:s}'.format(KSDiffHistoName1))
         #print('KSDiffHistoName 3 : {:s}'.format(KSDiffHistoName3))
 
@@ -254,7 +254,7 @@ for i in range(0, N_histos): # 1 N_histos histo for debug
         cy3.append(max(ord_3)/2.)
         cy3.append(max(ord_3)/2.)
 
-        HistoFileName = folder + '/KSCompHisto_' + branches[i] + "_" + rel + '_v3.png'
+        HistoFileName = folder + '/KSCompHisto_' + branches[i] + "_" + rel + '.png'
         plt.clf()
         plt.figure(figsize=(10, 5))
         fig, ax1 = plt.subplots()
