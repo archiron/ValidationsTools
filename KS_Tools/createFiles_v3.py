@@ -191,7 +191,8 @@ tic = time.time()
 
 for i in range(0, N_histos): # 1 N_histos histo for debug
     print(branches[i]) # print histo name
-
+    
+    histo_rel = h_rel.Get(branches[i])
     if (histo_rel):
         print('%s OK' % branches[i])
         name = resultPath + "histo_" + branches[i] + '_{:03d}'.format(nbFiles) + ".txt"
