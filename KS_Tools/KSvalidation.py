@@ -241,7 +241,7 @@ for i in range(0, len(histoArray)): # 1 N_histos histo for debug len(histoArray)
                 datas.append('ElectronMcSignalHistos.txt') # can be other histo file
                 tl.createDefinitionsFile(datas, config_target_name)
 
-            fHisto = open(folderDBox + short_histo_name + '.txt', 'w') # web page
+            fHisto = open(folderDBox + short_histo_name + '_' + rel + '.txt', 'w') # web page
             fHisto.write('<table border="1" bordercolor=green cellpadding="2" style="margin-left:auto;margin-right:auto">' + '\n')
             KS_Path1 = folderDBox.replace('/sps/cms/chiron/Validations/', 'https://llrvalidation.in2p3.fr/') # /sps/cms/chiron/Validations/ /data_CMS/cms/chiron/Validations/
             KS_Path0 = folderNB # 
