@@ -199,7 +199,7 @@ for line in fCF:
             histoArray.append(line)
             #print(line)
 
-for i in range(0, len(histoArray)): # 1 N_histos histo for debug len(histoArray)
+for i in range(0, N_histos): # 1 N_histos histo for debug len(histoArray)
     print(histoArray[i]) # print histo name
     
     short_histo_name, short_histo_names, histo_positions = tl.shortHistoName(histoArray[i])
@@ -215,8 +215,10 @@ for i in range(0, len(histoArray)): # 1 N_histos histo for debug len(histoArray)
             file = elem[2]
 
             gif_name = folderDBox + short_histo_names[0] + '_' + rel + ".gif"
-            png_name = folderDBox + short_histo_names[0] + '_' + rel+ "_n.png" # for DB yellow curves
-            png_cumul_name = folderDBox + short_histo_names[0] + '_' + rel+ "_cum.png" # for DB yellow curves
+            short_png_name = short_histo_names[0] + '_' + rel+ "_n.png"
+            png_name = folderDBox + short_png_name # for DB yellow curves
+            short_png_cumul_name = short_histo_names[0] + '_' + rel+ "_cum.png"
+            png_cumul_name = folderDBox + short_png_cumul_name # for DB yellow curves
             config_target_name = folderDBox + 'definitions_' + rel+ ".txt"
 
             # get the "new" root file datas
@@ -240,6 +242,7 @@ for i in range(0, len(histoArray)): # 1 N_histos histo for debug len(histoArray)
                 datas.append('')
                 datas.append('ElectronMcSignalHistos.txt') # can be other histo file
                 tl.createDefinitionsFile(datas, config_target_name)
+                DB.generateExplanation(folderDBox)
 
             fHisto = open(folderDBox + short_histo_name + '_' + rel + '.txt', 'w') # web page
             fHisto.write('<table border="1" bordercolor=green cellpadding="2" style="margin-left:auto;margin-right:auto">' + '\n')
@@ -269,8 +272,8 @@ for i in range(0, len(histoArray)): # 1 N_histos histo for debug len(histoArray)
                     DB_picture = valEnv_d.imageKO() # color = 'red'
             KS_V = [KS_values_1, KS_values_2, KS_values_3]
             #KS_V = [KS_values_1]
-            Names = [short_histo_name, gif_name, short_histo_names[0], png_name, png_cumul_name]
-            DB.DBwebPage2(fHisto, Names, KS_V, DB_picture, KS_Path0, KS_Path1, ycFlag, rel) # , shortReference, self.webURL, self.shortWebFolder, dataSetFolder
+            Names = [short_histo_name, gif_name, short_histo_names[0], short_png_name, short_png_cumul_name]
+            DB.DBwebPage2(fHisto, Names, KS_V, DB_picture, KS_Path1, ycFlag) # , KS_Path0, rel, shortReference, self.webURL, self.shortWebFolder, dataSetFolder
 
         fHisto.close()
 

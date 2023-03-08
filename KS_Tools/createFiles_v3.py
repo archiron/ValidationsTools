@@ -187,6 +187,27 @@ print('reference ind. : %d' % ind_reference)
 h_KSref = getHisto(f_KSref, tp_1)
 print(h_KSref)
 
+wKS0_Files = []
+wKS__Files = []
+wKSp_Files = []
+for elem in sortedRels:
+    rel = elem[1]
+    
+    KS_diffName = folder + "/histo_differences_KScurve" + "_" + rel + "_" + '_{:03d}'.format(nbFiles) + ".txt"
+    print("KSname 1 : %s" % KS_diffName)
+    wKS0 = open(KS_diffName, 'w')
+    wKS0_Files.append(wKS0)
+
+    KS_resume = folder + "/histo_resume" + "_" + rel + ".txt"
+    print("KSname 0 : %s" % KS_resume)
+    wKS_ = open(KS_resume, 'w')
+    wKS__Files.append(wKS_)
+
+    KS_pValues = folder + "/histo_pValues" + "_" + rel + ".txt"
+    print("KSname 2 : %s" % KS_pValues)
+    wKSp = open(KS_pValues, 'w')
+    wKSp_Files.append(wKSp)
+
 tic = time.time()
 
 for i in range(0, N_histos): # 1 N_histos histo for debug
@@ -272,6 +293,7 @@ for i in range(0, N_histos): # 1 N_histos histo for debug
         #print(s_KSref)
         Ntot_h_KSref = histo_KSref.GetEntries()
 
+        ind_rel = 0
         for elem in sortedRels:
             print(elem)
             rel = elem[1]
@@ -289,7 +311,7 @@ for i in range(0, N_histos): # 1 N_histos histo for debug
             nb_red3 = 0
             nb_green3 = 0
 
-            KS_diffName = folder + "/histo_differences_KScurve" + "_" + rel + "_" + '_{:03d}'.format(nbFiles) + ".txt"
+            '''KS_diffName = folder + "/histo_differences_KScurve" + "_" + rel + "_" + '_{:03d}'.format(nbFiles) + ".txt"
             print("KSname 1 : %s" % KS_diffName)
             wKS0 = open(KS_diffName, 'w')
 
@@ -299,7 +321,7 @@ for i in range(0, N_histos): # 1 N_histos histo for debug
 
             KS_pValues = folder + "/histo_pValues" + "_" + rel + ".txt"
             print("KSname 2 : %s" % KS_pValues)
-            wKSp = open(KS_pValues, 'w')
+            wKSp = open(KS_pValues, 'w')'''
 
             h_rel = getHisto(f_rel, tp_1)
             histo_rel = h_rel.Get(branches[i])
@@ -383,7 +405,7 @@ for i in range(0, N_histos): # 1 N_histos histo for debug
             # diff max between new & old
             diffMax0, posMax0, sDKS = DB.diffMAXKS2(s_KSref, s_new, Ntot_h_KSref, Ntot_h_rel)
             print("diffMax0 : %f - posMax0 : %f" % (diffMax0, posMax0))
-            wKS0.write('%s : %e\n' % (branches[i], diffMax0))
+            wKS0_Files[ind_rel].write('%s : %e\n' % (branches[i], diffMax0))
             print(s_new[0:8])
             print(s_KSref[0:8])
             print(sDKS[0:8]) # diff
@@ -559,7 +581,7 @@ for i in range(0, N_histos): # 1 N_histos histo for debug
             print('\nunormalized p_Value : %0.4e for nbins=%d' % (pValue3, nbins))
             print('normalized p_Value : %0.4e for nbins=%d' % (pValue3/I_max3, nbins))
 
-            wKSp.write('%s, %e, %e, %e\n' % (branches[i], pValue/I_max, pValue2/I_max2, pValue3/I_max3))
+            wKSp_Files[ind_rel].write('%s, %e, %e, %e\n' % (branches[i], pValue/I_max, pValue2/I_max2, pValue3/I_max3))
 
             plt.close('all')
             # save the KS curves
@@ -574,20 +596,26 @@ for i in range(0, N_histos): # 1 N_histos histo for debug
             wKS3.write(' '.join("{:10.04e}".format(x) for x in yellowCurveCum3 ))
             wKS3.write('\n')
             wKS3.close()
-        else:
-            print('%s KO' % branches[i])
 
-    # print nb of red/green lines
-    print('KS 1 : %d red - %d green for %s' % (nb_red1, nb_green1, rel))
-    print('KS 2 : %d red - %d green for %s' % (nb_red2, nb_green2, rel))
-    print('KS 3 : %d red - %d green for %s' % (nb_red3, nb_green3, rel))
-    nb_red = nb_red1 + nb_red2 + nb_red3
-    nb_green = nb_green1 + nb_green2 + nb_green3
-    print('KS ttl : %d red - %d green for %s' % (nb_red, nb_green, rel))
-    wKS_.write('KS 1 : %d red - %d green for %s\n' % (nb_red1, nb_green1, rel))
-    wKS_.write('KS 2 : %d red - %d green for %s\n' % (nb_red2, nb_green2, rel))
-    wKS_.write('KS 3 : %d red - %d green for %s\n' % (nb_red3, nb_green3, rel))
-    wKS_.write('KS ttl : %d red - %d green for %s\n' % (nb_red, nb_green, rel))
+            ind_rel += 1
+    else:
+        print('%s KO' % branches[i])
+
+    ind_rel = 0
+    for elem in sortedRels:
+        rel = elem[1]
+        # print nb of red/green lines
+        print('KS 1 : %d red - %d green for %s' % (nb_red1, nb_green1, rel))
+        print('KS 2 : %d red - %d green for %s' % (nb_red2, nb_green2, rel))
+        print('KS 3 : %d red - %d green for %s' % (nb_red3, nb_green3, rel))
+        nb_red = nb_red1 + nb_red2 + nb_red3
+        nb_green = nb_green1 + nb_green2 + nb_green3
+        print('KS ttl : %d red - %d green for %s' % (nb_red, nb_green, rel))
+        wKS__Files[ind_rel].write('KS 1 : %d red - %d green for %s\n' % (nb_red1, nb_green1, rel))
+        wKS__Files[ind_rel].write('KS 2 : %d red - %d green for %s\n' % (nb_red2, nb_green2, rel))
+        wKS__Files[ind_rel].write('KS 3 : %d red - %d green for %s\n' % (nb_red3, nb_green3, rel))
+        wKS__Files[ind_rel].write('KS ttl : %d red - %d green for %s\n' % (nb_red, nb_green, rel))
+        ind_rel += 1
 
 toc = time.time()
 print('Done in {:.4f} seconds'.format(toc-tic))
