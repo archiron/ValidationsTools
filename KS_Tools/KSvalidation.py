@@ -198,8 +198,9 @@ for line in fCF:
         if "/" in line:
             histoArray.append(line)
             #print(line)
+print('len(histoArray) : {:d} - N_histos : {:d}'.format(len(histoArray), N_histos))
 
-for i in range(0, N_histos): # 1 N_histos histo for debug len(histoArray)
+for i in range(0, len(histoArray)): # 1 N_histos histo for debug len(histoArray)
     print(histoArray[i]) # print histo name
     
     short_histo_name, short_histo_names, histo_positions = tl.shortHistoName(histoArray[i])
