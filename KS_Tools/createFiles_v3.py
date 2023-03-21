@@ -72,6 +72,7 @@ from default import *
 from rootValues import NB_EVTS
 from controlFunctions import *
 from graphicFunctions import getHisto, getHistoConfEntry, fill_Snew2, fill_Snew
+from graphicAutoEncoderFunctions import GraphicKS
 from DecisionBox import DecisionBox
 from sources import *
 
@@ -91,6 +92,7 @@ cleanBranches(branches) # remove some histo wich have a pbm with KS.
 ######## ===== COMMON LINES ===== ########
 
 DB = DecisionBox()
+grKS = GraphicKS()
 rels = []
 tmp_branches = []
 nb_ttl_histos = []
@@ -210,7 +212,7 @@ for elem in sortedRels:
 
 tic = time.time()
 
-for i in range(0, N_histos): # 1 N_histos histo for debug
+for i in range(0, 2): # 1 N_histos histo for debug
     print(branches[i]) # print histo name
     
     histo_rel = h_rel.Get(branches[i])
@@ -228,15 +230,6 @@ for i in range(0, N_histos): # 1 N_histos histo for debug
         cols_entries = cols[6::2]
         df_entries = df[cols_entries]
         #print(df_entries.head(15))#
-
-        '''# check the values data
-        #print(df.head(5))
-        cols = df.columns.values
-        n_cols = len(cols)
-        print('nb of columns for histos : %d' % n_cols)
-        cols_entries = cols[6::2]
-        df_entries = df[cols_entries]
-        #print(df_entries.head(15))#'''
 
         # nbBins (GetEntries())
         df_GetEntries = df['nbBins']
@@ -259,7 +252,8 @@ for i in range(0, N_histos): # 1 N_histos histo for debug
                 series1 = df_entries.iloc[l,:]     
                 sum0 = df_GetEntries[k]
                 sum1 = df_GetEntries[l]
-                totalDiff.append(DB.diffMAXKS(series0, series1, sum0, sum1)[0]) # 9000, 9000
+                #totalDiff.append(DB.diffMAXKS3(series0, series1, sum0, sum1)[0]) # 9000, 9000
+                totalDiff.append(DB.diffMAXKS3(series0, series1)[0]) # 9000, 9000
 
         print('ttl nb1 of couples 1 : %d' % nb1)
 
@@ -277,7 +271,8 @@ for i in range(0, N_histos): # 1 N_histos histo for debug
                 nb2 += 1
                 series0 = df_entries.iloc[k,:]
                 sum0 = df_GetEntries[k]
-                totalDiff2.append(DB.diffMAXKS(series0, series_reference, sum0, nbBins_reference)[0]) # 9000, 9000
+                #totalDiff2.append(DB.diffMAXKS3(series0, series_reference, sum0, nbBins_reference)[0]) # 9000, 9000
+                totalDiff2.append(DB.diffMAXKS3(series0, series_reference)[0]) # 9000, 9000
 
         print('ttl nb of couples 2 : %d' % nb2)
         
@@ -371,7 +366,8 @@ for i in range(0, N_histos): # 1 N_histos histo for debug
                 nb3 += 1
                 series0 = df_entries.iloc[k,:]
                 sum0 = df_GetEntries[k]
-                totalDiff3.append(DB.diffMAXKS(series0, s_new, sum0, Ntot_h_rel)[0])
+                #totalDiff3.append(DB.diffMAXKS3(series0, s_new, sum0, Ntot_h_rel)[0])
+                totalDiff3.append(DB.diffMAXKS3(series0, s_new)[0])
 
             print('ttl nb of couples 3 : %d' % nb3)
         
@@ -394,16 +390,20 @@ for i in range(0, N_histos): # 1 N_histos histo for debug
             mean_df_entries = df_entries.mean()
             mean_sum = mean_df_entries.sum()
                 
-            diffMax1, posMax1 = DB.diffMAXKS(mean_df_entries, s_new, mean_sum, Ntot_h_rel)
-            diffMax2, posMax2 = DB.diffMAXKS(series_reference, s_new, nbBins_reference, Ntot_h_rel)
-            diffMax3, posMax3 = DB.diffMAXKS(s_new, s_KSref, Ntot_h_rel, Ntot_h_KSref)
+            #diffMax1, posMax1 = DB.diffMAXKS3(mean_df_entries, s_new, mean_sum, Ntot_h_rel)
+            diffMax1, posMax1, _ = DB.diffMAXKS3(mean_df_entries, s_new)
+            #diffMax2, posMax2 = DB.diffMAXKS3(series_reference, s_new, nbBins_reference, Ntot_h_rel)
+            diffMax2, posMax2, _ = DB.diffMAXKS3(series_reference, s_new)
+            #diffMax3, posMax3 = DB.diffMAXKS3(s_new, s_KSref, Ntot_h_rel, Ntot_h_KSref)
+            diffMax3, posMax3, _ = DB.diffMAXKS3(s_new, s_KSref)
             print("diffMax1 : %f - posMax1 : %f" % (diffMax1, posMax1))
             print("diffMax2 : %f - posMax2 : %f" % (diffMax2, posMax2))
             print("diffMax3 : %f - posMax3 : %f" % (diffMax3, posMax3))
             print('Ntot_h_rel : %d - Ntot_h_KSref : %d' % (Ntot_h_rel, Ntot_h_KSref))
 
             # diff max between new & old
-            diffMax0, posMax0, sDKS = DB.diffMAXKS2(s_KSref, s_new, Ntot_h_KSref, Ntot_h_rel)
+            #diffMax0, posMax0, sDKS = DB.diffMAXKS3(s_KSref, s_new, Ntot_h_KSref, Ntot_h_rel)
+            diffMax0, posMax0, sDKS = DB.diffMAXKS3(s_KSref, s_new)
             print("diffMax0 : %f - posMax0 : %f" % (diffMax0, posMax0))
             wKS0_Files[ind_rel].write('%s : %e\n' % (branches[i], diffMax0))
             print(s_new[0:8])
@@ -419,29 +419,39 @@ for i in range(0, N_histos): # 1 N_histos histo for debug
 
             # Kolmogoroff-Smirnov curve
             seriesTotalDiff1 = pd.DataFrame(totalDiff, columns=['KSDiff'])
-            KSDiffname1 = folder + '/KSDiffValues_1_' + branches[i] + '.txt' # csv imposed by pd.to_csv + "_" + rel 
+            KSDiffname1 = folder + '/KSDiffValues_1_' + branches[i] + "_" + rel+ '.txt' # csv imposed by pd.to_csv + "_" + rel 
             df.to_csv(KSDiffname1)
-            plt_diff_KS1 = seriesTotalDiff1.plot.hist(bins=nbins, title='KS diff. 1')
+            plt_diff_KS1 = seriesTotalDiff1.plot.hist(bins=nbins, title='KS diff. 1', label='')
             print('\ndiffMin0/sTD.min 1 : %f/%f' % (diffMax0, seriesTotalDiff1.values.min()))
             print('\ndiffMax0/sTD.max 1 : %f/%f' % (diffMax0, seriesTotalDiff1.values.max()))
+            ymi, yMa = plt_diff_KS1.get_ylim()
             if (diffMax0 >= seriesTotalDiff1.values.max()):
                 color1 = 'r'
                 nb_red1 += 1
                 x1 = seriesTotalDiff1.values.max()
+                plt.text(x1, yMa/2., '== ' + str(diffMax0) + ' =>', fontsize = 12, bbox = dict(facecolor = 'red', alpha = 0.5))
             elif (diffMax0 <= seriesTotalDiff1.values.min()):
                 color1 = 'g'
                 nb_green1 += 1
                 x1 = seriesTotalDiff1.values.min()
+                plt.text(x1, yMa/2., '<= ' + str(diffMax0) + ' ==', fontsize = 12, bbox = dict(facecolor = 'green', alpha = 0.5))
             else:
                 color1 = 'g'
                 nb_green1 += 1
                 x1 = diffMax0
+                plt_diff_KS1.vlines(x1, ymi, 0.9*yMa, color=color1, linewidth=4)
             print('x1 : %f' % x1)
-            ymi, yMa = plt_diff_KS1.get_ylim()
-            plt_diff_KS1.vlines(x1, ymi, 0.9*yMa, color=color1, linewidth=4)
+
+
             fig = plt_diff_KS1.get_figure()
             fig.savefig(folderKS + '/KS-ttlDiff_1_' + branches[i] + "_" + rel + '.png')
             fig.clf()
+
+            fileName1 = folderKS + '/KS-ttlDiff_1_' + branches[i] + "_" + rel + 'XX.png'
+            [nr, ng] = grKS.createKSttlDiffPicture(totalDiff, nbins, diffMax0,'KS diff. 1', fileName1)
+            nb_green1 += ng
+            nb_red1 += nr
+
             count, division = np.histogram(seriesTotalDiff1[~np.isnan(seriesTotalDiff1)], bins=nbins)
             div_min = np.amin(division)
             div_max = np.amax(division)
@@ -455,12 +465,8 @@ for i in range(0, N_histos): # 1 N_histos histo for debug
 
             # Get the max of the integral
             I_max = DB.integralpValue(division, count, 0.)
-            ##print('\nMax. integral 1 : %0.4e for nbins=%d' % (I_max, nbins))
             # print the min/max values of differences
-            ##print('Kolmogoroff-Smirnov min value : %0.4e - max value : %0.4e | diff value : %e \n' % (div_min, div_max, x1))
             pValue = DB.integralpValue(division, count, diffMax0)
-            #print(division)
-            #print(count)
             # save the KS curves
             wKS1.write('%e, %d\n' % (I_max, nbins))
             wKS1.write('%e, %e\n' % (div_min, div_max))
@@ -497,6 +503,11 @@ for i in range(0, N_histos): # 1 N_histos histo for debug
             fig = plt_diff_KS2.get_figure()
             fig.savefig(folderKS + '/KS-ttlDiff_2_' + branches[i] + "_" + rel + '.png')
             fig.clf()
+            fileName2 = folderKS + '/KS-ttlDiff_2_' + branches[i] + "_" + rel + 'XX.png'
+            [nr, ng] = grKS.createKSttlDiffPicture(totalDiff2, nbins, diffMax0,'KS diff. 2', fileName2)
+            nb_green2 += ng
+            nb_red2 += nr
+
             count, division = np.histogram(seriesTotalDiff2, bins=nbins)
             div_min = np.amin(division)
             div_max = np.amax(division)
@@ -552,6 +563,11 @@ for i in range(0, N_histos): # 1 N_histos histo for debug
             fig = plt_diff_KS3.get_figure()
             fig.savefig(folderKS + '/KS-ttlDiff_3_' + branches[i] + "_" + rel + '.png')
             fig.clf()
+            fileName3 = folderKS + '/KS-ttlDiff_3_' + branches[i] + "_" + rel + 'XX.png'
+            [nr, ng] = grKS.createKSttlDiffPicture(totalDiff3, nbins, diffMax0,'KS diff. 3', fileName3)
+            nb_green3 += ng
+            nb_red3 += nr
+            
             count, division = np.histogram(seriesTotalDiff3, bins=nbins)
             div_min = np.amin(division)
             div_max = np.amax(division)
