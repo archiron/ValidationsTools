@@ -212,7 +212,7 @@ for elem in sortedRels:
 
 tic = time.time()
 
-for i in range(0, 2): # 1 N_histos histo for debug
+for i in range(0, N_histos): # 1 N_histos histo for debug
     print(branches[i]) # print histo name
     
     histo_rel = h_rel.Get(branches[i])
@@ -421,9 +421,9 @@ for i in range(0, 2): # 1 N_histos histo for debug
             seriesTotalDiff1 = pd.DataFrame(totalDiff, columns=['KSDiff'])
             KSDiffname1 = folder + '/KSDiffValues_1_' + branches[i] + "_" + rel+ '.txt' # csv imposed by pd.to_csv + "_" + rel 
             df.to_csv(KSDiffname1)
-            plt_diff_KS1 = seriesTotalDiff1.plot.hist(bins=nbins, title='KS diff. 1', label='')
             print('\ndiffMin0/sTD.min 1 : %f/%f' % (diffMax0, seriesTotalDiff1.values.min()))
             print('\ndiffMax0/sTD.max 1 : %f/%f' % (diffMax0, seriesTotalDiff1.values.max()))
+            '''plt_diff_KS1 = seriesTotalDiff1.plot.hist(bins=nbins, title='KS diff. 1', label='')
             ymi, yMa = plt_diff_KS1.get_ylim()
             if (diffMax0 >= seriesTotalDiff1.values.max()):
                 color1 = 'r'
@@ -441,11 +441,9 @@ for i in range(0, 2): # 1 N_histos histo for debug
                 x1 = diffMax0
                 plt_diff_KS1.vlines(x1, ymi, 0.9*yMa, color=color1, linewidth=4)
             print('x1 : %f' % x1)
-
-
             fig = plt_diff_KS1.get_figure()
             fig.savefig(folderKS + '/KS-ttlDiff_1_' + branches[i] + "_" + rel + '.png')
-            fig.clf()
+            fig.clf()'''
 
             fileName1 = folderKS + '/KS-ttlDiff_1_' + branches[i] + "_" + rel + 'XX.png'
             [nr, ng] = grKS.createKSttlDiffPicture(totalDiff, nbins, diffMax0,'KS diff. 1', fileName1)
@@ -482,9 +480,9 @@ for i in range(0, 2): # 1 N_histos histo for debug
 
             # Kolmogoroff-Smirnov curve 2
             seriesTotalDiff2 = pd.DataFrame(totalDiff2, columns=['KSDiff'])
-            plt_diff_KS2 = seriesTotalDiff2.plot.hist(bins=nbins, title='KS diff. 2')
             print('\ndiffMin0/sTD.min 1 : %f/%f' % (diffMax0, seriesTotalDiff2.values.min()))
             print('\ndiffMax0/sTD.max 2 : %f/%f' % (diffMax0, seriesTotalDiff2.values.max()))
+            '''plt_diff_KS2 = seriesTotalDiff2.plot.hist(bins=nbins, title='KS diff. 2')
             if (diffMax0 >= seriesTotalDiff2.values.max()):
                 color2 = 'r'
                 nb_red2 += 1
@@ -502,7 +500,7 @@ for i in range(0, 2): # 1 N_histos histo for debug
             plt_diff_KS2.vlines(x2, ymi, 0.9*yMa, color=color2, linewidth=4)
             fig = plt_diff_KS2.get_figure()
             fig.savefig(folderKS + '/KS-ttlDiff_2_' + branches[i] + "_" + rel + '.png')
-            fig.clf()
+            fig.clf()'''
             fileName2 = folderKS + '/KS-ttlDiff_2_' + branches[i] + "_" + rel + 'XX.png'
             [nr, ng] = grKS.createKSttlDiffPicture(totalDiff2, nbins, diffMax0,'KS diff. 2', fileName2)
             nb_green2 += ng
@@ -542,9 +540,9 @@ for i in range(0, 2): # 1 N_histos histo for debug
 
             # Kolmogoroff-Smirnov curve 3
             seriesTotalDiff3 = pd.DataFrame(totalDiff3, columns=['new'])
-            plt_diff_KS3 = seriesTotalDiff3.plot.hist(bins=nbins, title='KS diff. 3')
             print('\ndiffMin0/sTD.min 3 : %f/%f' % (diffMax0, seriesTotalDiff3.values.min()))
             print('diffMax0/sTD.max 3 : %f/%f' % (diffMax0, seriesTotalDiff3.values.max()))
+            '''plt_diff_KS3 = seriesTotalDiff3.plot.hist(bins=nbins, title='KS diff. 3')
             if (diffMax0 >= seriesTotalDiff3.values.max()):
                 color3 = 'r'
                 nb_red3 += 1
@@ -562,7 +560,7 @@ for i in range(0, 2): # 1 N_histos histo for debug
             plt_diff_KS3.vlines(x3, ymi, 0.9*yMa, color=color3, linewidth=4)
             fig = plt_diff_KS3.get_figure()
             fig.savefig(folderKS + '/KS-ttlDiff_3_' + branches[i] + "_" + rel + '.png')
-            fig.clf()
+            fig.clf()'''
             fileName3 = folderKS + '/KS-ttlDiff_3_' + branches[i] + "_" + rel + 'XX.png'
             [nr, ng] = grKS.createKSttlDiffPicture(totalDiff3, nbins, diffMax0,'KS diff. 3', fileName3)
             nb_green3 += ng
