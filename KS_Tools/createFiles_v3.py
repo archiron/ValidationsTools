@@ -423,27 +423,6 @@ for i in range(0, N_histos): # 1 N_histos histo for debug
             df.to_csv(KSDiffname1)
             print('\ndiffMin0/sTD.min 1 : %f/%f' % (diffMax0, seriesTotalDiff1.values.min()))
             print('\ndiffMax0/sTD.max 1 : %f/%f' % (diffMax0, seriesTotalDiff1.values.max()))
-            '''plt_diff_KS1 = seriesTotalDiff1.plot.hist(bins=nbins, title='KS diff. 1', label='')
-            ymi, yMa = plt_diff_KS1.get_ylim()
-            if (diffMax0 >= seriesTotalDiff1.values.max()):
-                color1 = 'r'
-                nb_red1 += 1
-                x1 = seriesTotalDiff1.values.max()
-                plt.text(x1, yMa/2., '== ' + str(diffMax0) + ' =>', fontsize = 12, bbox = dict(facecolor = 'red', alpha = 0.5))
-            elif (diffMax0 <= seriesTotalDiff1.values.min()):
-                color1 = 'g'
-                nb_green1 += 1
-                x1 = seriesTotalDiff1.values.min()
-                plt.text(x1, yMa/2., '<= ' + str(diffMax0) + ' ==', fontsize = 12, bbox = dict(facecolor = 'green', alpha = 0.5))
-            else:
-                color1 = 'g'
-                nb_green1 += 1
-                x1 = diffMax0
-                plt_diff_KS1.vlines(x1, ymi, 0.9*yMa, color=color1, linewidth=4)
-            print('x1 : %f' % x1)
-            fig = plt_diff_KS1.get_figure()
-            fig.savefig(folderKS + '/KS-ttlDiff_1_' + branches[i] + "_" + rel + '.png')
-            fig.clf()'''
 
             fileName1 = folderKS + '/KS-ttlDiff_1_' + branches[i] + "_" + rel + 'XX.png'
             [nr, ng] = grKS.createKSttlDiffPicture(totalDiff, nbins, diffMax0,'KS diff. 1', fileName1)
@@ -482,25 +461,7 @@ for i in range(0, N_histos): # 1 N_histos histo for debug
             seriesTotalDiff2 = pd.DataFrame(totalDiff2, columns=['KSDiff'])
             print('\ndiffMin0/sTD.min 1 : %f/%f' % (diffMax0, seriesTotalDiff2.values.min()))
             print('\ndiffMax0/sTD.max 2 : %f/%f' % (diffMax0, seriesTotalDiff2.values.max()))
-            '''plt_diff_KS2 = seriesTotalDiff2.plot.hist(bins=nbins, title='KS diff. 2')
-            if (diffMax0 >= seriesTotalDiff2.values.max()):
-                color2 = 'r'
-                nb_red2 += 1
-                x2 = seriesTotalDiff2.values.max()
-            elif (diffMax0 <= seriesTotalDiff2.values.min()):
-                color2 = 'g'
-                nb_green2 += 1
-                x2 = seriesTotalDiff2.values.min()
-            else:
-                color2 = 'g'
-                nb_green2 += 1
-                x2 = diffMax0
-            print('x2 : %f' % x2)
-            ymi, yMa = plt_diff_KS2.get_ylim()
-            plt_diff_KS2.vlines(x2, ymi, 0.9*yMa, color=color2, linewidth=4)
-            fig = plt_diff_KS2.get_figure()
-            fig.savefig(folderKS + '/KS-ttlDiff_2_' + branches[i] + "_" + rel + '.png')
-            fig.clf()'''
+
             fileName2 = folderKS + '/KS-ttlDiff_2_' + branches[i] + "_" + rel + 'XX.png'
             [nr, ng] = grKS.createKSttlDiffPicture(totalDiff2, nbins, diffMax0,'KS diff. 2', fileName2)
             nb_green2 += ng
@@ -542,25 +503,7 @@ for i in range(0, N_histos): # 1 N_histos histo for debug
             seriesTotalDiff3 = pd.DataFrame(totalDiff3, columns=['new'])
             print('\ndiffMin0/sTD.min 3 : %f/%f' % (diffMax0, seriesTotalDiff3.values.min()))
             print('diffMax0/sTD.max 3 : %f/%f' % (diffMax0, seriesTotalDiff3.values.max()))
-            '''plt_diff_KS3 = seriesTotalDiff3.plot.hist(bins=nbins, title='KS diff. 3')
-            if (diffMax0 >= seriesTotalDiff3.values.max()):
-                color3 = 'r'
-                nb_red3 += 1
-                x3 = seriesTotalDiff3.values.max()
-            elif (diffMax0 <= seriesTotalDiff3.values.min()):
-                color3 = 'g'
-                nb_green3 += 1
-                x3 = seriesTotalDiff3.values.min()
-            else:
-                color3 = 'g'
-                nb_green3 += 1
-                x3 = diffMax0
-            print('x3 : %f' % x3)
-            ymi, yMa = plt_diff_KS3.get_ylim()
-            plt_diff_KS3.vlines(x3, ymi, 0.9*yMa, color=color3, linewidth=4)
-            fig = plt_diff_KS3.get_figure()
-            fig.savefig(folderKS + '/KS-ttlDiff_3_' + branches[i] + "_" + rel + '.png')
-            fig.clf()'''
+            
             fileName3 = folderKS + '/KS-ttlDiff_3_' + branches[i] + "_" + rel + 'XX.png'
             [nr, ng] = grKS.createKSttlDiffPicture(totalDiff3, nbins, diffMax0,'KS diff. 3', fileName3)
             nb_green3 += ng
