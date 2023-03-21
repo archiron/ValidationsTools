@@ -424,7 +424,7 @@ for i in range(0, N_histos): # 1 N_histos histo for debug
             print('\ndiffMin0/sTD.min 1 : %f/%f' % (diffMax0, seriesTotalDiff1.values.min()))
             print('\ndiffMax0/sTD.max 1 : %f/%f' % (diffMax0, seriesTotalDiff1.values.max()))
 
-            fileName1 = folderKS + '/KS-ttlDiff_1_' + branches[i] + "_" + rel + 'XX.png'
+            fileName1 = folderKS + '/KS-ttlDiff_1_' + branches[i] + "_" + rel + '.png'
             [nr, ng] = grKS.createKSttlDiffPicture(totalDiff, nbins, diffMax0,'KS diff. 1', fileName1)
             nb_green1 += ng
             nb_red1 += nr
@@ -462,7 +462,7 @@ for i in range(0, N_histos): # 1 N_histos histo for debug
             print('\ndiffMin0/sTD.min 1 : %f/%f' % (diffMax0, seriesTotalDiff2.values.min()))
             print('\ndiffMax0/sTD.max 2 : %f/%f' % (diffMax0, seriesTotalDiff2.values.max()))
 
-            fileName2 = folderKS + '/KS-ttlDiff_2_' + branches[i] + "_" + rel + 'XX.png'
+            fileName2 = folderKS + '/KS-ttlDiff_2_' + branches[i] + "_" + rel + '.png'
             [nr, ng] = grKS.createKSttlDiffPicture(totalDiff2, nbins, diffMax0,'KS diff. 2', fileName2)
             nb_green2 += ng
             nb_red2 += nr
@@ -504,7 +504,7 @@ for i in range(0, N_histos): # 1 N_histos histo for debug
             print('\ndiffMin0/sTD.min 3 : %f/%f' % (diffMax0, seriesTotalDiff3.values.min()))
             print('diffMax0/sTD.max 3 : %f/%f' % (diffMax0, seriesTotalDiff3.values.max()))
             
-            fileName3 = folderKS + '/KS-ttlDiff_3_' + branches[i] + "_" + rel + 'XX.png'
+            fileName3 = folderKS + '/KS-ttlDiff_3_' + branches[i] + "_" + rel + '.png'
             [nr, ng] = grKS.createKSttlDiffPicture(totalDiff3, nbins, diffMax0,'KS diff. 3', fileName3)
             nb_green3 += ng
             nb_red3 += nr
