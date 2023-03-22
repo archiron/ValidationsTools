@@ -306,18 +306,6 @@ for i in range(0, N_histos): # 1 N_histos histo for debug
             nb_red3 = 0
             nb_green3 = 0
 
-            '''KS_diffName = folder + "/histo_differences_KScurve" + "_" + rel + "_" + '_{:03d}'.format(nbFiles) + ".txt"
-            print("KSname 1 : %s" % KS_diffName)
-            wKS0 = open(KS_diffName, 'w')
-
-            KS_resume = folder + "/histo_resume" + "_" + rel + ".txt"
-            print("KSname 0 : %s" % KS_resume)
-            wKS_ = open(KS_resume, 'w')
-
-            KS_pValues = folder + "/histo_pValues" + "_" + rel + ".txt"
-            print("KSname 2 : %s" % KS_pValues)
-            wKSp = open(KS_pValues, 'w')'''
-
             h_rel = getHisto(f_rel, tp_1)
             histo_rel = h_rel.Get(branches[i])
 
@@ -562,23 +550,6 @@ for i in range(0, N_histos): # 1 N_histos histo for debug
             ind_rel += 1
     else:
         print('%s KO' % branches[i])
-
-    '''ind_rel = 0
-    for elem in sortedRels:
-        rel = elem[1]
-        # print nb of red/green lines
-        print('KS 1 : %d red - %d green for %s' % (nb_red1, nb_green1, rel))
-        print('KS 2 : %d red - %d green for %s' % (nb_red2, nb_green2, rel))
-        print('KS 3 : %d red - %d green for %s' % (nb_red3, nb_green3, rel))
-        nb_red = nb_red1 + nb_red2 + nb_red3
-        nb_green = nb_green1 + nb_green2 + nb_green3
-        print('KS ttl : %d red - %d green for %s' % (nb_red, nb_green, rel))
-        wKS__Files[ind_rel].write('KS 1 : %d red - %d green for %s\n' % (nb_red1, nb_green1, rel))
-        wKS__Files[ind_rel].write('KS 2 : %d red - %d green for %s\n' % (nb_red2, nb_green2, rel))
-        wKS__Files[ind_rel].write('KS 3 : %d red - %d green for %s\n' % (nb_red3, nb_green3, rel))
-        wKS__Files[ind_rel].write('KS ttl : %d red - %d green for %s\n' % (nb_red, nb_green, rel))
-        ind_rel += 1
-    '''
 
 toc = time.time()
 print('Done in {:.4f} seconds'.format(toc-tic))
