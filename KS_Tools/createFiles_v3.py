@@ -71,7 +71,7 @@ import default as dfo
 from default import *
 from rootValues import NB_EVTS
 from controlFunctions import *
-from graphicFunctions import getHisto, getHistoConfEntry, fill_Snew2, fill_Snew
+from graphicFunctions import getHisto, getHistoConfEntry, fill_Snew2 #, fill_Snew
 from graphicAutoEncoderFunctions import GraphicKS
 from DecisionBox import DecisionBox
 from sources import *
@@ -209,6 +209,11 @@ for elem in sortedRels:
     print("KSname 2 : %s" % KS_pValues)
     wKSp = open(KS_pValues, 'w')
     wKSp_Files.append(wKSp)
+
+nbRels = len(sortedRels)
+redGreen1 = [[0 for c in range(nbRels)] for r in range(2)]
+redGreen2 = [[0 for c in range(nbRels)] for r in range(2)]
+redGreen3 = [[0 for c in range(nbRels)] for r in range(2)]
 
 tic = time.time()
 
@@ -413,7 +418,7 @@ for i in range(0, N_histos): # 1 N_histos histo for debug
             print('\ndiffMax0/sTD.max 1 : %f/%f' % (diffMax0, seriesTotalDiff1.values.max()))
 
             fileName1 = folderKS + '/KS-ttlDiff_1_' + branches[i] + "_" + rel + '.png'
-            [nb_red1, nb_green1] = grKS.createKSttlDiffPicture(totalDiff, nbins, diffMax0,'KS diff. 1', fileName1)
+            [nb_green1, nb_red1] = grKS.createKSttlDiffPicture(totalDiff, nbins, diffMax0,'KS diff. 1', fileName1)
 
             count, division = np.histogram(seriesTotalDiff1[~np.isnan(seriesTotalDiff1)], bins=nbins)
             div_min = np.amin(division)
@@ -449,7 +454,7 @@ for i in range(0, N_histos): # 1 N_histos histo for debug
             print('\ndiffMax0/sTD.max 2 : %f/%f' % (diffMax0, seriesTotalDiff2.values.max()))
 
             fileName2 = folderKS + '/KS-ttlDiff_2_' + branches[i] + "_" + rel + '.png'
-            [nb_red2, nb_green2] = grKS.createKSttlDiffPicture(totalDiff2, nbins, diffMax0,'KS diff. 2', fileName2)
+            [nb_green2, nb_red2] = grKS.createKSttlDiffPicture(totalDiff2, nbins, diffMax0,'KS diff. 2', fileName2)
 
             count, division = np.histogram(seriesTotalDiff2, bins=nbins)
             div_min = np.amin(division)
@@ -489,7 +494,7 @@ for i in range(0, N_histos): # 1 N_histos histo for debug
             print('diffMax0/sTD.max 3 : %f/%f' % (diffMax0, seriesTotalDiff3.values.max()))
             
             fileName3 = folderKS + '/KS-ttlDiff_3_' + branches[i] + "_" + rel + '.png'
-            [nb_red3, nb_green3] = grKS.createKSttlDiffPicture(totalDiff3, nbins, diffMax0,'KS diff. 3', fileName3)
+            [nb_green3, nb_red3] = grKS.createKSttlDiffPicture(totalDiff3, nbins, diffMax0,'KS diff. 3', fileName3)
             
             count, division = np.histogram(seriesTotalDiff3, bins=nbins)
             div_min = np.amin(division)
@@ -547,9 +552,22 @@ for i in range(0, N_histos): # 1 N_histos histo for debug
             wKS__Files[ind_rel].write('KS 2 : %d red - %d green for %s\n' % (nb_red2, nb_green2, branches[i]))
             wKS__Files[ind_rel].write('KS 3 : %d red - %d green for %s\n' % (nb_red3, nb_green3, branches[i]))
             wKS__Files[ind_rel].write('KS ttl : %d red - %d green for %s\n' % (nb_red, nb_green, branches[i]))
+            redGreen1[ind_rel][0] += nb_red1
+            redGreen1[ind_rel][1] += nb_green1
+            redGreen2[ind_rel][0] += nb_red2
+            redGreen2[ind_rel][1] += nb_green2
+            redGreen3[ind_rel][0] += nb_red3
+            redGreen3[ind_rel][1] += nb_green3
             ind_rel += 1
     else:
         print('%s KO' % branches[i])
+
+ind_rel = 0
+for elem in sortedRels:
+    wKS__Files[ind_rel].write('KS 1 : %d ttl red - %d ttl green\n' % (redGreen1[ind_rel][0], redGreen1[ind_rel][1]))
+    wKS__Files[ind_rel].write('KS 2 : %d ttl red - %d ttl green\n' % (redGreen2[ind_rel][0], redGreen2[ind_rel][1]))
+    wKS__Files[ind_rel].write('KS 3 : %d ttl red - %d ttl green\n' % (redGreen3[ind_rel][0], redGreen3[ind_rel][1]))
+    ind_rel += 1
 
 toc = time.time()
 print('Done in {:.4f} seconds'.format(toc-tic))
