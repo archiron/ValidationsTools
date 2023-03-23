@@ -17,21 +17,13 @@ echo "paths file : $5"
 
 #cd $LOG_SOURCE
 cd $1
-#source /afs/cern.ch/cms/cmsset_default.sh
-#eval `scramv1 runtime -sh`
-#cd -
-
-#cd $2
 echo "executing $4/checkRootFiles.py"
 python3 $4/checkRootFiles.py $3 $4 $5
 echo " "
 echo "executing $4/checkMapDiff.py"
 python3 $4/checkMapDiff.py $3 $4 $5
+echo " "
+echo "executing $4/checkCreatedVsOfficial.py"
+python3 $4/checkCreatedVsOfficial.py $3 $4 $5
 
-#python3 $2/extrGT.py
-#echo "executing $1/extrGT.py"
-#python3 $2/createFiles_v2.py
-#echo "executing $2/createFiles_v2.py"
-#python3 $2/zeepValues.py
-#echo "executing $2/zeepValues.py"
 
