@@ -187,7 +187,7 @@ print(h_KSref)
 
 tic = time.time()
 
-for i in range(0, 1): # 1 N_histos histo for debug
+for i in range(0, N_histos): # 1 N_histos histo for debug
     print(branches[i]) # print histo name
     
     histo_KSref = h_KSref.Get(branches[i])
@@ -213,21 +213,21 @@ for i in range(0, 1): # 1 N_histos histo for debug
         (Nrows, Ncols) = df_entries.shape
         print('[Nrows, Ncols] : [%d, %d]' % (Nrows, Ncols))
         
+        histo_KSref = h_KSref.Get(branches[i])
+        s_KSref = []
+        for entry in histo_KSref:
+            s_KSref.append(entry)
+        s_KSref = np.asarray(s_KSref)
+        s_KSref = s_KSref[1:-1]
+        Ntot_h_KSref = histo_KSref.GetEntries()
+        #print(s_KSref)
+
         # redefining Nrows
         rowArray = [10, 50, 100]
         for Nrows in rowArray:
             #Nrows = 50
             print('[Nrows, Ncols] : [%d, %d]' % (Nrows, Ncols))
             #print(df_entries.iloc[0,:])
-
-            histo_KSref = h_KSref.Get(branches[i])
-            s_KSref = []
-            for entry in histo_KSref:
-                s_KSref.append(entry)
-            s_KSref = np.asarray(s_KSref)
-            s_KSref = s_KSref[1:-1]
-            Ntot_h_KSref = histo_KSref.GetEntries()
-            #print(s_KSref)
 
             # create the datas for the p-Value graph
             # by comparing all curves between them. (KS 1)

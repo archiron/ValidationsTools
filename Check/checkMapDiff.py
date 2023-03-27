@@ -70,7 +70,7 @@ import default as dfo
 from default import *
 from rootValues import NB_EVTS
 from controlFunctions import *
-from graphicFunctions import getHisto, getHistoConfEntry, fill_Snew, fill_Snew2
+from graphicFunctions import getHisto, getHistoConfEntry, fill_Snew2
 from DecisionBox import DecisionBox
 from sources import *
 
@@ -144,14 +144,6 @@ for i in range(0, N_histos): # 1 histo for debug
         #print("d = {}".format(d))
     
         ii=0
-        '''
-        s_new = []
-        for entry in histo_1:
-            s_new.append(entry)
-            ii += 1
-        s_new = np.asarray(s_new)
-        s_new = s_new[1:-1]
-        '''
         #s_new = fill_Snew(histo_1)
         s_new = fill_Snew2(d, histo_1)
         Ntot_h1 = histo_1.GetEntries()

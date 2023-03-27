@@ -120,13 +120,6 @@ for elem in fileList:
     for i in range(0, N_histos): # 1 N_histos histo for debug
         #print('\n' + branches[i]) # print histo name
         histo_1 = h1.Get(branches[i])
-        '''
-        s_new = []
-        for entry in histo_1:
-            s_new.append(entry)
-        s_new = np.asarray(s_new)
-        s_new = s_new[1:-1]
-        '''
         if (histo_1):
             #print('%s OK' % branches[i])
             s_new = fill_Snew(histo_1)
@@ -179,13 +172,6 @@ for item in rootFilesList:
         histo_1 = h1.Get(branches[i])
         if (histo_1):
             #print('%s OK' % branches[i])
-            '''
-            s_new = []
-            for entry in histo_1:
-                s_new.append(entry)
-            s_new = np.asarray(s_new)
-            s_new = s_new[1:-1]
-            '''
             s_new = fill_Snew(histo_1)
             Ntot_h1 = histo_1.GetEntries()
 
@@ -239,25 +225,6 @@ for elem in fileList:
             d = getHistoConfEntry(histo_1)
             #print("d = {}".format(d))
 
-            '''
-            s_new = []
-            ii = 0
-            if (d==1):
-                for entry in histo_1:
-                    s_new.append(entry)
-            else:
-                for entry in histo_1:
-                    if ((histo_1.GetBinEntries(ii) == 0.) and (entry == 0.)):
-                        s_new.append(0.)
-                    elif ((histo_1.GetBinEntries(ii) == 0.) and (entry != 0.)):
-                        s_new.append(1.e38)
-                        print('========================================',ii,entry,histo_1.GetBinEntries(ii))
-                    else:
-                        s_new.append(entry/histo_1.GetBinEntries(ii))
-                    ii+=1
-            s_new = np.asarray(s_new)
-            s_new = s_new[1:-1]
-            '''
             s_new = fill_Snew2(d, histo_1)
             Ntot_h1 = histo_1.GetEntries()
             
@@ -312,25 +279,6 @@ for item in rootFilesList:
             d = getHistoConfEntry(histo_1)
             #print("d = {}".format(d))
 
-            '''
-            s_new = []
-            ii = 0
-            if (d==1):
-                for entry in histo_1:
-                    s_new.append(entry)
-            else:
-                for entry in histo_1:
-                    if ((histo_1.GetBinEntries(ii) == 0.) and (entry == 0.)):
-                        s_new.append(0.)
-                    elif ((histo_1.GetBinEntries(ii) == 0.) and (entry != 0.)):
-                        s_new.append(1.e38)
-                        print('========================================',ii,entry,histo_1.GetBinEntries(ii))
-                    else:
-                        s_new.append(entry/histo_1.GetBinEntries(ii))
-                    ii+=1
-            s_new = np.asarray(s_new)
-            s_new = s_new[1:-1]
-            '''
             s_new = fill_Snew2(d, histo_1)
             Ntot_h1 = histo_1.GetEntries()
             
@@ -454,9 +402,5 @@ for i in range(0, N_histos): # 1 N_histos histo for debug
         print('ttl nb of couples 3 : %d' % nb3)
     else:
         print('%s KO PASS 3' % branches[i])
-
-
-
-
 
 print("Fin !")
