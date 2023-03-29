@@ -5,6 +5,7 @@
 # with command line options: ZEE_14TeV_TuneCP5_cfi --beamspot Run3RoundOptics25ns13TeVLowSigmaZ --conditions auto:phase1_2022_realistic --datatier GEN-SIM --era Run3 --eventcontent FEVTDEBUG --fileout file:step1.root --geometry DB:Extended --nStreams 2 --nThreads 8 --no_exec --number 10 --python_filename step_1_cfg.py --relval 9000,100 --step GEN,SIM
 import FWCore.ParameterSet.Config as cms
 import os, sys
+from datetime import datetime
 
 from Configuration.Eras.Era_Run3_cff import Run3
 
@@ -169,6 +170,9 @@ process.generator = cms.EDFilter("Pythia8ConcurrentGeneratorFilter",
     pythiaPylistVerbosity = cms.untracked.int32(0)
 )
 
+now = datetime.now().microsecond
+process.RandomNumberGeneratorService.generator.initialSeed = cms.untracked.uint32(now)
+process.RandomNumberGeneratorService.g4SimHits.initialSeed  = cms.untracked.uint32(now)
 
 # Path and EndPath definitions
 process.generation_step = cms.Path(process.pgen)
