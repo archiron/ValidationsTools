@@ -31,6 +31,7 @@ if len(sys.argv) > 1:
     print("AEGeneration - arg. 3 :", sys.argv[3]) # nb of datasets
     print("AEGeneration - arg. 4 :", sys.argv[4]) # dataset name
     print("AEGeneration - arg. 5 :", sys.argv[5]) # cpu/gpu option
+    print("AEGeneration - arg. 6 :", sys.argv[6]) # timeFolder
     commonPath = sys.argv[1]
     filePaths = sys.argv[2]
     workPath=sys.argv[1][:-12]
@@ -38,6 +39,7 @@ if len(sys.argv) > 1:
     branch = sys.argv[4][1:]
     print('branch : {:s}'.format(branch))
     cg_pu = sys.argv[5]
+    timeFolder = sys.argv[6]
 else:
     print("rien")
     resultPath = ''
@@ -135,8 +137,8 @@ folder = resultPath + checkFolderName(dfo.folder)
 data_dir = folder + '/{:03d}'.format(nbFiles)
 print('data_dir path : {:s}'.format(data_dir))
 data_res = data_dir + '/AE_RESULTS/'
-#data_res = data_dir + '/AE_RESULTS/'
-data_res = '/pbs/home/c/chiron/public/TEMP/AE_RESULTS/'
+data_res = data_dir + '/AE_RESULTS/'
+#data_res = '/pbs/home/c/chiron/public/TEMP/AE_RESULTS/'
 print('data_res path : {:s}'.format(data_res))
 
 # get list of added ROOT files
@@ -198,7 +200,7 @@ if (cg_pu == 'cpu'):
     use_GPU = False
 print('\n===\ndevice : {:s}\n===\n'.format(str(device)))
 
-timeFolder = time.strftime("%Y%m%d-%H%M%S")
+#timeFolder = time.strftime("%Y%m%d-%H%M%S") # only kept for tests
 
 folderName = data_res + createAEfolderName(hidden_size_1, hidden_size_2, hidden_size_3, hidden_size_4, useHL3, useHL4, latent_size)
 checkFolder(folderName)

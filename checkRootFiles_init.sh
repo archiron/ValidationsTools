@@ -77,7 +77,7 @@ elif [[ "$Choice" == "PBS" ]]
     module load Compilers/gcc/9.3.1
     module load DataManagement/xrootd/4.8.1
     module load Analysis/root/6.24.06
-    sbatch -L sps -n 8 --mem=16000 -t 4-0:0:0 -J $JobName -o $output checkRootFiles.sh $LOG_SOURCE $LOG_KS_SOURCE $COMMON_SOURCE $CHECK_SOURCE $FileName
+    sbatch -L sps -n 3 --mem=8000 -t 4-0:0:0 -J $JobName -o $output checkRootFiles.sh $LOG_SOURCE $LOG_KS_SOURCE $COMMON_SOURCE $CHECK_SOURCE $FileName
 fi
 
 echo "END"

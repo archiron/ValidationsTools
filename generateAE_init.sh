@@ -98,7 +98,7 @@ if [[ "$Choice" == "LLR" ]]
         #echo $line
         arrLine=(${line//dator/ })
         echo "${arrLine[1]}"
-        /opt/exp_soft/cms/t3/t3submit -8c $options generateAE.sh $LOG_AE_SOURCE $COMMON_SOURCE AEGeneration.py $FileName $var ${arrLine[1]} 'cpu' # $LOG_SOURCE 
+        /opt/exp_soft/cms/t3/t3submit -8c $options generateAE.sh $LOG_AE_SOURCE $COMMON_SOURCE AEGeneration.py $FileName $var ${arrLine[1]} 'cpu' $timeFolder # $LOG_SOURCE 
       fi
     done
 elif [[ "$Choice" == "PBS" ]] 
@@ -121,7 +121,7 @@ elif [[ "$Choice" == "PBS" ]]
         #echo $line
         arrLine=(${line//dator/ })
         echo "${arrLine[1]}"
-        sbatch -L sps -n 4 --mem=16000 -t 4-0:0:0 -J $JobName -o $output generateAE.sh $LOG_AE_SOURCE $COMMON_SOURCE AEGeneration.py $FileName $var ${arrLine[1]} 'cpu' # $LOG_SOURCE 
+        sbatch -L sps -n 4 --mem=16000 -t 4-0:0:0 -J $JobName -o $output generateAE.sh $LOG_AE_SOURCE $COMMON_SOURCE AEGeneration.py $FileName $var ${arrLine[1]} 'cpu' $timeFolder # $LOG_SOURCE 
       fi
     done
     deactivate

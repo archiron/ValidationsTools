@@ -96,11 +96,12 @@ elif [[ "$Choice" == "PBS" ]]
     echo "PBS"
     cd $LOG_SOURCE
     eval `scramv1 runtime -sh`
-    for i in $(eval echo "{$Nbegin..$Nend}") # 641 701 714 809 822 838 982 987 991
+    for i in 217 #  $(eval echo "{$Nbegin..$Nend}")
     do
       sbatch -L sps -n 8 --mem=16000 -t 4-0:0:0 -J $JobName -o $output createROOTFiles.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER
     done
 fi
 
 echo "END"
+
 

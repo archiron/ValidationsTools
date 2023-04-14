@@ -13,7 +13,7 @@
 #  module use /opt/exp_soft/vo.llr.in2p3.fr/modulefiles_el7
 #  module load torch/1.5.0-py37-nocuda
 # into the AE_Tools folder, launch :
-#  python3 resumeAE.py ~/PYTHON/ValidationsTools/CommonFiles/ pathsLLR.py
+#  python3 resumeAE.py ~/PYTHON/ValidationsTools/CommonFiles/ pathsLLR.py timeFolder
 
 ################################################################################
 
@@ -31,12 +31,14 @@ from sys import argv
 
 if len(sys.argv) > 1:
     print(sys.argv)
-    print("step 4 - arg. 0 :", sys.argv[0]) # name of the script
-    print("step 4 - arg. 1 :", sys.argv[1]) # COMMON files path
-    print("step 4 - arg. 2 :", sys.argv[2]) # FileName for paths
+    print("resumeAE - arg. 0 :", sys.argv[0]) # name of the script
+    print("resumeAE - arg. 1 :", sys.argv[1]) # COMMON files path
+    print("resumeAE - arg. 2 :", sys.argv[2]) # FileName for paths
+    print("resumeAE - arg. 3 :", sys.argv[3]) # timeFolder
     commonPath = sys.argv[1]
     filePaths = sys.argv[2]
     workPath=sys.argv[1][:-12]
+    timeFolder = sys.argv[3]
 else:
     print("rien")
     resultPath = ''
@@ -115,12 +117,19 @@ print('data_res path : {:s}'.format(data_res))
 
 t = datetime.datetime.today()
 tic= time.time()
-timeFolder = time.strftime("%Y%m%d-%H%M%S")
+#timeFolder = time.strftime("%Y%m%d-%H%M%S")
 #timeFolder = '20221108-101911/' #3 DEV_2
 #timeFolder = '20221108-101702/' #4 DEV_2
-timeFolder = '20221102-154453/' #5 DEV_2
-timeFolder = '20221219-121255/' #3 DEV_3
-timeFolder = '20221219-133455/' #4 DEV_3
+#timeFolder = '20221102-154453/' #5 DEV_2
+#timeFolder = '20221219-121255/' #3 DEV_3
+#timeFolder = '20221219-133455/' #4 DEV_3
+#timeFolder = '20230103-101222/' #3 DEV_3
+#timeFolder = '20230103-140600/' #4 DEV_3
+#timeFolder = '20230103-162931/' #5 DEV_3
+#timeFolder = '20230109-111639/' #3 DEV_3
+#timeFolder = '20230112-150730/' #5 DEV_3
+#timeFolder = '20230412-163943/' #3 DEV_6
+#timeFolder = '20230413-090707/' #3 DEV_6
 
 ####### Loss prediction #######
 AEfolderName = createAEfolderName(hidden_size_1, hidden_size_2, hidden_size_3, hidden_size_4, useHL3, useHL4, latent_size)
@@ -130,7 +139,7 @@ print('\nComplete folder name : {:s}'.format(folderName))
 
 loopMaxValue = nbBranches #25 # nbBranches
 for i in range(0, loopMaxValue):
-    print('{:s}\n'.format(branches[i]))
+    #print('{:s}\n'.format(branches[i]))
     df = []
     fileName = "/predLossesValues_" + branches[i] + ".txt"
     Name = folderName + '/' + branches[i] + '/' + timeFolder + fileName
@@ -160,7 +169,7 @@ print(sortedRels)
 
 print(arrayValues.head())
 lignes, col = arrayValues.shape
-print('[{:d}, {:d}]'.format(lignes, col))
+print('arrayValues : [{:d}, {:d}]'.format(lignes, col))
 aa = arrayValues.to_numpy()
 
 for ind in range(0, lignes):
@@ -183,7 +192,7 @@ for i in range(0, loopMaxValue):
     print('{:s}\n'.format(sortedRels[i]))
     miniRel = sortedRels[i].strip()
     miniRel = miniRel[6:]
-    fileName = "/histo_pValues_" + miniRel + "_v2.txt"
+    fileName = "/histo_pValues_" + miniRel + ".txt"
     Name = folderKS + fileName
     if Path(Name).exists():
         #print('{:s} exist'.format(Name))
@@ -203,7 +212,7 @@ print(pValues1.head())
 #print(pValues2.head())
 #print(pValues3.head())
 lignes, col = pValues1.shape
-print('[{:d}, {:d}]'.format(lignes, col))
+print('pValues1 : [{:d}, {:d}]'.format(lignes, col))
 aa1 = pValues1.to_numpy().transpose()
 aa2 = pValues2.to_numpy().transpose()
 aa3 = pValues3.to_numpy().transpose()
@@ -230,7 +239,7 @@ for i in range(0, loopMaxValue):
     print('{:s}\n'.format(sortedRels[i]))
     miniRel = sortedRels[i].strip()
     miniRel = miniRel[6:]
-    fileName = "/histo_differences_KScurve_" + miniRel + "__" + str(nbFiles) + "_v2.txt"
+    fileName = "/histo_differences_KScurve_" + miniRel + "__" + str(nbFiles) + ".txt"
     Name = folderKS + fileName
     if Path(Name).exists():
         #print('{:s} exist'.format(Name))
@@ -250,7 +259,9 @@ for i in range(0, loopMaxValue):
 print('histos2 : {:d}'.format(len(histos2)))
 branch2 = {}
 for i in range(0, len(histos2)):
+    #print('histo : {:s}'.format(histos2[i]))
     branch2[histos2[i]] = branch[histos2[i]]
+
 #print(branch2)
 print(differences.head())
 aa1 = differences.to_numpy().transpose()
