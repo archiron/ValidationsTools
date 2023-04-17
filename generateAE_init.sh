@@ -4,6 +4,8 @@
 JobName="generateAE_serial_job_test" # for slurm
 output="/sps/cms/chiron/TEMP/generateAE_%j.log" # for slurm
 
+timeFolder="$(date +"%Y%m%d-%H%M%S")"
+
 declare -a readarray
 
 aa=$PWD

@@ -2,7 +2,7 @@
 # coding: utf-8
 
 ################################################################################
-# AEGeneration : create a KS comparison (max diff) between the original curve 
+# resumeAE : create a KS comparison (max diff) between the original curve 
 # and the predicted one for different egamma validation releases.
 #
 # MUST be launched with the cmsenv cmd after a cmsrel cmd !!
@@ -142,7 +142,7 @@ for i in range(0, loopMaxValue):
     #print('{:s}\n'.format(branches[i]))
     df = []
     fileName = "/predLossesValues_" + branches[i] + ".txt"
-    Name = folderName + '/' + branches[i] + '/' + timeFolder + fileName
+    Name = folderName + '/' + branches[i] + '/' + timeFolder + '/' + fileName
     if Path(Name).exists():
         #print('{:s} exist'.format(Name))
         df = pd.read_csv(Name, header=None)
@@ -313,8 +313,8 @@ for i in range(0, N):
         #print(j,branch3[j])
         tmp1[branch3[j]] = 'null'
     file1.write(sortedRels[i] + '\n')
-    lossesFileName = folderPictures + 'losses_' + '{:s}'.format(sortedRels[i].strip()) + '.txt'
-    differencesFileName = folderPictures + 'differences_' + '{:s}'.format(sortedRels[i].strip()) + '.txt'
+    lossesFileName = folderPictures + '/losses_' + '{:s}'.format(sortedRels[i].strip()) + '.txt'
+    differencesFileName = folderPictures + '/differences_' + '{:s}'.format(sortedRels[i].strip()) + '.txt'
     print(lossesFileName)
     print(differencesFileName)
     file4 = open(lossesFileName, 'w')
@@ -322,7 +322,7 @@ for i in range(0, N):
     for elem in aa[i]:
         file4.write(str(elem) + '\n')
     for elem in branch:#aa1[i]:
-        print(elem, tmp1[elem])
+        #print(elem, tmp1[elem])
         file5.write(str(tmp1[elem]) + '\n')
     file4.close()
     file5.close()
