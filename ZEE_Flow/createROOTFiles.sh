@@ -8,6 +8,7 @@ echo "nb : $1"
 echo "chemin : $2"
 echo "nb evts : $3"
 echo "result folder : $4"
+echo "initial SEED Kolmogorov : $5"
 echo ""
 
 LOG_SOURCE=$2
@@ -31,7 +32,7 @@ cd $2
 eval `scramv1 runtime -sh`
 cd -
 
-time cmsRun $2/step1.py $1 $2 $3 $4
+time cmsRun $2/step1.py $1 $2 $3 $4 $5
 
 time cmsRun $2/step2.py $1 $2 $3 $4
 rm $4/$name1

@@ -2,7 +2,7 @@
 # using: 
 # Revision: 1.19 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
-# with command line options: ZEE_14TeV_TuneCP5_cfi --beamspot Run3RoundOptics25ns13TeVLowSigmaZ --conditions auto:phase1_2022_realistic --datatier GEN-SIM --era Run3 --eventcontent FEVTDEBUG --fileout file:step1.root --geometry DB:Extended --nStreams 2 --nThreads 8 --no_exec --number 10 --python_filename step_1_cfg.py --relval 9000,100 --step GEN,SIM
+# with command line options: ZEE_14TeV_TuneCP5_cfi --beamspot Realistic25ns13p6TeVEarly2022Collision --conditions auto:phase1_2022_realistic --datatier GEN-SIM --era Run3 --eventcontent FEVTDEBUG --fileout file:step1.root --geometry DB:Extended --nStreams 2 --nThreads 8 --no_exec --number 10 --python_filename step_1_cfg.py --relval 9000,100 --step GEN,SIM
 import FWCore.ParameterSet.Config as cms
 import os, sys
 from datetime import datetime
@@ -17,9 +17,11 @@ if len(sys.argv) > 1:
     print("step 1 - arg. 3 :", sys.argv[3]) # path of the script ($LOG_SOURCE)
     print("step 1 - arg. 4 :", sys.argv[4]) # nb of evts
     print("step 1 - arg. 5 :", sys.argv[5]) # path of output
+    print("step 1 - arg. 6 :", sys.argv[6]) # initial SEED
     ind = int(sys.argv[2])
     max_number = int(sys.argv[4])
     outputPath = sys.argv[5]
+    initialSEED = sys.argv[6]
 else:
     print("step 1 - rien")
     ind = 0
@@ -40,7 +42,7 @@ process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
 process.load('Configuration.StandardSequences.GeometrySimDB_cff')
 process.load('Configuration.StandardSequences.MagneticField_cff')
 process.load('Configuration.StandardSequences.Generator_cff')
-process.load('IOMC.EventVertexGenerators.VtxSmearedRun3RoundOptics25ns13TeVLowSigmaZ_cfi')
+process.load('IOMC.EventVertexGenerators.VtxSmearedRealistic25ns13p6TeVEarly2022Collision_cfi')
 process.load('GeneratorInterface.Core.genFilterSummary_cff')
 process.load('Configuration.StandardSequences.SimIdeal_cff')
 process.load('Configuration.StandardSequences.EndOfProcess_cff')
@@ -170,9 +172,10 @@ process.generator = cms.EDFilter("Pythia8ConcurrentGeneratorFilter",
     pythiaPylistVerbosity = cms.untracked.int32(0)
 )
 
-now = datetime.now().microsecond
-process.RandomNumberGeneratorService.generator.initialSeed = cms.untracked.uint32(now)
-process.RandomNumberGeneratorService.g4SimHits.initialSeed  = cms.untracked.uint32(now)
+if (initialSEED != -1.):
+    now = datetime.now().microsecond
+    process.RandomNumberGeneratorService.generator.initialSeed = cms.untracked.uint32(now)
+    process.RandomNumberGeneratorService.g4SimHits.initialSeed  = cms.untracked.uint32(now)
 
 # Path and EndPath definitions
 process.generation_step = cms.Path(process.pgen)
@@ -187,7 +190,7 @@ from PhysicsTools.PatAlgos.tools.helpers import associatePatAlgosToolsTask
 associatePatAlgosToolsTask(process)
 
 #Setup FWK for multithreaded
-process.options.numberOfThreads = 2
+process.options.numberOfThreads = 8
 process.options.numberOfStreams = 2
 # filter all path with the production filter sequence
 for path in process.paths:

@@ -79,6 +79,7 @@ echo "LOG_OUTPUT : $LOG_OUTPUT"
 echo "RESULTFOLDER : $RESULTFOLDER"
 
 mkdir -p $RESULTFOLDER
+initialSEED=123.456 # must be commented if not used
 
 if [[ "$Choice" == "LLR" ]] 
   then
@@ -89,16 +90,16 @@ if [[ "$Choice" == "LLR" ]]
     do
       #/opt/exp_soft/cms/t3/t3submit -8c -long createROOTFiles.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER
       #/opt/exp_soft/cms/t3/t3submit -8c -short createROOTFiles.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER
-      /opt/exp_soft/cms/t3/t3submit -8c -reserv createROOTFiles.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER
+      /opt/exp_soft/cms/t3/t3submit -8c -reserv createROOTFiles.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER $initialSEED
     done
 elif [[ "$Choice" == "PBS" ]] 
   then
     echo "PBS"
     cd $LOG_SOURCE
     eval `scramv1 runtime -sh`
-    for i in 217 #  $(eval echo "{$Nbegin..$Nend}")
+    for i in $(eval echo "{$Nbegin..$Nend}") #  $(eval echo "{$Nbegin..$Nend}")
     do
-      sbatch -L sps -n 8 --mem=16000 -t 4-0:0:0 -J $JobName -o $output createROOTFiles.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER
+      sbatch -L sps -n 8 --mem=16000 -t 4-0:0:0 -J $JobName -o $output createROOTFiles.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER $initialSEED
     done
 fi
 
