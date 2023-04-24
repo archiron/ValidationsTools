@@ -172,10 +172,13 @@ process.generator = cms.EDFilter("Pythia8ConcurrentGeneratorFilter",
     pythiaPylistVerbosity = cms.untracked.int32(0)
 )
 
-if (initialSEED != -1.):
+if (initialSEED == "0"):
     now = datetime.now().microsecond
     process.RandomNumberGeneratorService.generator.initialSeed = cms.untracked.uint32(now)
     process.RandomNumberGeneratorService.g4SimHits.initialSeed  = cms.untracked.uint32(now)
+else:
+    process.RandomNumberGeneratorService.generator.initialSeed = cms.untracked.uint32(initialSEED)
+    process.RandomNumberGeneratorService.g4SimHits.initialSeed  = cms.untracked.uint32(initialSEED)
 
 # Path and EndPath definitions
 process.generation_step = cms.Path(process.pgen)
