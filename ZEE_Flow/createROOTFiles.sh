@@ -40,11 +40,11 @@ time cmsRun $2/step3.py $1 $2 $3 $4
 rm $4/$name2
 
 time cmsRun $2/step4.py $1 $2 $3 $4
+
+#cp *.root $4
+mv DQM*.root $4
 rm $4/$name31
 rm $4/$name32
 rm $4/$name33
 rm $4/$name34
-
-#cp *.root $4
-mv DQM*.root $4
 
