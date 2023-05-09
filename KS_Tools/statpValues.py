@@ -36,12 +36,12 @@ if len(sys.argv) > 1:
     print("step 4 - arg. 0 :", sys.argv[0]) # name of the script
     print("step 4 - arg. 2 :", sys.argv[1]) # COMMON files path
     print("step 4 - arg. 4 :", sys.argv[2]) # FileName for paths
-    commonPath = sys.argv[1]
+    pathCommonFiles = sys.argv[1]
     filePaths = sys.argv[2]
-    workPath=sys.argv[1][:-12]
+    pathLIBS=sys.argv[1][:-12]
 else:
     print("rien")
-    resultPath = ''
+    pathBase = ''
 
 # these line for daltonians !
 #seaborn.set_palette('colorblind')
@@ -49,18 +49,18 @@ else:
 print('statpValue')
 
 # Import module
-loader = importlib.machinery.SourceFileLoader( filePaths, commonPath+filePaths )
+loader = importlib.machinery.SourceFileLoader( filePaths, pathCommonFiles+filePaths )
 spec = importlib.util.spec_from_loader( filePaths, loader )
 blo = importlib.util.module_from_spec( spec )
 loader.exec_module( blo )
 print('DATA_SOURCE : %s' % blo.DATA_SOURCE)
-resultPath = blo.RESULTFOLDER 
-print('result path : {:s}'.format(resultPath))
+pathBase = blo.RESULTFOLDER 
+print('result path : {:s}'.format(pathBase))
 
-Chilib_path = workPath + '/' + blo.LIB_SOURCE # checkFolderName(blo.LIB_SOURCE) # sys.argv[1]
-print('Lib path : {:s}'.format(Chilib_path))
-sys.path.append(Chilib_path)
-sys.path.append(commonPath)
+pathChiLib = pathLIBS + '/' + blo.LIB_SOURCE # checkFolderName(blo.LIB_SOURCE) # sys.argv[1]
+print('Lib path : {:s}'.format(pathChiLib))
+sys.path.append(pathChiLib)
+sys.path.append(pathCommonFiles)
 
 import default as df
 from default import *
@@ -69,30 +69,30 @@ from controlFunctions import *
 from graphicFunctions import createHistoPicture
 
 ######## ===== COMMON LINES ===== ########
-resultPath += '/' + str(NB_EVTS)
-resultPath = checkFolderName(resultPath)
-print('resultPath : {:s}'.format(resultPath))
+pathNb_evts = pathBase + '/' + str(NB_EVTS)
+pathNb_evts = checkFolderName(pathNb_evts)
+print('pathNb_evts : {:s}'.format(pathNb_evts))
 ######## ===== COMMON LINES ===== ########
-folder = resultPath + checkFolderName(df.folder)
+pathCase = pathNb_evts + checkFolderName(df.folder)
 
 # get list of generated ROOT files
-rootFilesList_0 = getListFiles(resultPath, 'root')
+rootFilesList_0 = getListFiles(pathNb_evts, 'root')
 print('there is ' + '{:03d}'.format(len(rootFilesList_0)) + ' ROOT files')
 nbFiles = change_nbFiles(len(rootFilesList_0), nbFiles)
 
-folder += '{:03d}'.format(nbFiles)
-folder = checkFolderName(folder)
-print('folder après check : %s' % folder)
-checkFolder(folder)
-folderKS = folder + 'KS'
-folderKS =checkFolderName(folderKS)
-print('folder KS après check : %s' % folderKS)
-checkFolder(folderKS)
+pathNb_files = pathCase + '{:03d}'.format(nbFiles)
+pathNb_files = checkFolderName(pathNb_files)
+print('folder après check : %s' % pathNb_files)
+checkFolder(pathNb_files)
+pathKS = pathNb_files + 'KS'
+pathKS =checkFolderName(pathKS)
+print('folder KS après check : %s' % pathKS)
+checkFolder(pathKS)
 
 rels = []
 # get list of the added ROOT files
-rootFolderName = workPath + '/' + blo.DATA_SOURCE # '/pbs/home/c/chiron/private/KS_Tools/GenExtract/DATA/NewFiles'
-rootFilesList = getListFiles(rootFolderName, 'root')
+pathDATA = pathLIBS + '/' + blo.DATA_SOURCE # '/pbs/home/c/chiron/private/KS_Tools/GenExtract/DATA/NewFiles'
+rootFilesList = getListFiles(pathDATA, 'root')
 print('we use the files :')
 for item in rootFilesList:
     print('%s' % item)
@@ -104,7 +104,7 @@ sortedRels = sorted(rels, key = lambda x: x[0]) # gives an array with releases s
 for elem in sortedRels:
     print(elem)
     rel = elem[1]
-    KS_pValues = folder + 'histo_pValues_' + rel + '.txt'
+    KS_pValues = pathNb_files + 'histo_pValues_' + rel + '.txt'
     print("KSname 2 : %s" % KS_pValues)
     wKSp = open(KS_pValues, 'r')
 
@@ -121,9 +121,9 @@ for elem in sortedRels:
         histo2.Fill(float(a[2])) # pvalue2
         histo3.Fill(float(a[3])) # pvalue3
     
-    createHistoPicture(histo1, folderKS + 'KS_1_' + rel + '.png')
-    createHistoPicture(histo2, folderKS + 'KS_2_' + rel + '.png')
-    createHistoPicture(histo3, folderKS + 'KS_3_' + rel + '.png')
+    createHistoPicture(histo1, pathKS + 'KS_1_' + rel + '.png')
+    createHistoPicture(histo2, pathKS + 'KS_2_' + rel + '.png')
+    createHistoPicture(histo3, pathKS + 'KS_3_' + rel + '.png')
 
 print("Fin !")
 

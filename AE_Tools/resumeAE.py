@@ -35,13 +35,13 @@ if len(sys.argv) > 1:
     print("resumeAE - arg. 1 :", sys.argv[1]) # COMMON files path
     print("resumeAE - arg. 2 :", sys.argv[2]) # FileName for paths
     print("resumeAE - arg. 3 :", sys.argv[3]) # timeFolder
-    commonPath = sys.argv[1]
+    pathCommonFiles = sys.argv[1]
     filePaths = sys.argv[2]
-    workPath=sys.argv[1][:-12]
+    pathLIBS=sys.argv[1][:-12]
     timeFolder = sys.argv[3]
 else:
     print("rien")
-    resultPath = ''
+    pathBase = ''
 
 import pandas as pd
 import numpy as np
@@ -56,18 +56,17 @@ from torch.nn.functional import normalize
 print("\nAE Generation")
 
 # Import module
-loader = importlib.machinery.SourceFileLoader( filePaths, commonPath+filePaths )
+loader = importlib.machinery.SourceFileLoader( filePaths, pathCommonFiles+filePaths )
 spec = importlib.util.spec_from_loader( filePaths, loader )
 blo = importlib.util.module_from_spec( spec )
 loader.exec_module( blo )
-print('DATA_SOURCE : %s' % blo.DATA_SOURCE)
-resultPath = blo.RESULTFOLDER 
-print('result path : {:s}'.format(resultPath))
+pathBase = blo.RESULTFOLDER 
+print('result path : {:s}'.format(pathBase))
 
-Chilib_path = workPath + '/' + blo.LIB_SOURCE # checkFolderName(blo.LIB_SOURCE) # sys.argv[1]
-print('Lib path : {:s}'.format(Chilib_path))
-sys.path.append(Chilib_path)
-sys.path.append(commonPath)
+pathChiLib = pathLIBS + '/' + blo.LIB_SOURCE # checkFolderName(blo.LIB_SOURCE) # sys.argv[1]
+print('Lib path : {:s}'.format(pathChiLib))
+sys.path.append(pathChiLib)
+sys.path.append(pathCommonFiles)
 
 import default as dfo
 from default import *
@@ -91,7 +90,7 @@ histos1 = []
 # get the branches for ElectronMcSignalHistos.txt
 ######## ===== COMMON LINES ===== ########
 branches = []
-source = Chilib_path + "/HistosConfigFiles/ElectronMcSignalHistos.txt"
+source = pathChiLib + "/HistosConfigFiles/ElectronMcSignalHistos.txt"
 branches = getBranches(tp_1, source)
 cleanBranches(branches) # remove some histo wich have a pbm with KS.
 ######## ===== COMMON LINES ===== ########
@@ -99,9 +98,9 @@ cleanBranches(branches) # remove some histo wich have a pbm with KS.
 nbBranches = len(branches) # [0:8]
 print('there is {:03d} datasets'.format(nbBranches))
 
-resultPath += '/' + str(NB_EVTS)
-resultPath = checkFolderName(resultPath)
-print('resultPath : {:s}'.format(resultPath))
+pathNb_evts = pathBase + '/' + str(NB_EVTS)
+pathNb_evts = checkFolderName(pathNb_evts)
+print('pathNb_evts : {:s}'.format(pathNb_evts))
 
 # get list of generated ROOT files
 rootPath = '/data_CMS/cms/chiron/ROOT_Files/CMSSW_12_5_0_pre4/'
@@ -109,10 +108,10 @@ rootFilesList_0 = getListFiles(rootPath, 'root')
 print('there is ' + '{:04d}'.format(len(rootFilesList_0)) + ' generated ROOT files')
 nbFiles = change_nbFiles(len(rootFilesList_0), nbFiles)
 
-folder = resultPath + checkFolderName(dfo.folder)
-data_dir = folder + '/{:03d}'.format(nbFiles)
-print('data_dir path : {:s}'.format(data_dir))
-data_res = data_dir + '/AE_RESULTS/'
+pathCase = pathNb_evts + checkFolderName(dfo.folder)
+pathNb_files = pathCase + '/{:03d}'.format(nbFiles)
+print('pathNb_files path : {:s}'.format(pathNb_files))
+data_res = pathNb_files + '/AE_RESULTS/'
 print('data_res path : {:s}'.format(data_res))
 
 t = datetime.datetime.today()
@@ -182,18 +181,16 @@ fileName = folderPictures + '/Summary_AllReleases_EvolutionArray.png'
 createComplexPicture2(sortedRels, aa, ['nb of values', 'pred losses values'], fileName, branches)
 
 ####### pValues #######
-folderKS = data_dir 
-checkFolder(folderKS)
-folderPictures = folderKS + '/KS/'
-checkFolder(folderPictures)
-print('\KS folder name : {:s}'.format(folderKS))
+pathKS = pathNb_files + '/KS/'
+checkFolder(pathKS)
+print('\KS folder name : {:s}'.format(pathKS))
 loopMaxValue = len(sortedRels)
 for i in range(0, loopMaxValue):
     print('{:s}\n'.format(sortedRels[i]))
     miniRel = sortedRels[i].strip()
     miniRel = miniRel[6:]
     fileName = "/histo_pValues_" + miniRel + ".txt"
-    Name = folderKS + fileName
+    Name = pathKS + fileName
     if Path(Name).exists():
         #print('{:s} exist'.format(Name))
         df = pd.read_csv(Name, header=None)
@@ -218,19 +215,17 @@ aa2 = pValues2.to_numpy().transpose()
 aa3 = pValues3.to_numpy().transpose()
 
 for ind in range(0,loopMaxValue):
-    fileName = folderPictures + '/Summary_pV1_releaseEvolution.png'
+    fileName = pathKS + '/Summary_pV1_releaseEvolution.png'
     createComplexPicture2(sortedRels, aa1, ['nb of values', 'pValues 1'], fileName, histos1)
-    fileName = folderPictures + '/Summary_pV2_releaseEvolution.png'
+    fileName = pathKS + '/Summary_pV2_releaseEvolution.png'
     createComplexPicture2(sortedRels, aa2, ['nb of values', 'pValues 2'], fileName, histos1)
-    fileName = folderPictures + '/Summary_pV3_releaseEvolution.png'
+    fileName = pathKS + '/Summary_pV3_releaseEvolution.png'
     createComplexPicture2(sortedRels, aa3, ['nb of values', 'pValues 3'], fileName, histos1)
 
 ####### Differences #######
-folderKS = data_dir #+ '/KS/'
-checkFolder(folderKS)
-folderPictures = folderKS + '/KS/' + AEfolderName + '/' + timeFolder
+folderPictures = pathNb_files + '/KS/' + AEfolderName + '/' + timeFolder
 checkFolder(folderPictures)
-print('\KS folder name : {:s}'.format(folderKS))
+print('\KS folder name : {:s}'.format(pathKS))
 differences = pd.DataFrame()
 loopMaxValue = len(sortedRels)
 for i in range(0, loopMaxValue):
@@ -240,7 +235,7 @@ for i in range(0, loopMaxValue):
     miniRel = sortedRels[i].strip()
     miniRel = miniRel[6:]
     fileName = "/histo_differences_KScurve_" + miniRel + "__" + str(nbFiles) + ".txt"
-    Name = folderKS + fileName
+    Name = pathKS + fileName
     if Path(Name).exists():
         #print('{:s} exist'.format(Name))
         diff_file = open(Name, 'r')

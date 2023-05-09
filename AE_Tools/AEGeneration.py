@@ -32,9 +32,9 @@ if len(sys.argv) > 1:
     print("AEGeneration - arg. 4 :", sys.argv[4]) # dataset name
     print("AEGeneration - arg. 5 :", sys.argv[5]) # cpu/gpu option
     print("AEGeneration - arg. 6 :", sys.argv[6]) # timeFolder
-    commonPath = sys.argv[1]
+    pathCommonFiles = sys.argv[1]
     filePaths = sys.argv[2]
-    workPath=sys.argv[1][:-12]
+    pathLIBS=sys.argv[1][:-12]
     nbBranches = int(sys.argv[3])
     branch = sys.argv[4][1:]
     print('branch : {:s}'.format(branch))
@@ -42,7 +42,7 @@ if len(sys.argv) > 1:
     timeFolder = sys.argv[6]
 else:
     print("rien")
-    resultPath = ''
+    pathBase = ''
     cg_pu = ''
 
 import pandas as pd
@@ -58,18 +58,18 @@ from torch.nn.functional import normalize
 print("\nAE Generation")
 
 # Import module
-loader = importlib.machinery.SourceFileLoader( filePaths, commonPath+filePaths )
+loader = importlib.machinery.SourceFileLoader( filePaths, pathCommonFiles+filePaths )
 spec = importlib.util.spec_from_loader( filePaths, loader )
 blo = importlib.util.module_from_spec( spec )
 loader.exec_module( blo )
 print('DATA_SOURCE : %s' % blo.DATA_SOURCE)
-resultPath = blo.RESULTFOLDER 
-print('result path : {:s}'.format(resultPath))
+pathBase = blo.RESULTFOLDER 
+print('result path : {:s}'.format(pathBase))
 
-Chilib_path = workPath + '/' + blo.LIB_SOURCE
-print('Lib path : {:s}'.format(Chilib_path))
-sys.path.append(Chilib_path)
-sys.path.append(commonPath)
+pathChiLib = pathLIBS + '/' + blo.LIB_SOURCE
+print('Lib path : {:s}'.format(pathChiLib))
+sys.path.append(pathChiLib)
+sys.path.append(pathCommonFiles)
 
 import default as dfo
 from default import *
@@ -124,26 +124,24 @@ y_pred_o = []
 #nbBranches = len(branches) # [0:8]
 print('there is {:03d} datasets'.format(nbBranches))
 
-resultPath += '/' + str(NB_EVTS)
-resultPath = checkFolderName(resultPath)
-print('resultPath : {:s}'.format(resultPath))
+pathNb_evts = pathBase + '/' + str(NB_EVTS)
+pathNb_evts = checkFolderName(pathNb_evts)
+print('pathNb_evts : {:s}'.format(pathNb_evts))
 
 # get list of generated ROOT files
-rootFilesList_0 = getListFiles(resultPath, 'root')
+rootFilesList_0 = getListFiles(pathNb_evts, 'root')
 print('there is ' + '{:03d}'.format(len(rootFilesList_0)) + ' generated ROOT files')
 nbFiles = change_nbFiles(len(rootFilesList_0), nbFiles)
 
-folder = resultPath + checkFolderName(dfo.folder)
-data_dir = folder + '/{:03d}'.format(nbFiles)
-print('data_dir path : {:s}'.format(data_dir))
-data_res = data_dir + '/AE_RESULTS/'
-data_res = data_dir + '/AE_RESULTS/'
-#data_res = '/pbs/home/c/chiron/public/TEMP/AE_RESULTS/'
-print('data_res path : {:s}'.format(data_res))
+pathCase = pathNb_evts + checkFolderName(dfo.folder)
+pathNb_files = pathCase + '/{:03d}'.format(nbFiles)
+print('data_dir path : {:s}'.format(pathNb_files))
+pathAE = pathNb_files + '/AE_RESULTS/'
+print('data_res path : {:s}'.format(pathAE))
 
 # get list of added ROOT files
-rootFolderName = workPath + '/' + blo.DATA_SOURCE # '/pbs/home/c/chiron/private/KS_Tools/GenExtract/DATA/NewFiles'
-rootFilesList = getListFiles(rootFolderName, 'root')
+pathDATA = pathNb_evts + '/' + blo.DATA_SOURCE # '/pbs/home/c/chiron/private/KS_Tools/GenExtract/DATA/NewFiles'
+rootFilesList = getListFiles(pathDATA, 'root')
 print('there is ' + '{:03d}'.format(len(rootFilesList)) + ' added ROOT files')
 for item in rootFilesList:
     b = (item.split('__')[2]).split('-')
@@ -153,10 +151,10 @@ for elem in sortedRels:
     print(elem)
 
 # get list of text files
-pathKSFiles = data_dir
-print('KS path : %s' % pathKSFiles)
+#pathKSFiles = pathNb_files
+#print('KS path : %s' % pathKSFiles)
 KSlistFiles = []
-tmp = getListFiles(pathKSFiles, 'txt')
+tmp = getListFiles(pathNB_files, 'txt')
 for elem in tmp:
     if (elem[5:10] == '_diff'): # to keep only histo_differences_KScurves files
         KSlistFiles.append(elem)
@@ -165,7 +163,7 @@ print(KSlistFiles, len(KSlistFiles))
 for item in KSlistFiles:
     print('file : %s' % item)
     aa = item.split('__')[0]
-    fileName = pathKSFiles + '/' + item
+    fileName = pathNB_files + '/' + item
     file1 = open(fileName, 'r')
     bb = file1.readlines()
     for elem in bb:
@@ -184,7 +182,7 @@ else:
     print('we have the same number of KS files than releases')
 
 #load data from branchesHistos_NewFiles.txt file ..
-fileName = data_dir + "/branchesHistos_NewFiles.txt"
+fileName = pathNb_files + "/branchesHistos_NewFiles.txt"
 print('%s' % fileName)
 file1 = open(fileName, 'r')
 Lines = file1.readlines()
@@ -202,7 +200,7 @@ print('\n===\ndevice : {:s}\n===\n'.format(str(device)))
 
 #timeFolder = time.strftime("%Y%m%d-%H%M%S") # only kept for tests
 
-folderName = data_res + createAEfolderName(hidden_size_1, hidden_size_2, hidden_size_3, hidden_size_4, useHL3, useHL4, latent_size)
+folderName = pathAE + createAEfolderName(hidden_size_1, hidden_size_2, hidden_size_3, hidden_size_4, useHL3, useHL4, latent_size)
 checkFolder(folderName)
 print('\nComplete folder name : {:s}'.format(folderName))
 
@@ -216,7 +214,7 @@ fParam.close()
 
 print('{:s}\n'.format(branch))
 df = []
-fileName = resultPath + "/histo_" + branch + '_{:03d}'.format(nbFiles) + ".txt"
+fileName = pathNb_evts + "/histo_" + branch + '_{:03d}'.format(nbFiles) + ".txt"
 if Path(fileName).exists():
     print('{:s} exist'.format(fileName))
     df = pd.read_csv(fileName)
@@ -648,7 +646,7 @@ labels = sortedRels
 labels1 = []
 val1 = []
 for ll in labels:
-    predKSValues = data_dir + "/histo_differences_KScurve_" + ll[1] + "__{:03d}".format(nbFiles) + ".txt"
+    predKSValues = pathNb_files + "/histo_differences_KScurve_" + ll[1] + "__{:03d}".format(nbFiles) + ".txt"
     print("values file : %s" % predKSValues)
     wPredKSVal = open(predKSValues, 'r')
     LinesKSVal = wPredKSVal.readlines()

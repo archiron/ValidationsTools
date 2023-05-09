@@ -34,12 +34,12 @@ if len(sys.argv) > 1:
     print("step 4 - arg. 0 :", sys.argv[0]) # name of the script
     print("step 4 - arg. 2 :", sys.argv[1]) # COMMON files path
     print("step 4 - arg. 4 :", sys.argv[2]) # FileName for paths
-    commonPath = sys.argv[1]
+    pathCommonFiles = sys.argv[1]
     filePaths = sys.argv[2]
-    workPath=sys.argv[1][:-12]
+    pathLIBS = sys.argv[1][:-12]
 else:
     print("rien")
-    resultPath = ''
+    pathBase = ''
 
 import pandas as pd
 import matplotlib
@@ -52,18 +52,18 @@ matplotlib.use('agg')
 print("func_Extract")
 
 # Import module
-loader = importlib.machinery.SourceFileLoader( filePaths, commonPath+filePaths )
+loader = importlib.machinery.SourceFileLoader( filePaths, pathCommonFiles+filePaths )
 spec = importlib.util.spec_from_loader( filePaths, loader )
 blo = importlib.util.module_from_spec( spec )
 loader.exec_module( blo )
 print('DATA_SOURCE : %s' % blo.DATA_SOURCE)
-resultPath = blo.RESULTFOLDER 
-print('result path : {:s}'.format(resultPath))
+pathBase = blo.RESULTFOLDER 
+print('result path : {:s}'.format(pathBase))
 
-Chilib_path = workPath + '/' + blo.LIB_SOURCE # checkFolderName(blo.LIB_SOURCE) # sys.argv[1]
-print('Lib path : {:s}'.format(Chilib_path))
-sys.path.append(Chilib_path)
-sys.path.append(commonPath)
+pathChiLib = pathLIBS + '/' + blo.LIB_SOURCE # checkFolderName(blo.LIB_SOURCE) # sys.argv[1]
+print('Lib path : {:s}'.format(pathChiLib))
+sys.path.append(pathChiLib)
+sys.path.append(pathCommonFiles)
 
 import default as dfo
 from default import *
@@ -73,16 +73,15 @@ from sources import *
 from graphicAutoEncoderFunctions import *
 from graphicFunctions import getHisto, getHistoConfEntry, fill_Snew2, fill_Snew
 
-resultPath += '/' + str(NB_EVTS)
-resultPath = checkFolderName(resultPath)
-print('resultPath : {:s}'.format(resultPath))
-resultPath = checkFolderName(resultPath)
-folder = resultPath + checkFolderName(dfo.folder)
+pathNb_evts = pathBase + '/' + str(NB_EVTS)
+pathNb_evts = checkFolderName(pathNb_evts)
+print('pathNb_evts : {:s}'.format(pathNb_evts))
+pathCase = pathNb_evts + checkFolderName(dfo.folder)
 
 # get the branches for ElectronMcSignalHistos.txt
 ######## ===== COMMON LINES ===== ########
 branches = []
-source = Chilib_path + "/HistosConfigFiles/ElectronMcSignalHistos.txt"
+source = pathChiLib + "/HistosConfigFiles/ElectronMcSignalHistos.txt"
 branches = getBranches(tp_1, source)
 cleanBranches(branches) # remove some histo wich have a pbm with KS.
 ######## ===== COMMON LINES ===== ########
@@ -95,19 +94,19 @@ N_histos = len(branches)
 print('N_histos : %d' % N_histos)
     
 # create folder 
-if not os.path.exists(folder):
+if not os.path.exists(pathCase):
     try:
-        os.makedirs(folder)
+        os.makedirs(pathCase)
     except OSError as e:
         if e.errno != errno.EEXIST: # the folder did not exist
             raise  # raises the error again
-    print('Creation of %s release folder\n' % folder)
+    print('Creation of %s release folder\n' % pathCase)
 else:
-    print('Folder %s already created\n' % folder)
+    print('Folder %s already created\n' % pathCase)
 
 # get list of the added ROOT files
-rootFolderName = workPath + '/' + blo.DATA_SOURCE # '/pbs/home/c/chiron/private/KS_Tools/GenExtract/DATA/NewFiles'
-rootFilesList = getListFiles(rootFolderName, 'root')
+pathDATA = pathLIBS + '/' + blo.DATA_SOURCE # '/pbs/home/c/chiron/private/KS_Tools/GenExtract/DATA/NewFiles'
+rootFilesList = getListFiles(pathDATA, 'root')
 print('we use the files :')
 for item in rootFilesList:
     tmp_branch = []
@@ -115,7 +114,7 @@ for item in rootFilesList:
     print('%s' % item)
     b = (item.split('__')[2]).split('-')
     rels.append([b[0], b[0][6:]])
-    f_root = ROOT.TFile(rootFolderName + item)
+    f_root = ROOT.TFile(pathDATA + item)
     h1 = getHisto(f_root, tp_1)
     for i in range(0, N_histos): # 1 N_histos histo for debug
         histo_1 = h1.Get(branches[i])
@@ -154,17 +153,17 @@ print('N_histos : %d' % N_histos)
 sortedRels = sorted(rels, key = lambda x: x[0]) # gives an array with releases sorted
 
 # get list of generated ROOT files
-rootFilesList_0 = getListFiles(resultPath, 'root')
+rootFilesList_0 = getListFiles(pathNb_evts, 'root')
 print('there is ' + '{:03d}'.format(len(rootFilesList_0)) + ' generated ROOT files')
 nbFiles = change_nbFiles(len(rootFilesList_0), nbFiles)
-folder += '{:03d}'.format(nbFiles)
-folder = checkFolderName(folder)
-print('folder après check : %s' % folder)
-checkFolder(folder)
-folderKS = folder + 'KS'
-folderKS =checkFolderName(folderKS)
-print('folder KS après check : %s' % folderKS)
-checkFolder(folderKS)
+pathNb_files = pathCase + '{:03d}'.format(nbFiles)
+pathNb_files = checkFolderName(pathNb_files)
+print('pathNb_files après check : %s' % pathNb_files)
+checkFolder(pathNb_files)
+pathKS = pathNb_files + 'KS'
+pathKS =checkFolderName(pathKS)
+print('folder KS après check : %s' % pathKS)
+checkFolder(pathKS)
 
 tic = time.time()
 
@@ -176,8 +175,8 @@ for elem in sortedRels:
     rel = elem[1]
 
     # get the KS file datas
-    KS_diffName = folder + "/histo_differences_KScurve" + "_" + rel + "_" + '_{:03d}'.format(nbFiles) + ".txt"
-    pValue_Name = folder + "/histo_pValues" + "_" + rel + ".txt"
+    KS_diffName = pathNb_files + "/histo_differences_KScurve" + "_" + rel + "_" + '_{:03d}'.format(nbFiles) + ".txt"
+    pValue_Name = pathNb_files + "/histo_pValues" + "_" + rel + ".txt"
     if exists(KS_diffName):
         print('%s existe'%KS_diffName)
     else:
@@ -233,7 +232,7 @@ for ind in df1.index:
     print(branch)
     val = list(a[1:])
     #print(val)
-    pictureName = folderKS + 'comparison_KS_values_' + branch + '_{:03d}'.format(nbFiles) +'.png' # 
+    pictureName = pathKS + 'comparison_KS_values_' + branch + '_{:03d}'.format(nbFiles) +'.png' # 
     print(pictureName)
     title = r"$\bf{" + branch + "}$" + ' : Comparison of KS diff values as function of releases.'
     createCompLossesPicture(labels,val, pictureName, title)
@@ -247,7 +246,7 @@ for ind in df2.index:
     print(branch)
     val = list(a[1:])
     #print(val)
-    pictureName = folderKS + 'comparison_pValues_' + branch + '_{:03d}'.format(nbFiles) +'.png' # 
+    pictureName = pathKS + 'comparison_pValues_' + branch + '_{:03d}'.format(nbFiles) +'.png' # 
     print(pictureName)
     title = r"$\bf{" + branch + "}$" + ' : Comparison of KS pValues as function of releases.'
     createCompPValuesPicture(labels,val, pictureName, title)

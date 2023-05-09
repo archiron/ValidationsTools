@@ -33,12 +33,12 @@ if len(sys.argv) > 1:
     print("step 4 - arg. 0 :", sys.argv[0]) # name of the script
     print("step 4 - arg. 2 :", sys.argv[1]) # COMMON files path
     print("step 4 - arg. 4 :", sys.argv[2]) # FileName for paths
-    commonPath = sys.argv[1]
+    pathCommonFiles = sys.argv[1]
     filePaths = sys.argv[2]
-    workPath=sys.argv[1][:-12]
+    pathLIBS = sys.argv[1][:-12]
 else:
     print("rien")
-    resultPath = ''
+    pathBase = ''
 
 import pandas as pd
 import numpy as np
@@ -54,17 +54,17 @@ from matplotlib import pyplot as plt
 print("\nKSvalidation")
 
 # Import module
-loader = importlib.machinery.SourceFileLoader( filePaths, commonPath+filePaths )
+loader = importlib.machinery.SourceFileLoader( filePaths, pathCommonFiles+filePaths )
 spec = importlib.util.spec_from_loader( filePaths, loader )
 blo = importlib.util.module_from_spec( spec )
 loader.exec_module( blo )
 print('DATA_SOURCE : %s' % blo.DATA_SOURCE)
-resultPath = blo.RESULTFOLDER 
-print('result path : {:s}'.format(resultPath))
+pathBase = blo.RESULTFOLDER 
+print('result path : {:s}'.format(pathBase))
 
-Chilib_path = workPath + '/' + blo.LIB_SOURCE # checkFolderName(blo.LIB_SOURCE) # sys.argv[1]
-sys.path.append(Chilib_path)
-sys.path.append(commonPath)
+pathChiLib = pathLIBS + '/' + blo.LIB_SOURCE # checkFolderName(blo.LIB_SOURCE) # sys.argv[1]
+sys.path.append(pathChiLib)
+sys.path.append(pathCommonFiles)
 
 import default as dfo
 from default import *
@@ -84,17 +84,16 @@ tl = Tools()
 gr = Graphic()
 valEnv_d = env_default()
 
-resultPath += '/' + str(NB_EVTS)
-resultPath = checkFolderName(resultPath)
-print('resultPath : {:s}'.format(resultPath))
-resultPath = checkFolderName(resultPath)
+pathNb_evts = pathBase + '/' + str(NB_EVTS)
+pathNb_evts = checkFolderName(pathNb_evts)
+print('pathNb_evts : {:s}'.format(pathNb_evts))
 #folder = checkFolderName(dfo.folder)
-folder = resultPath + checkFolderName(dfo.folder)
+pathCase = pathNb_evts + checkFolderName(dfo.folder)
 
 # get the branches for ElectronMcSignalHistos.txt
 ######## ===== COMMON LINES ===== ########
 branches = []
-source = Chilib_path + "/HistosConfigFiles/ElectronMcSignalHistos.txt"
+source = pathChiLib + "/HistosConfigFiles/ElectronMcSignalHistos.txt"
 branches = getBranches(tp_1, source)
 cleanBranches(branches) # remove some histo wich have a pbm with KS.
 ######## ===== COMMON LINES ===== ########
@@ -107,19 +106,19 @@ N_histos = len(branches)
 print('N_histos : %d' % N_histos)
 
 # create folder 
-if not os.path.exists(folder):
+if not os.path.exists(pathCase):
     try:
-        os.makedirs(folder)
+        os.makedirs(pathCase)
     except OSError as e:
         if e.errno != errno.EEXIST: # the folder did not exist
             raise  # raises the error again
-    print('Creation of %s release folder\n' % folder)
+    print('Creation of %s release folder\n' % pathCase)
 else:
-    print('Folder %s already created\n' % folder)
+    print('Folder %s already created\n' % pathCase)
 
 # get list of added ROOT files for comparison
-rootFolderName = workPath + '/' + blo.DATA_SOURCE # '/pbs/home/c/chiron/private/KS_Tools/GenExtract/DATA/NewFiles'
-rootFilesList = getListFiles(rootFolderName, 'root')
+pathDATA = pathLIBS + '/' + blo.DATA_SOURCE # '/pbs/home/c/chiron/private/KS_Tools/GenExtract/DATA/NewFiles'
+rootFilesList = getListFiles(pathDATA, 'root')
 print('we use the files :')
 for item in rootFilesList:
     tmp_branch = []
@@ -127,7 +126,7 @@ for item in rootFilesList:
     print('\n%s' % item)
     b = (item.split('__')[2]).split('-')
     rels.append([b[0], b[0][6:], item])
-    f_root = ROOT.TFile(rootFolderName + item)
+    f_root = ROOT.TFile(pathDATA + item)
     h_rel = getHisto(f_root, tp_1)
     for i in range(0, N_histos): # 1 N_histos histo for debug
         histo_rel = h_rel.Get(branches[i])
@@ -164,25 +163,25 @@ if (len(branches) != len(newBranches)):
 print('N_histos : %d' % N_histos)
 
 # get list of generated ROOT files
-rootFilesList_0 = getListFiles(resultPath, 'root')
+rootFilesList_0 = getListFiles(pathNb_evts, 'root')
 print('there is ' + '{:03d}'.format(len(rootFilesList_0)) + ' ROOT files')
 nbFiles = change_nbFiles(len(rootFilesList_0), nbFiles)
 
-folder += '{:03d}'.format(nbFiles)
-folder = checkFolderName(folder)
-checkFolder(folder)
-folderNB = folder
-folderKS = folder + 'KS'
-folderKS =checkFolderName(folderKS)
-checkFolder(folderKS)
+pathNb_files = pathCase + '{:03d}'.format(nbFiles)
+pathNb_files = checkFolderName(pathNb_files)
+checkFolder(pathNb_files)
+folderNB = pathNb_files
+pathKS = pathNb_files + 'KS'
+pathKS =checkFolderName(pathKS)
+checkFolder(pathKS)
 
 sortedRels = sorted(rels, key = lambda x: x[0]) # gives an array with releases sorted
 
-folderDBox = folderKS + 'DBox'
-folderDBox =checkFolderName(folderDBox)
-checkFolder(folderDBox)
+pathDBox = pathKS + 'DBox'
+pathDBox =checkFolderName(pathDBox)
+checkFolder(pathDBox)
 
-f_KSref = ROOT.TFile(rootFolderName + input_ref_file)
+f_KSref = ROOT.TFile(pathDATA + input_ref_file)
 print('we use the %s file as KS reference' % input_ref_file)
 h_KSref = getHisto(f_KSref, tp_1)
 Release = input_ref_file.split('-')[0]
@@ -191,7 +190,7 @@ shortRelease = Release[6:] # get the KS reference release without the "CMSSW_"
 
 # get histoConfig file
 histoArray = []
-hCF = Chilib_path + '/HistosConfigFiles/ElectronMcSignalHistos.txt'
+hCF = pathChiLib + '/HistosConfigFiles/ElectronMcSignalHistos.txt'
 fCF = open(hCF, 'r') # histo Config file
 for line in fCF:
     if (len(line) != 0):
@@ -215,16 +214,16 @@ for i in range(0, len(histoArray)): # 1 N_histos histo for debug len(histoArray)
             rel = elem[1]
             file = elem[2]
 
-            gif_name = folderDBox + short_histo_names[0] + '_' + rel + ".gif"
+            gif_name = pathDBox + short_histo_names[0] + '_' + rel + ".gif"
             short_png_name = short_histo_names[0] + '_' + rel+ "_n.png"
-            png_name = folderDBox + short_png_name # for DB yellow curves
+            png_name = pathDBox + short_png_name # for DB yellow curves
             short_png_cumul_name = short_histo_names[0] + '_' + rel+ "_cum.png"
-            png_cumul_name = folderDBox + short_png_cumul_name # for DB yellow curves
-            config_target_name = folderDBox + 'definitions_' + rel+ ".txt"
+            png_cumul_name = pathDBox + short_png_cumul_name # for DB yellow curves
+            config_target_name = pathDBox + 'definitions_' + rel+ ".txt"
 
             # get the "new" root file datas
             input_rel_file = file
-            f_rel = ROOT.TFile(rootFolderName + input_rel_file)
+            f_rel = ROOT.TFile(pathDATA + input_rel_file)
             h1 = getHisto(f_rel, tp_1)
             histo_1 = h1.Get(short_histo_names[0]) #
             histo_2 = h_KSref.Get(short_histo_names[0]) #
@@ -243,11 +242,11 @@ for i in range(0, len(histoArray)): # 1 N_histos histo for debug len(histoArray)
                 datas.append('')
                 datas.append('ElectronMcSignalHistos.txt') # can be other histo file
                 tl.createDefinitionsFile(datas, config_target_name)
-                DB.generateExplanation(folderDBox)
+                DB.generateExplanation(pathDBox)
 
-            fHisto = open(folderDBox + short_histo_name + '_' + rel + '.txt', 'w') # web page
+            fHisto = open(pathDBox + short_histo_name + '_' + rel + '.txt', 'w') # web page
             fHisto.write('<table border="1" bordercolor=green cellpadding="2" style="margin-left:auto;margin-right:auto">' + '\n')
-            KS_Path1 = folderDBox.replace('/sps/cms/chiron/Validations/', 'https://llrvalidation.in2p3.fr/') # /sps/cms/chiron/Validations/ /data_CMS/cms/chiron/Validations/
+            KS_Path1 = pathDBox.replace('/sps/cms/chiron/Validations/', 'https://llrvalidation.in2p3.fr/') # /sps/cms/chiron/Validations/ /data_CMS/cms/chiron/Validations/
             KS_Path0 = folderNB # 
             KS_values_1 = DB.decisionBox1(short_histo_names[0], histo_1, histo_2, KS_Path0, rel) # , shortRelease
             KS_values_2 = DB.decisionBox2(short_histo_names[0], histo_1, histo_2, KS_Path0, rel) # , shortRelease

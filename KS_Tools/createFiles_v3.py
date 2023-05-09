@@ -32,14 +32,14 @@ from ROOT import *
 if len(sys.argv) > 1:
     print(sys.argv)
     print("step 4 - arg. 0 :", sys.argv[0]) # name of the script
-    print("step 4 - arg. 2 :", sys.argv[1]) # COMMON files path
-    print("step 4 - arg. 4 :", sys.argv[2]) # FileName for paths
-    commonPath = sys.argv[1]
+    print("step 4 - arg. 1 :", sys.argv[1]) # COMMON files path
+    print("step 4 - arg. 2 :", sys.argv[2]) # FileName for paths
+    pathCommonFiles = sys.argv[1]
     filePaths = sys.argv[2]
-    workPath=sys.argv[1][:-12]
+    pathLIBS = sys.argv[1][:-12]
 else:
     print("rien")
-    resultPath = ''
+    pathBase = ''
 
 import pandas as pd
 import numpy as np
@@ -52,20 +52,20 @@ from matplotlib import pyplot as plt
 # these line for daltonians !
 #seaborn.set_palette('colorblind')
 
-print("\nextractFiles_v3")
+print("\ncreateFiles_v3")
 
 # Import module
-loader = importlib.machinery.SourceFileLoader( filePaths, commonPath+filePaths )
+loader = importlib.machinery.SourceFileLoader( filePaths, pathCommonFiles+filePaths )
 spec = importlib.util.spec_from_loader( filePaths, loader )
 blo = importlib.util.module_from_spec( spec )
 loader.exec_module( blo )
 print('DATA_SOURCE : %s' % blo.DATA_SOURCE)
-resultPath = blo.RESULTFOLDER 
-print('result path : {:s}'.format(resultPath))
+pathBase = blo.RESULTFOLDER 
+print('result path : {:s}'.format(pathBase))
 
-Chilib_path = workPath + '/' + blo.LIB_SOURCE # checkFolderName(blo.LIB_SOURCE) # sys.argv[1]
-sys.path.append(Chilib_path)
-sys.path.append(commonPath)
+pathChiLib = pathLIBS + '/' + blo.LIB_SOURCE # checkFolderName(blo.LIB_SOURCE) # sys.argv[1]
+sys.path.append(pathChiLib)
+sys.path.append(pathCommonFiles)
 
 import default as dfo
 from default import *
@@ -76,17 +76,16 @@ from graphicAutoEncoderFunctions import GraphicKS
 from DecisionBox import DecisionBox
 from sources import *
 
-resultPath += '/' + str(NB_EVTS)
-resultPath = checkFolderName(resultPath)
-print('resultPath : {:s}'.format(resultPath))
-resultPath = checkFolderName(resultPath)
+pathNb_evts = pathBase + '/' + str(NB_EVTS)
+pathNb_evts = checkFolderName(pathNb_evts)
+print('pathNb_evts : {:s}'.format(pathNb_evts))
 #folder = checkFolderName(dfo.folder)
-folder = resultPath + checkFolderName(dfo.folder)
+pathCase = pathNb_evts + checkFolderName(dfo.folder)
 
 # get the branches for ElectronMcSignalHistos.txt
 ######## ===== COMMON LINES ===== ########
 branches = []
-source = Chilib_path + "/HistosConfigFiles/ElectronMcSignalHistos.txt"
+source = pathChiLib + "/HistosConfigFiles/ElectronMcSignalHistos.txt"
 branches = getBranches(tp_1, source)
 cleanBranches(branches) # remove some histo wich have a pbm with KS.
 ######## ===== COMMON LINES ===== ########
@@ -101,19 +100,19 @@ N_histos = len(branches)
 print('N_histos : %d' % N_histos)
 
 # create folder 
-if not os.path.exists(folder):
+if not os.path.exists(pathCase):
     try:
-        os.makedirs(folder)
+        os.makedirs(pathCase)
     except OSError as e:
         if e.errno != errno.EEXIST: # the folder did not exist
             raise  # raises the error again
-    print('Creation of %s release folder\n' % folder)
+    print('Creation of %s release folder\n' % pathCase)
 else:
-    print('Folder %s already created\n' % folder)
+    print('Folder %s already created\n' % pathCase)
 
 # get list of added ROOT files for comparison
-rootFolderName = workPath + '/' + blo.DATA_SOURCE # '/pbs/home/c/chiron/private/KS_Tools/GenExtract/DATA/NewFiles'
-rootFilesList = getListFiles(rootFolderName, 'root')
+pathDATA = pathLIBS + '/' + blo.DATA_SOURCE # '/pbs/home/c/chiron/private/KS_Tools/GenExtract/DATA/NewFiles'
+rootFilesList = getListFiles(pathDATA, 'root')
 print('we use the files :')
 for item in rootFilesList:
     tmp_branch = []
@@ -122,7 +121,7 @@ for item in rootFilesList:
     b = (item.split('__')[2]).split('-')
     #print('%s - %s' % (b[0], b[0][6:]))
     rels.append([b[0], b[0][6:], item])
-    f_root = ROOT.TFile(rootFolderName + item)
+    f_root = ROOT.TFile(pathDATA + item)
     h_rel = getHisto(f_root, tp_1)
     for i in range(0, N_histos): # 1 N_histos histo for debug
         histo_rel = h_rel.Get(branches[i])
@@ -159,18 +158,18 @@ if (len(branches) != len(newBranches)):
 print('N_histos : %d' % N_histos)
 
 # get list of generated ROOT files
-rootFilesList_0 = getListFiles(resultPath, 'root')
+rootFilesList_0 = getListFiles(pathNb_evts, 'root')
 print('there is ' + '{:03d}'.format(len(rootFilesList_0)) + ' ROOT files')
 nbFiles = change_nbFiles(len(rootFilesList_0), nbFiles)
 
-folder += '{:03d}'.format(nbFiles)
-folder = checkFolderName(folder)
-checkFolder(folder)
-folderKS = folder + 'KS'
-folderKS =checkFolderName(folderKS)
-checkFolder(folderKS)
+pathNb_files = pathCase + '{:03d}'.format(nbFiles)
+pathNb_files = checkFolderName(pathNb_files)
+checkFolder(pathNb_files)
+pathKS = pathNb_files + 'KS'
+pathKS =checkFolderName(pathKS)
+checkFolder(pathKS)
 
-source_dest = folder + "/ElectronMcSignalHistos.txt"
+source_dest = pathNb_files + "/ElectronMcSignalHistos.txt"
 shutil.copy2(source, source_dest)
 
 #print('-')
@@ -180,7 +179,7 @@ sortedRels = sorted(rels, key = lambda x: x[0]) # gives an array with releases s
 #print('-')
 #LOG_SOURCE_WORK= #'/pbs/home/c/chiron/private/KS_Tools/GenExtract/DATA/NewFiles/'
 # get the "reference" root file datas
-f_KSref = ROOT.TFile(rootFolderName + input_ref_file)
+f_KSref = ROOT.TFile(pathDATA + input_ref_file)
 print('we use the %s file as KS reference' % input_ref_file)
 
 if (ind_reference == -1): 
@@ -195,17 +194,17 @@ wKSp_Files = []
 for elem in sortedRels:
     rel = elem[1]
     
-    KS_diffName = folder + "/histo_differences_KScurve" + "_" + rel + "_" + '_{:03d}'.format(nbFiles) + ".txt"
+    KS_diffName = pathNb_files + "/histo_differences_KScurve" + "_" + rel + "_" + '_{:03d}'.format(nbFiles) + ".txt"
     print("KSname 1 : %s" % KS_diffName)
     wKS0 = open(KS_diffName, 'w')
     wKS0_Files.append(wKS0)
 
-    KS_resume = folder + "/histo_resume" + "_" + rel + ".txt"
+    KS_resume = pathNb_files + "/histo_resume" + "_" + rel + ".txt"
     print("KSname 0 : %s" % KS_resume)
     wKS_ = open(KS_resume, 'w')
     wKS__Files.append(wKS_)
 
-    KS_pValues = folder + "/histo_pValues" + "_" + rel + ".txt"
+    KS_pValues = pathNb_files + "/histo_pValues" + "_" + rel + ".txt"
     print("KSname 2 : %s" % KS_pValues)
     wKSp = open(KS_pValues, 'w')
     wKSp_Files.append(wKSp)
@@ -223,7 +222,7 @@ for i in range(0, N_histos): # 1 N_histos histo for debug
     histo_rel = h_rel.Get(branches[i])
     if (histo_rel):
         print('%s OK' % branches[i])
-        name = resultPath + "histo_" + branches[i] + '_{:03d}'.format(nbFiles) + ".txt"
+        name = pathNb_evts + "histo_" + branches[i] + '_{:03d}'.format(nbFiles) + ".txt"
         print('\n%d - %s' %(i, name))
         df = pd.read_csv(name)
     
@@ -301,7 +300,7 @@ for i in range(0, N_histos): # 1 N_histos histo for debug
 
             # get the "new" root file datas
             input_rel_file = file
-            f_rel = ROOT.TFile(rootFolderName + input_rel_file)
+            f_rel = ROOT.TFile(pathDATA + input_rel_file)
             print('we use the %s file as new release' % input_rel_file)
 
             nb_red1 = 0
@@ -340,9 +339,9 @@ for i in range(0, N_histos): # 1 N_histos histo for debug
                 continue
 
             # create file for KS curve
-            KSname1 = folder + "/histo_" + branches[i] + "_KScurve1" + "_" + rel + ".txt"
-            KSname2 = folder + "/histo_" + branches[i] + "_KScurve2" + "_" + rel + ".txt"
-            KSname3 = folder + "/histo_" + branches[i] + "_KScurve3" + "_" + rel + ".txt"
+            KSname1 = pathNb_files + "/histo_" + branches[i] + "_KScurve1" + "_" + rel + ".txt"
+            KSname2 = pathNb_files + "/histo_" + branches[i] + "_KScurve2" + "_" + rel + ".txt"
+            KSname3 = pathNb_files + "/histo_" + branches[i] + "_KScurve3" + "_" + rel + ".txt"
             print("KSname 1 : %s" % KSname1)
             print("KSname 2 : %s" % KSname2)
             print("KSname 3 : %s" % KSname3)
@@ -374,7 +373,7 @@ for i in range(0, N_histos): # 1 N_histos histo for debug
                 series0 = df_entries.iloc[k,:]
                 curves = DB.funcKS(series0)
                 plt.plot(curves)
-            fig.savefig(folderKS + '/cumulative_curve_' + branches[i] + "_" + rel + '.png')
+            fig.savefig(pathKS + '/cumulative_curve_' + branches[i] + "_" + rel + '.png')
             fig.clf()
         
             # ================================ #
@@ -412,18 +411,18 @@ for i in range(0, N_histos): # 1 N_histos histo for debug
 
             # Kolmogoroff-Smirnov curve
             seriesTotalDiff1 = pd.DataFrame(totalDiff, columns=['KSDiff'])
-            KSDiffname1 = folder + '/KSDiffValues_1_' + branches[i] + "_" + rel+ '.txt' # csv imposed by pd.to_csv + "_" + rel 
+            KSDiffname1 = pathNb_files + '/KSDiffValues_1_' + branches[i] + "_" + rel+ '.txt' # csv imposed by pd.to_csv + "_" + rel 
             df.to_csv(KSDiffname1)
             print('\ndiffMin0/sTD.min 1 : %f/%f' % (diffMax0, seriesTotalDiff1.values.min()))
             print('\ndiffMax0/sTD.max 1 : %f/%f' % (diffMax0, seriesTotalDiff1.values.max()))
 
-            fileName1 = folderKS + '/KS-ttlDiff_1_' + branches[i] + "_" + rel + '.png'
+            fileName1 = pathKS + '/KS-ttlDiff_1_' + branches[i] + "_" + rel + '.png'
             [nb_green1, nb_red1] = grKS.createKSttlDiffPicture(totalDiff, nbins, diffMax0,'KS diff. 1', fileName1)
 
             count, division = np.histogram(seriesTotalDiff1[~np.isnan(seriesTotalDiff1)], bins=nbins)
             div_min = np.amin(division)
             div_max = np.amax(division)
-            KSDiffHistoname1 = folder + '/KSDiffHistoValues_1_' + branches[i] + "_" + rel + '.txt'
+            KSDiffHistoname1 = pathNb_files + '/KSDiffHistoValues_1_' + branches[i] + "_" + rel + '.txt'
             wKSDiff1 = open(KSDiffHistoname1, 'w')
             wKSDiff1.write(' '.join("{:10.04e}".format(x) for x in count))
             wKSDiff1.write('\n')
@@ -453,13 +452,13 @@ for i in range(0, N_histos): # 1 N_histos histo for debug
             print('\ndiffMin0/sTD.min 1 : %f/%f' % (diffMax0, seriesTotalDiff2.values.min()))
             print('\ndiffMax0/sTD.max 2 : %f/%f' % (diffMax0, seriesTotalDiff2.values.max()))
 
-            fileName2 = folderKS + '/KS-ttlDiff_2_' + branches[i] + "_" + rel + '.png'
+            fileName2 = pathKS + '/KS-ttlDiff_2_' + branches[i] + "_" + rel + '.png'
             [nb_green2, nb_red2] = grKS.createKSttlDiffPicture(totalDiff2, nbins, diffMax0,'KS diff. 2', fileName2)
 
             count, division = np.histogram(seriesTotalDiff2, bins=nbins)
             div_min = np.amin(division)
             div_max = np.amax(division)
-            KSDiffHistoname2 = folder + '/KSDiffHistoValues_2_' + branches[i] + "_" + rel + '.txt'
+            KSDiffHistoname2 = pathNb_files + '/KSDiffHistoValues_2_' + branches[i] + "_" + rel + '.txt'
             wKSDiff2 = open(KSDiffHistoname2, 'w')
             wKSDiff2.write(' '.join("{:10.04e}".format(x) for x in count))
             wKSDiff2.write('\n')
@@ -493,13 +492,13 @@ for i in range(0, N_histos): # 1 N_histos histo for debug
             print('\ndiffMin0/sTD.min 3 : %f/%f' % (diffMax0, seriesTotalDiff3.values.min()))
             print('diffMax0/sTD.max 3 : %f/%f' % (diffMax0, seriesTotalDiff3.values.max()))
             
-            fileName3 = folderKS + '/KS-ttlDiff_3_' + branches[i] + "_" + rel + '.png'
+            fileName3 = pathKS + '/KS-ttlDiff_3_' + branches[i] + "_" + rel + '.png'
             [nb_green3, nb_red3] = grKS.createKSttlDiffPicture(totalDiff3, nbins, diffMax0,'KS diff. 3', fileName3)
             
             count, division = np.histogram(seriesTotalDiff3, bins=nbins)
             div_min = np.amin(division)
             div_max = np.amax(division)
-            KSDiffHistoname3 = folder + '/KSDiffHistoValues_3_' + branches[i] + "_" + rel + '.txt'
+            KSDiffHistoname3 = pathNb_files + '/KSDiffHistoValues_3_' + branches[i] + "_" + rel + '.txt'
             wKSDiff3 = open(KSDiffHistoname3, 'w')
             wKSDiff3.write(' '.join("{:10.04e}".format(x) for x in count))
             wKSDiff3.write('\n')

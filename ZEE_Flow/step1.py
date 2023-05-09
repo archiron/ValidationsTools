@@ -27,6 +27,7 @@ else:
     ind = 0
     path = ''
     max_number = 10 # number of events
+    initialSEED = "now"
 
 max_skipped = ind * max_number
 
@@ -172,13 +173,15 @@ process.generator = cms.EDFilter("Pythia8ConcurrentGeneratorFilter",
     pythiaPylistVerbosity = cms.untracked.int32(0)
 )
 
-if (initialSEED == "0"):
+if (initialSEED == "now"):
     now = datetime.now().microsecond
     process.RandomNumberGeneratorService.generator.initialSeed = cms.untracked.uint32(now)
     process.RandomNumberGeneratorService.g4SimHits.initialSeed  = cms.untracked.uint32(now)
+    print('using now : ',  now)
 else:
-    process.RandomNumberGeneratorService.generator.initialSeed = cms.untracked.uint32(initialSEED)
-    process.RandomNumberGeneratorService.g4SimHits.initialSeed  = cms.untracked.uint32(initialSEED)
+    process.RandomNumberGeneratorService.generator.initialSeed = cms.untracked.uint32(int(initialSEED))
+    process.RandomNumberGeneratorService.g4SimHits.initialSeed  = cms.untracked.uint32(int(initialSEED))
+    print('using initialseed : ', initialSEED)
 
 # Path and EndPath definitions
 process.generation_step = cms.Path(process.pgen)

@@ -11,7 +11,10 @@
 #                                                                              
 ################################################################################
 
-import sys
+import os,sys,shutil
+import importlib
+import importlib.machinery
+import importlib.util
 
 #import seaborn # only with cmsenv on cca.in2p3.fr
 
@@ -30,18 +33,29 @@ from ROOT import *
 if len(sys.argv) > 1:
     print(sys.argv)
     print("step 4 - arg. 0 :", sys.argv[0]) # name of the script
-    print("step 4 - arg. 1 :", sys.argv[1]) # LIB path
-    print("step 4 - arg. 2 :", sys.argv[2]) # COMMON files path
-    print("step 4 - arg. 3 :", sys.argv[3]) # RESULTFOLDER
-    resultPath = sys.argv[3]
+    print("step 4 - arg. 1 :", sys.argv[1]) # COMMON files path
+    print("step 4 - arg. 2 :", sys.argv[2]) # FileName for paths
+    pathCommonFiles = sys.argv[1]
+    filePaths = sys.argv[2]
+    pathLIBS = sys.argv[1][:-12]
 else:
     print("rien")
-    resultPath = ''
 
-Chilib_path = sys.argv[1]
-sys.path.append(Chilib_path)
-Common_path = sys.argv[2]
-sys.path.append(Common_path)
+print("\nextractValues")
+
+# Import module
+loader = importlib.machinery.SourceFileLoader( filePaths, pathCommonFiles+filePaths )
+spec = importlib.util.spec_from_loader( filePaths, loader )
+blo = importlib.util.module_from_spec( spec )
+loader.exec_module( blo )
+pathBase = blo.RESULTFOLDER 
+print('result path : {:s}'.format(pathBase))
+
+pathChiLib = pathLIBS + '/' + blo.LIB_SOURCE # checkFolderName(blo.LIB_SOURCE) # sys.argv[1]
+print('pathChiLib : {:s}'.format(pathChiLib))
+print('pathCommonFiles : {:s}'.format(pathCommonFiles))
+sys.path.append(pathChiLib)
+sys.path.append(pathCommonFiles)
 
 from default import *
 from rootValues import NB_EVTS
@@ -51,15 +65,15 @@ from graphicFunctions import getHisto, getHistoConfEntry
 # get the branches for ElectronMcSignalHistos.txt
 ######## ===== COMMON LINES ===== ########
 branches = []
-source = Chilib_path + "/HistosConfigFiles/ElectronMcSignalHistos.txt"
+source = pathChiLib + "/HistosConfigFiles/ElectronMcSignalHistos.txt"
 branches = getBranches(tp_1, source)
 cleanBranches(branches) # remove some histo wich have a pbm with KS.
 ######## ===== COMMON LINES ===== ########
 
 print("func_Extract")
-resultPath += '/' + str(NB_EVTS)
-resultPath = checkFolderName(resultPath)
-print('resultPath : {:s}'.format(resultPath))
+pathNb_evts = pathBase + '/' + str(NB_EVTS)
+pathNb_evts = checkFolderName(pathNb_evts)
+print('pathNb_evts : {:s}'.format(pathNb_evts))
 
 wr = []
 histos = {}
@@ -70,7 +84,7 @@ histos = {}
 for leaf in branches:
     histos[leaf] = []
     
-fileList = getListFiles(resultPath) # get the list of the root files in the folderName folder
+fileList = getListFiles(pathNb_evts) # get the list of the root files in the folderName folder
 if (len(fileList) ==0 ):
     print('there is no generated ROOT files')
     exit()
@@ -83,12 +97,12 @@ print(fileList)
 nbFiles = change_nbFiles(len(fileList), nbFiles)
 
 for elem in fileList:
-    input_file = resultPath + str(elem.split()[0])
-    name_1 = input_file.replace(resultPath, '').replace('DQM_V0001_R000000001__Global__CMSSW_X_Y_Z__RECO_', '').replace('.root', '')
+    input_file = pathNb_evts + str(elem.split()[0])
+    name_1 = input_file.replace(pathNb_evts, '').replace('DQM_V0001_R000000001__Global__CMSSW_X_Y_Z__RECO_', '').replace('.root', '')
     print('\n %s - name_1 : %s' % (input_file, name_1))
     #print('\n %s - name_1 : %s' % (input_file, colorText(name_1, 'lightyellow')))
     
-    f_root = ROOT.TFile(input_file) # 'DATA/' + 
+    f_root = ROOT.TFile(input_file) # 
     h1 = getHisto(f_root, tp_1)
     #h1.ls() # OK
     for leaf in branches:
@@ -137,7 +151,7 @@ i_leaf = 0
 for leaf in branches:
     histo = h1.Get(leaf)
     if (histo):
-        fileName = resultPath + 'histo_' + str(leaf) + '_' + '{:03d}'.format(nbFiles) + '.txt'
+        fileName = pathNb_evts + 'histo_' + str(leaf) + '_' + '{:03d}'.format(nbFiles) + '.txt'
         print('fileName : %s' % fileName)
         wr.append(open(fileName, 'w'))
         nb_max = len(histos[leaf][0]) - 1

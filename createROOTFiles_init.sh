@@ -79,7 +79,7 @@ echo "LOG_OUTPUT : $LOG_OUTPUT"
 echo "RESULTFOLDER : $RESULTFOLDER"
 
 mkdir -p $RESULTFOLDER
-initialSEED="0" # must be commented if not used
+initialSEED=123456 # must be "now" or an integer such as 123456
 
 if [[ "$Choice" == "LLR" ]] 
   then
@@ -99,7 +99,7 @@ elif [[ "$Choice" == "PBS" ]]
     eval `scramv1 runtime -sh`
     for i in $(eval echo "{$Nbegin..$Nend}") #  $(eval echo "{$Nbegin..$Nend}")
     do
-      sbatch -L sps -n 8 --mem=4000 -t 0-1:0:0 -J $JobName -o $output createROOTFiles.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER $initialSEED
+      sbatch -L sps -n 8 --mem=8000 -t 0-6:0:0 -J $JobName -o $output createROOTFiles.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER $initialSEED
     done
 fi
 

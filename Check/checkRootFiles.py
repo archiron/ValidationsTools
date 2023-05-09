@@ -33,32 +33,32 @@ if len(sys.argv) > 1:
     print("step 4 - arg. 1 :", sys.argv[1]) # COMMON files path
     print("step 4 - arg. 2 :", sys.argv[2]) # Check Folder
     print("step 5 - arg. 3 :", sys.argv[3]) # FileName for paths
-    commonPath = sys.argv[1]
-    workPath=sys.argv[2][:-6]
+    pathCommonFiles = sys.argv[1]
+    pathLIBS=sys.argv[2][:-6]
     filePaths = sys.argv[3]
 else:
     print("rien")
-    resultPath = ''
+    pathBase = ''
 
 import pandas as pd
 import numpy as np
 
 # Import module
-loader = importlib.machinery.SourceFileLoader( filePaths, commonPath+filePaths )
+loader = importlib.machinery.SourceFileLoader( filePaths, pathCommonFiles+filePaths )
 spec = importlib.util.spec_from_loader( filePaths, loader )
 blo = importlib.util.module_from_spec( spec )
 loader.exec_module( blo )
 
-resultPath = blo.RESULTFOLDER 
-print('result path : {:s}'.format(resultPath))
-Chilib_path = workPath + '/' + blo.LIB_SOURCE # checkFolderName(blo.LIB_SOURCE) # sys.argv[1]
-print('Lib path : {:s}'.format(Chilib_path))
-dataPath = workPath + '/' + blo.DATA_SOURCE
-print('DATA_SOURCE : %s' % dataPath)
+pathBase = blo.RESULTFOLDER 
+print('result path : {:s}'.format(pathBase))
+pathChiLib = pathLIBS + '/' + blo.LIB_SOURCE # checkFolderName(blo.LIB_SOURCE) # sys.argv[1]
+print('Lib path : {:s}'.format(pathChiLib))
+pathDATA = pathLIBS + '/' + blo.DATA_SOURCE
+print('DATA_SOURCE : %s' % pathDATA)
 
-sys.path.append(Chilib_path)
-sys.path.append(commonPath)
-sys.path.append(dataPath)
+sys.path.append(pathChiLib)
+sys.path.append(pathCommonFiles)
+sys.path.append(pathDATA)
 
 import default as dfo
 from rootValues import NB_EVTS
@@ -68,31 +68,30 @@ from DecisionBox import DecisionBox
 from default import *
 from sources import *
 
-#folder = resultPath + checkFolderName(dfo.folder)
-resultPath += '/' + str(NB_EVTS)
-resultPath = checkFolderName(resultPath)
-print('resultPath : {:s}'.format(resultPath))
-folder = resultPath + checkFolderName(dfo.folder)
-resultPath = checkFolderName(resultPath)
-dataPath = checkFolderName(dataPath)
+#folder = pathBase + checkFolderName(dfo.folder)
+pathNb_evts = pathBase + '/' + str(NB_EVTS)
+pathNb_evts = checkFolderName(pathNb_evts)
+print('pathNb_evts : {:s}'.format(pathNb_evts))
+pathCase = pathNb_evts + checkFolderName(dfo.folder)
+pathDATA = checkFolderName(pathDATA)
 
 # get the branches for ElectronMcSignalHistos.txt
 ######## ===== COMMON LINES ===== ########
 branches = []
-source = Chilib_path + "/HistosConfigFiles/ElectronMcSignalHistos.txt"
+source = pathChiLib + "/HistosConfigFiles/ElectronMcSignalHistos.txt"
 branches = getBranches(tp_1, source)
 cleanBranches(branches) # remove some histo wich have a pbm with KS.
 ######## ===== COMMON LINES ===== ########
 
 print("func_Extract")
-resultPath = checkFolderName(resultPath)    
+#pathNb_evts = checkFolderName(pathNb_evts)    
 DB = DecisionBox()
 
 N_histos = len(branches)
 print('N_histos : %d' % N_histos)
 
 # get the list of the generated ROOT files
-fileList = getListFiles(resultPath, 'root') # get the list of the root files in the folderName folder
+fileList = getListFiles(pathNb_evts, 'root') # get the list of the root files in the folderName folder
 fileList.sort()
 print('list of the generated ROOT files')
 print('there is ' + '{:03d}'.format(len(fileList)) + ' ROOT files')
@@ -109,8 +108,8 @@ for elem in fileList:
     tmp_branch = []
     nbHistosPass1 = 0
     
-    input_file = resultPath + str(elem.split()[0])
-    name_1 = input_file.replace(resultPath, '').replace('DQM_V0001_R000000001__Global__CMSSW_X_Y_Z__RECO_', '').replace('.root', '')
+    input_file = pathNb_evts + str(elem.split()[0])
+    name_1 = input_file.replace(pathNb_evts, '').replace('DQM_V0001_R000000001__Global__CMSSW_X_Y_Z__RECO_', '').replace('.root', '')
     print('\n %s - name_1 : %s' % (input_file, name_1))
     #print('\n %s - name_1 : %s' % (input_file, colorText(name_1, 'lightyellow')))
     f_root = ROOT.TFile(input_file)
@@ -152,7 +151,7 @@ else:
     newBranches = optimizeBranches(tmp_branches)
 
 # get list of added ROOT files for comparison
-rootFolderName = workPath + '/' + blo.DATA_SOURCE # '/pbs/home/c/chiron/private/KS_Tools/GenExtract/DATA/NewFiles'
+rootFolderName = pathLIBS + '/' + blo.DATA_SOURCE # '/pbs/home/c/chiron/private/KS_Tools/GenExtract/DATA/NewFiles'
 rootFilesList = getListFiles(rootFolderName, 'root')
 print('\nlist of the added ROOT files')
 print('we use the files :')
@@ -209,8 +208,8 @@ for elem in fileList:
     tmp_branch = []
     nbHistosPass2 = 0
     
-    input_file = resultPath + str(elem.split()[0])
-    name_1 = input_file.replace(resultPath, '').replace('DQM_V0001_R000000001__Global__CMSSW_X_Y_Z__RECO_', '').replace('.root', '')
+    input_file = pathNb_evts + str(elem.split()[0])
+    name_1 = input_file.replace(pathNb_evts, '').replace('DQM_V0001_R000000001__Global__CMSSW_X_Y_Z__RECO_', '').replace('.root', '')
     print('\n %s - name_1 : %s' % (input_file, name_1))
     #print('\n %s - name_1 : %s' % (input_file, colorText(name_1, 'lightyellow')))
     f_root = ROOT.TFile(input_file)
@@ -255,7 +254,7 @@ else:
     newBranches = optimizeBranches(tmp_branches)
 
 # get list of added ROOT files for comparison
-rootFolderName = workPath + '/' + blo.DATA_SOURCE # '/pbs/home/c/chiron/private/KS_Tools/GenExtract/DATA/NewFiles'
+rootFolderName = pathLIBS + '/' + blo.DATA_SOURCE # '/pbs/home/c/chiron/private/KS_Tools/GenExtract/DATA/NewFiles'
 rootFilesList = getListFiles(rootFolderName, 'root')
 print('\nlist of the added ROOT files')
 print('we use the files :')
@@ -323,7 +322,7 @@ for i in range(0, N_histos): # 1 N_histos histo for debug
     histo_1 = h1.Get(branches[i])
     if (histo_1):
         #print('%s OK PASS 3' % branches[i])
-        name = resultPath + "histo_" + branches[i] + '_{:03d}'.format(nbFiles) + ".txt"
+        name = pathNb_evts + "histo_" + branches[i] + '_{:03d}'.format(nbFiles) + ".txt"
         #print('\n%d - %s' %(i, name))
         df = pd.read_csv(name)
         #print('\n' + branches[i]) # print histo name
