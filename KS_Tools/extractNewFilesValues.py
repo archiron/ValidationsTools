@@ -111,7 +111,7 @@ for item in rootFilesList:
 N_histos = len(branches)
 print('N_histos : %d' % N_histos)
 
-KS_resume = pathNb_files + "branchesHistos_NewFiles.txt"
+KS_resume = pathNb_files + "/branchesHistos_NewFiles.txt"
 print("KSname 0 : %s" % KS_resume)
 wKS_ = open(KS_resume, 'w')
 

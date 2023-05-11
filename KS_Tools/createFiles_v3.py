@@ -210,14 +210,22 @@ for elem in sortedRels:
     wKSp_Files.append(wKSp)
 
 nbRels = len(sortedRels)
-redGreen1 = [[0 for c in range(nbRels)] for r in range(2)]
-redGreen2 = [[0 for c in range(nbRels)] for r in range(2)]
-redGreen3 = [[0 for c in range(nbRels)] for r in range(2)]
-
+redGreen1 = [[0 for c in range(2)] for r in range(nbRels)]
+redGreen2 = [[0 for c in range(2)] for r in range(nbRels)]
+redGreen3 = [[0 for c in range(2)] for r in range(nbRels)]
+'''
+print('{:d}/2 '.format(nbRels))
+for i in range(0, nbRels):
+    for j in range(0, 2):
+        print('{:d}/{:d} : {:d}'.format(i,j,redGreen1[i][j]))
+for i in range(0, nbRels):
+    for j in range(0, 2):
+        print('{:d}/{:d} : {:d}'.format(i,j,redGreen2[i][j]))
+'''
 tic = time.time()
 
 for i in range(0, N_histos): # 1 N_histos histo for debug
-    print(branches[i]) # print histo name
+    print('histo : {:s}'.format(branches[i])) # print histo name
     
     histo_rel = h_rel.Get(branches[i])
     if (histo_rel):
@@ -292,8 +300,10 @@ for i in range(0, N_histos): # 1 N_histos histo for debug
         #print(s_KSref)
         Ntot_h_KSref = histo_KSref.GetEntries()
 
+        print('\nWorking with sorted rels\n')
         ind_rel = 0
         for elem in sortedRels:
+            print('[ind_rel/nbRels] : [{:d}/{:d}]'.format(ind_rel, nbRels))
             print(elem)
             rel = elem[1]
             file = elem[2]
@@ -547,6 +557,7 @@ for i in range(0, N_histos): # 1 N_histos histo for debug
             nb_red = nb_red1 + nb_red2 + nb_red3
             nb_green = nb_green1 + nb_green2 + nb_green3
             print('KS ttl : %d red - %d green for %s' % (nb_red, nb_green, branches[i]))
+            print('[ind_rel/nbRels] : [{:d}/{:d}]'.format(ind_rel, nbRels))
             wKS__Files[ind_rel].write('KS 1 : %d red - %d green for %s\n' % (nb_red1, nb_green1, branches[i]))
             wKS__Files[ind_rel].write('KS 2 : %d red - %d green for %s\n' % (nb_red2, nb_green2, branches[i]))
             wKS__Files[ind_rel].write('KS 3 : %d red - %d green for %s\n' % (nb_red3, nb_green3, branches[i]))

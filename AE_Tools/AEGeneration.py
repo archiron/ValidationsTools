@@ -34,7 +34,7 @@ if len(sys.argv) > 1:
     print("AEGeneration - arg. 6 :", sys.argv[6]) # timeFolder
     pathCommonFiles = sys.argv[1]
     filePaths = sys.argv[2]
-    pathLIBS=sys.argv[1][:-12]
+    pathLIBS = sys.argv[1][:-12]
     nbBranches = int(sys.argv[3])
     branch = sys.argv[4][1:]
     print('branch : {:s}'.format(branch))
@@ -140,7 +140,7 @@ pathAE = pathNb_files + '/AE_RESULTS/'
 print('data_res path : {:s}'.format(pathAE))
 
 # get list of added ROOT files
-pathDATA = pathNb_evts + '/' + blo.DATA_SOURCE # '/pbs/home/c/chiron/private/KS_Tools/GenExtract/DATA/NewFiles'
+pathDATA = pathLIBS + '/' + blo.DATA_SOURCE # '/pbs/home/c/chiron/private/KS_Tools/GenExtract/DATA/NewFiles'
 rootFilesList = getListFiles(pathDATA, 'root')
 print('there is ' + '{:03d}'.format(len(rootFilesList)) + ' added ROOT files')
 for item in rootFilesList:
@@ -154,7 +154,7 @@ for elem in sortedRels:
 #pathKSFiles = pathNb_files
 #print('KS path : %s' % pathKSFiles)
 KSlistFiles = []
-tmp = getListFiles(pathNB_files, 'txt')
+tmp = getListFiles(pathNb_files, 'txt')
 for elem in tmp:
     if (elem[5:10] == '_diff'): # to keep only histo_differences_KScurves files
         KSlistFiles.append(elem)
@@ -163,7 +163,7 @@ print(KSlistFiles, len(KSlistFiles))
 for item in KSlistFiles:
     print('file : %s' % item)
     aa = item.split('__')[0]
-    fileName = pathNB_files + '/' + item
+    fileName = pathNb_files + '/' + item
     file1 = open(fileName, 'r')
     bb = file1.readlines()
     for elem in bb:
