@@ -244,36 +244,37 @@ for i in range(0, len(histoArray)): # 1 N_histos histo for debug len(histoArray)
                 tl.createDefinitionsFile(datas, config_target_name)
                 DB.generateExplanation(pathDBox)
 
-            fHisto = open(pathDBox + short_histo_name + '_' + rel + '.txt', 'w') # web page
-            fHisto.write('<table border="1" bordercolor=green cellpadding="2" style="margin-left:auto;margin-right:auto">' + '\n')
-            KS_Path1 = pathDBox.replace('/sps/cms/chiron/Validations/', 'https://llrvalidation.in2p3.fr/') # /sps/cms/chiron/Validations/ /data_CMS/cms/chiron/Validations/
-            KS_Path0 = folderNB # 
-            KS_values_1 = DB.decisionBox1(short_histo_names[0], histo_1, histo_2, KS_Path0, rel) # , shortRelease
-            KS_values_2 = DB.decisionBox2(short_histo_names[0], histo_1, histo_2, KS_Path0, rel) # , shortRelease
-            KS_values_3 = DB.decisionBox3(short_histo_names[0], histo_1, histo_2, KS_Path0, rel) # , shortRelease
+            if (histo_2):
+                fHisto = open(pathDBox + short_histo_name + '_' + rel + '.txt', 'w') # web page
+                fHisto.write('<table border="1" bordercolor=green cellpadding="2" style="margin-left:auto;margin-right:auto">' + '\n')
+                KS_Path1 = pathDBox.replace('/sps/cms/chiron/Validations/', 'https://llrvalidation.in2p3.fr/') # /sps/cms/chiron/Validations/ /data_CMS/cms/chiron/Validations/
+                KS_Path0 = folderNB # 
+                KS_values_1 = DB.decisionBox1(short_histo_names[0], histo_1, histo_2, KS_Path0, rel) # , shortRelease
+                KS_values_2 = DB.decisionBox2(short_histo_names[0], histo_1, histo_2, KS_Path0, rel) # , shortRelease
+                KS_values_3 = DB.decisionBox3(short_histo_names[0], histo_1, histo_2, KS_Path0, rel) # , shortRelease
 
-            if (len(KS_values_1) > 5):
-                yellowCurves = [ KS_values_1[5] ]
-                yellowCurvesCum = [ KS_values_1[6] ]
-                ycFlag = True
-        
-            print('ycFlag : {:s}/{:s} : {:d}'.format(short_histo_names[0], rel, ycFlag))
-            gr.PictureChoice(histo_1, histo_2, histo_positions[1], histo_positions[2], gif_name, 0) # 
+                if (len(KS_values_1) > 5):
+                    yellowCurves = [ KS_values_1[5] ]
+                    yellowCurvesCum = [ KS_values_1[6] ]
+                    ycFlag = True
+            
+                print('ycFlag : {:s}/{:s} : {:d}'.format(short_histo_names[0], rel, ycFlag))
+                gr.PictureChoice(histo_1, histo_2, histo_positions[1], histo_positions[2], gif_name, 0) # 
 
-            if ycFlag:
-                gr.PictureChoice_DB( histo_1, histo_2, histo_positions[1], histo_positions[2], png_name, 0, yellowCurves)
-                gr.PictureChoice_DB3(histo_1, histo_2, histo_positions[1], histo_positions[2], png_cumul_name, 0, yellowCurvesCum)
+                if ycFlag:
+                    gr.PictureChoice_DB( histo_1, histo_2, histo_positions[1], histo_positions[2], png_name, 0, yellowCurves)
+                    gr.PictureChoice_DB3(histo_1, histo_2, histo_positions[1], histo_positions[2], png_cumul_name, 0, yellowCurvesCum)
 
-                percentage = 0.05
-                #if ( KS_values_1[4] >= percentage ):
-                if ( KS_values_3[1] >= percentage ):
-                    DB_picture = valEnv_d.imageOK() # color = 'green'
-                else:
-                    DB_picture = valEnv_d.imageKO() # color = 'red'
-            KS_V = [KS_values_1, KS_values_2, KS_values_3]
-            #KS_V = [KS_values_1]
-            Names = [short_histo_name, gif_name, short_histo_names[0], short_png_name, short_png_cumul_name]
-            DB.DBwebPage2(fHisto, Names, KS_V, DB_picture, KS_Path1, ycFlag) # , KS_Path0, rel, shortReference, self.webURL, self.shortWebFolder, dataSetFolder
+                    percentage = 0.05
+                    #if ( KS_values_1[4] >= percentage ):
+                    if ( KS_values_3[1] >= percentage ):
+                        DB_picture = valEnv_d.imageOK() # color = 'green'
+                    else:
+                        DB_picture = valEnv_d.imageKO() # color = 'red'
+                KS_V = [KS_values_1, KS_values_2, KS_values_3]
+                #KS_V = [KS_values_1]
+                Names = [short_histo_name, gif_name, short_histo_names[0], short_png_name, short_png_cumul_name]
+                DB.DBwebPage2(fHisto, Names, KS_V, DB_picture, KS_Path1, ycFlag) # , KS_Path0, rel, shortReference, self.webURL, self.shortWebFolder, dataSetFolder
 
         fHisto.close()
 

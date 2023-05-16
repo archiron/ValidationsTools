@@ -37,7 +37,7 @@ if len(sys.argv) > 1:
     print("resumeAE - arg. 3 :", sys.argv[3]) # timeFolder
     pathCommonFiles = sys.argv[1]
     filePaths = sys.argv[2]
-    pathLIBS=sys.argv[1][:-12]
+    pathLIBS = sys.argv[1][:-12]
     timeFolder = sys.argv[3]
 else:
     print("rien")
@@ -96,14 +96,15 @@ cleanBranches(branches) # remove some histo wich have a pbm with KS.
 ######## ===== COMMON LINES ===== ########
 
 nbBranches = len(branches) # [0:8]
-print('there is {:03d} datasets'.format(nbBranches))
+print('there is {:03d} datasets'.format(nbBranches)) # 263 branches
 
 pathNb_evts = pathBase + '/' + str(NB_EVTS)
 pathNb_evts = checkFolderName(pathNb_evts)
 print('pathNb_evts : {:s}'.format(pathNb_evts))
 
 # get list of generated ROOT files
-rootPath = '/data_CMS/cms/chiron/ROOT_Files/CMSSW_12_5_0_pre4/'
+rootPath = '/data_CMS/cms/chiron/ROOT_Files/CMSSW_12_5_0_pre5/' # for LLR
+rootPath = pathNb_evts # for CC
 rootFilesList_0 = getListFiles(rootPath, 'root')
 print('there is ' + '{:04d}'.format(len(rootFilesList_0)) + ' generated ROOT files')
 nbFiles = change_nbFiles(len(rootFilesList_0), nbFiles)
@@ -116,19 +117,6 @@ print('data_res path : {:s}'.format(data_res))
 
 t = datetime.datetime.today()
 tic= time.time()
-#timeFolder = time.strftime("%Y%m%d-%H%M%S")
-#timeFolder = '20221108-101911/' #3 DEV_2
-#timeFolder = '20221108-101702/' #4 DEV_2
-#timeFolder = '20221102-154453/' #5 DEV_2
-#timeFolder = '20221219-121255/' #3 DEV_3
-#timeFolder = '20221219-133455/' #4 DEV_3
-#timeFolder = '20230103-101222/' #3 DEV_3
-#timeFolder = '20230103-140600/' #4 DEV_3
-#timeFolder = '20230103-162931/' #5 DEV_3
-#timeFolder = '20230109-111639/' #3 DEV_3
-#timeFolder = '20230112-150730/' #5 DEV_3
-#timeFolder = '20230412-163943/' #3 DEV_6
-#timeFolder = '20230413-090707/' #3 DEV_6
 
 ####### Loss prediction #######
 AEfolderName = createAEfolderName(hidden_size_1, hidden_size_2, hidden_size_3, hidden_size_4, useHL3, useHL4, latent_size)
@@ -137,6 +125,8 @@ checkFolder(folderName)
 print('\nComplete folder name : {:s}'.format(folderName))
 
 loopMaxValue = nbBranches #25 # nbBranches
+branch = {}
+branch0 = {}
 for i in range(0, loopMaxValue):
     #print('{:s}\n'.format(branches[i]))
     df = []
@@ -149,14 +139,18 @@ for i in range(0, loopMaxValue):
         #print('end of %s' % branches[i])
         rels = df[1].to_numpy()
         arrayValues[branches[i]] = df[0]
+        branch[branches[i]] = i
     else:
         print('{:s} does not exist'.format(Name))
         continue
 print('branches : {:d}'.format(len(branches)))
-branch = {}
 for i in range(0, loopMaxValue):
-    branch[branches[i]] = i
-#print(branch)
+    branch0[branches[i]] = i
+'''print(branch)
+print(len(branch)) # 254 datasets
+print(branch0)
+print(len(branch0)) # 263 datasets
+'''
 
 ####### Pictures creation #######
 folderPictures = folderName + '/Pictures/' + timeFolder
@@ -190,7 +184,7 @@ for i in range(0, loopMaxValue):
     miniRel = sortedRels[i].strip()
     miniRel = miniRel[6:]
     fileName = "/histo_pValues_" + miniRel + ".txt"
-    Name = pathKS + fileName
+    Name = pathNb_files + fileName
     if Path(Name).exists():
         #print('{:s} exist'.format(Name))
         df = pd.read_csv(Name, header=None)
@@ -225,9 +219,10 @@ for ind in range(0,loopMaxValue):
 ####### Differences #######
 folderPictures = pathNb_files + '/KS/' + AEfolderName + '/' + timeFolder
 checkFolder(folderPictures)
-print('\KS folder name : {:s}'.format(pathKS))
+print('\picture folder name : {:s}'.format(folderPictures))
 differences = pd.DataFrame()
 loopMaxValue = len(sortedRels)
+branch2 = {}
 for i in range(0, loopMaxValue):
     histos2 = []
     diff1 = []
@@ -235,9 +230,9 @@ for i in range(0, loopMaxValue):
     miniRel = sortedRels[i].strip()
     miniRel = miniRel[6:]
     fileName = "/histo_differences_KScurve_" + miniRel + "__" + str(nbFiles) + ".txt"
-    Name = pathKS + fileName
+    Name = pathNb_files + fileName
     if Path(Name).exists():
-        #print('{:s} exist'.format(Name))
+        print('{:s} exist'.format(Name))
         diff_file = open(Name, 'r')
         lines = diff_file.readlines()
         #print('end of %s' % sortedRels[i])
@@ -252,14 +247,18 @@ for i in range(0, loopMaxValue):
         continue
     #print('{:d} : histos2 : {:d}'.format(i, len(histos2)))
 print('histos2 : {:d}'.format(len(histos2)))
-branch2 = {}
 for i in range(0, len(histos2)):
     #print('histo : {:s}'.format(histos2[i]))
-    branch2[histos2[i]] = branch[histos2[i]]
+    branch2[histos2[i]] = branch0[histos2[i]]
 
-#print(branch2)
+'''print(branch)
+print(branch2)
+print(len(branch))
+print(len(branch2))'''
 print(differences.head())
 aa1 = differences.to_numpy().transpose()
+#print(np.shape(aa))
+#print(np.shape(aa1))
 
 fileName = folderPictures + '/Summary_differences_releaseEvolution.png'
 print('creation pf {:s}'.format(fileName))
@@ -277,12 +276,12 @@ print('=== Dynamic export ===')
 branch3 = list(set(branch) - set(branch2))
 #for elem in branch3:
 #    print('branch3 : ', elem)
-print(len(branch))
+'''print(len(branch))
 print(len(branch2))
 print(len(branch3))
 print(type(branch))
 print(type(branch2))
-print(type(branch3))
+print(type(branch3))'''
 #for k,v in branch2.items():
 #    print(k,v)
 
