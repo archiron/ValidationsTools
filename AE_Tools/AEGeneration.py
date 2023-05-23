@@ -201,9 +201,9 @@ print('\n===\ndevice : {:s}\n===\n'.format(str(device)))
 #timeFolder = time.strftime("%Y%m%d-%H%M%S") # only kept for tests
 
 HL = [hidden_size_1, hidden_size_2, hidden_size_3, hidden_size_4, hidden_size_5, hidden_size_6, hidden_size_7]
-useHL = [useHL3, useHL4, useHL5, useHL6, useHL7]
-#folderName = pathAE + createAEfolderName(hidden_size_1, hidden_size_2, hidden_size_3, hidden_size_4, useHL3, useHL4, latent_size)
-folderName = pathAE + createAEfolderName2(HL, useHL, latent_size)
+useHL = [1, 1, useHL3, useHL4, useHL5, useHL6, useHL7] # useHL1/HL2 always = 1.
+#folderName = pathAE + createAEfolderName1(hidden_size_1, hidden_size_2, hidden_size_3, hidden_size_4, useHL3, useHL4, latent_size)
+folderName = pathAE + createAEfolderName(HL, useHL, latent_size)
 checkFolder(folderName)
 print('\nComplete folder name : {:s}'.format(folderName))
 
