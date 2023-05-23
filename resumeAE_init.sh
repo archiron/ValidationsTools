@@ -4,8 +4,6 @@
 JobName="generateAE_serial_job_test" # for slurm
 output="/sps/cms/chiron/TEMP/generateAE_%j.log" # for slurm
 
-timeFolder="$(date +"%Y%m%d-%H%M%S")"
-
 declare -a readarray
 
 aa=$PWD
@@ -70,7 +68,7 @@ if [[ "$Choice" == "LLR" ]]
     module load python/3.7.0
     cd $LOG_SOURCE
     options="-reserv" # -short -long -reserv
-    /opt/exp_soft/cms/t3/t3submit -8c $options resumeAE.sh $LOG_AE_SOURCE $COMMON_SOURCE $FileName $timeFolder # $LOG_SOURCE 
+    /opt/exp_soft/cms/t3/t3submit -8c $options resumeAE.sh $LOG_AE_SOURCE $COMMON_SOURCE $FileName '20230522-175054' 
 elif [[ "$Choice" == "PBS" ]] 
   then
     echo "PBS"
@@ -78,7 +76,7 @@ elif [[ "$Choice" == "PBS" ]]
     source /pbs/home/c/chiron/private/ValidationsTools/ValidationsTools/bin/activate 
     cd $LOG_SOURCE
 
-    sbatch -L sps -n 4 --mem=16000 -t 4-0:0:0 -J $JobName -o $output resumeAE.sh $LOG_AE_SOURCE $COMMON_SOURCE $FileName '20230515-104902'
+    sbatch -L sps -n 4 --mem=16000 -t 4-0:0:0 -J $JobName -o $output resumeAE.sh $LOG_AE_SOURCE $COMMON_SOURCE $FileName '20230522-175054'
     deactivate
 fi
 
