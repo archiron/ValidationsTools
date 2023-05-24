@@ -120,7 +120,7 @@ tic= time.time()
 
 ####### Loss prediction #######
 HL = [hidden_size_1, hidden_size_2, hidden_size_3, hidden_size_4, hidden_size_5, hidden_size_6, hidden_size_7]
-useHL = [1, 1, useHL3, useHL4, useHL5, useHL6, useHL7] # useHL1/HL2 always = 1.
+useHL = [useHL1, useHL2, useHL3, useHL4, useHL5, useHL6, useHL7] # useHL1/HL2 always = 1.
 #AEfolderName = createAEfolderName1(hidden_size_1, hidden_size_2, hidden_size_3, hidden_size_4, useHL3, useHL4, latent_size)
 AEfolderName = createAEfolderName(HL, useHL, latent_size)
 
