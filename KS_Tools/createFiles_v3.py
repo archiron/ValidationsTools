@@ -117,7 +117,7 @@ print('we use the files :')
 for item in rootFilesList:
     tmp_branch = []
     nbHistos = 0
-    print('\n%s' % item)
+    #print('\n%s' % item)
     b = (item.split('__')[2]).split('-')
     #print('%s - %s' % (b[0], b[0][6:]))
     rels.append([b[0], b[0][6:], item])
@@ -126,7 +126,7 @@ for item in rootFilesList:
     for i in range(0, N_histos): # 1 N_histos histo for debug
         histo_rel = h_rel.Get(branches[i])
         if (histo_rel):
-            print('%s OK' % branches[i])
+            #print('%s OK' % branches[i])
             d = getHistoConfEntry(histo_rel)
             s_tmp = fill_Snew2(d, histo_rel)
             #s_tmp = fill_Snew(histo_rel)
@@ -224,7 +224,7 @@ for i in range(0, nbRels):
 '''
 tic = time.time()
 
-for i in range(0, N_histos): # 1 N_histos histo for debug
+for i in range(0, N_histos):# range(N_histos - 1, N_histos):  # 1 N_histos histo for debug
     print('histo : {:s}'.format(branches[i])) # print histo name
     
     histo_rel = h_rel.Get(branches[i])
@@ -426,9 +426,6 @@ for i in range(0, N_histos): # 1 N_histos histo for debug
             print('\ndiffMin0/sTD.min 1 : %f/%f' % (diffMax0, seriesTotalDiff1.values.min()))
             print('\ndiffMax0/sTD.max 1 : %f/%f' % (diffMax0, seriesTotalDiff1.values.max()))
 
-            fileName1 = pathKS + '/KS-ttlDiff_1_' + branches[i] + "_" + rel + '.png'
-            [nb_green1, nb_red1] = grKS.createKSttlDiffPicture(totalDiff, nbins, diffMax0,'KS diff. 1', fileName1)
-
             count, division = np.histogram(seriesTotalDiff1[~np.isnan(seriesTotalDiff1)], bins=nbins)
             div_min = np.amin(division)
             div_max = np.amax(division)
@@ -457,13 +454,13 @@ for i in range(0, N_histos): # 1 N_histos histo for debug
             wKS1.write('\n')
             wKS1.close()
 
+            fileName1 = pathKS + '/KS-ttlDiff_1_' + branches[i] + "_" + rel + '.png'
+            [nb_green1, nb_red1] = grKS.createKSttlDiffPicture(totalDiff, nbins, diffMax0,'KS diff. 1', fileName1, pValue, I_max)
+
             # Kolmogoroff-Smirnov curve 2
             seriesTotalDiff2 = pd.DataFrame(totalDiff2, columns=['KSDiff'])
             print('\ndiffMin0/sTD.min 1 : %f/%f' % (diffMax0, seriesTotalDiff2.values.min()))
             print('\ndiffMax0/sTD.max 2 : %f/%f' % (diffMax0, seriesTotalDiff2.values.max()))
-
-            fileName2 = pathKS + '/KS-ttlDiff_2_' + branches[i] + "_" + rel + '.png'
-            [nb_green2, nb_red2] = grKS.createKSttlDiffPicture(totalDiff2, nbins, diffMax0,'KS diff. 2', fileName2)
 
             count, division = np.histogram(seriesTotalDiff2, bins=nbins)
             div_min = np.amin(division)
@@ -497,13 +494,13 @@ for i in range(0, N_histos): # 1 N_histos histo for debug
             wKS2.write('\n')
             wKS2.close()
 
+            fileName2 = pathKS + '/KS-ttlDiff_2_' + branches[i] + "_" + rel + '.png'
+            [nb_green2, nb_red2] = grKS.createKSttlDiffPicture(totalDiff2, nbins, diffMax0,'KS diff. 2', fileName2, pValue2, I_max2)
+
             # Kolmogoroff-Smirnov curve 3
             seriesTotalDiff3 = pd.DataFrame(totalDiff3, columns=['new'])
             print('\ndiffMin0/sTD.min 3 : %f/%f' % (diffMax0, seriesTotalDiff3.values.min()))
             print('diffMax0/sTD.max 3 : %f/%f' % (diffMax0, seriesTotalDiff3.values.max()))
-            
-            fileName3 = pathKS + '/KS-ttlDiff_3_' + branches[i] + "_" + rel + '.png'
-            [nb_green3, nb_red3] = grKS.createKSttlDiffPicture(totalDiff3, nbins, diffMax0,'KS diff. 3', fileName3)
             
             count, division = np.histogram(seriesTotalDiff3, bins=nbins)
             div_min = np.amin(division)
@@ -549,6 +546,9 @@ for i in range(0, N_histos): # 1 N_histos histo for debug
             wKS3.write(' '.join("{:10.04e}".format(x) for x in yellowCurveCum3 ))
             wKS3.write('\n')
             wKS3.close()
+            
+            fileName3 = pathKS + '/KS-ttlDiff_3_' + branches[i] + "_" + rel + '.png'
+            [nb_green3, nb_red3] = grKS.createKSttlDiffPicture(totalDiff3, nbins, diffMax0,'KS diff. 3', fileName3, pValue3, I_max3)
 
             # print nb of red/green lines
             print('KS 1 : %d red - %d green for %s' % (nb_red1, nb_green1, branches[i]))

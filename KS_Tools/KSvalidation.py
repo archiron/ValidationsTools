@@ -123,7 +123,7 @@ print('we use the files :')
 for item in rootFilesList:
     tmp_branch = []
     nbHistos = 0
-    print('\n%s' % item)
+    #print('\n%s' % item)
     b = (item.split('__')[2]).split('-')
     rels.append([b[0], b[0][6:], item])
     f_root = ROOT.TFile(pathDATA + item)
@@ -131,7 +131,7 @@ for item in rootFilesList:
     for i in range(0, N_histos): # 1 N_histos histo for debug
         histo_rel = h_rel.Get(branches[i])
         if (histo_rel):
-            print('%s OK' % branches[i])
+            #print('%s OK' % branches[i])
             d = getHistoConfEntry(histo_rel)
             s_tmp = fill_Snew2(d, histo_rel)
             #s_tmp = fill_Snew(histo_rel)
@@ -199,7 +199,7 @@ for line in fCF:
             #print(line)
 print('len(histoArray) : {:d} - N_histos : {:d}'.format(len(histoArray), N_histos))
 
-for i in range(0, len(histoArray)): # 1 N_histos histo for debug len(histoArray)
+for i in range(0, len(histoArray)): # range(len(histoArray) - 1, len(histoArray)): # 1 N_histos histo for debug len(histoArray)
     print(histoArray[i]) # print histo name
     
     short_histo_name, short_histo_names, histo_positions = tl.shortHistoName(histoArray[i])
@@ -210,7 +210,7 @@ for i in range(0, len(histoArray)): # 1 N_histos histo for debug len(histoArray)
         print('\nshort histo name : {:s}'.format(short_histo_names[0]))
         
         for elem in sortedRels:
-            print(elem)
+            print('release : %s' %elem)
             rel = elem[1]
             file = elem[2]
 
@@ -249,9 +249,13 @@ for i in range(0, len(histoArray)): # 1 N_histos histo for debug len(histoArray)
                 fHisto.write('<table border="1" bordercolor=green cellpadding="2" style="margin-left:auto;margin-right:auto">' + '\n')
                 KS_Path1 = pathDBox.replace('/sps/cms/chiron/Validations/', 'https://llrvalidation.in2p3.fr/') # /sps/cms/chiron/Validations/ /data_CMS/cms/chiron/Validations/
                 KS_Path0 = folderNB # 
-                KS_values_1 = DB.decisionBox1(short_histo_names[0], histo_1, histo_2, KS_Path0, rel) # , shortRelease
-                KS_values_2 = DB.decisionBox2(short_histo_names[0], histo_1, histo_2, KS_Path0, rel) # , shortRelease
-                KS_values_3 = DB.decisionBox3(short_histo_names[0], histo_1, histo_2, KS_Path0, rel) # , shortRelease
+                KS_values_1 = DB.decisionBox1(short_histo_names[0], histo_1, histo_2, KS_Path0, rel, nbFiles) # , shortRelease
+                KS_values_2 = DB.decisionBox2(short_histo_names[0], histo_1, histo_2, KS_Path0, rel, nbFiles) # , shortRelease
+                KS_values_3 = DB.decisionBox3(short_histo_names[0], histo_1, histo_2, KS_Path0, rel, nbFiles) # , shortRelease
+                #print(KS_values_1)
+                #print(KS_values_3)
+                print('KS values 1 : %f' % KS_values_1[4])
+                print('KS values 3 : %f' % KS_values_3[1])
 
                 if (len(KS_values_1) > 5):
                     yellowCurves = [ KS_values_1[5] ]
@@ -277,5 +281,7 @@ for i in range(0, len(histoArray)): # 1 N_histos histo for debug len(histoArray)
                 DB.DBwebPage2(fHisto, Names, KS_V, DB_picture, KS_Path1, ycFlag) # , KS_Path0, rel, shortReference, self.webURL, self.shortWebFolder, dataSetFolder
 
         fHisto.close()
+    else:
+        print('%s KO' % short_histo_names[0])
 
 print("Fin !\n")
