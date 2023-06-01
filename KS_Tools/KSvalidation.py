@@ -199,7 +199,7 @@ for line in fCF:
             #print(line)
 print('len(histoArray) : {:d} - N_histos : {:d}'.format(len(histoArray), N_histos))
 
-for i in range(0, len(histoArray)): # range(len(histoArray) - 1, len(histoArray)): # 1 N_histos histo for debug len(histoArray)
+for i in range(0, len(histoArray)): #, len(histoArray) - 1 range(len(histoArray) - 1, len(histoArray)): # 1 N_histos histo for debug len(histoArray)
     print(histoArray[i]) # print histo name
     
     short_histo_name, short_histo_names, histo_positions = tl.shortHistoName(histoArray[i])

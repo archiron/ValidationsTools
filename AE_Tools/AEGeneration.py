@@ -84,7 +84,7 @@ DB = DecisionBox()
 
 def createAutoEncoderRef(nbFiles, nbBranches, device, lr, epsilon, hidden_size_1, hidden_size_2, hidden_size_3, hidden_size_4, latent_size, batch_size, nb_epochs, percentageTrain):
     Text = []
-    Text.append(' <h1><center><b><font color=\'blue\'>AutoEncoder with {:d} files.</font></b></center></h1> <br>\n'.format(nbFiles))
+    Text.append(' <h1><center><b><font color=\'blue\'>AutoEncoder with {:d} ROOT files.</font></b></center></h1> <br>\n'.format(nbFiles))
     Text.append('<table border=\"1\" cellpadding=\"5\" width=\"100%\">\n')
     Text.append('<tr>\n')
     Text.append('<td>\n')
@@ -583,7 +583,7 @@ for elem in sortedLossesVal:
 textHisto += "\n</table>\n"
 textHisto += "</td>"
 pictureName = folderNamePict + '/comparison_loss_values_' + branch + '.png'
-title = r"$\bf{" + branch + "}$" + ' : Comparison of the losses values as function of releases.'
+title = r"$\bf{" + branch + "}$" + ' : Losses vs releases.'
 createCompLossesPicture(labels,val, pictureName, title)
 
 title='Latent ReleasesVsTrain comparison in 2 dim'
@@ -629,7 +629,7 @@ for j in range(0, len(sortedRels)):
     labels.append(sortedRels[j][1])
 
 fileName = folderNamePict + 'compLossesValuesVsKS_' + branch + '.png'
-title = r"$\bf{" + branch + "}$" + ' : Losses values vs KS pValues as function of releases.'
+title = r"$\bf{" + branch + "}$" + ' : Losses, KS pValues vs releases.'
 createCompLossesPicture2Axis(labels, Val1, Val2, fileName, title)
 
 # extract the values of originals curves from Lines
@@ -689,7 +689,7 @@ for l in labels1:
 if (len(val1) > 0):
     pictureName = folderNamePict + 'comparison_KSvsAE_' + branch + '_{:03d}'.format(nbFiles) +'.png' # 
     print(pictureName)
-    title = r"$\bf{" + branch + "}$" + ' : KS diff. max. values vs AE losses values as function of releases.'
+    title = r"$\bf{" + branch + "}$" + ' : KS diff. max., AE losses vs releases.'
     createCompKSvsAEPicture(labels2, val1, val2, pictureName, title)
     pictureName = folderNamePict + 'comparison_KSvsAE_2Axis_' + branch + '_{:03d}'.format(nbFiles) +'.png' # give a name whith data_CMS/cms/chiron/Validations/1000/DEV_01//004/AE_RESULTS/
     createCompKSvsAEPicture2Axis(labels2, val1, val2, pictureName, title) # same as above with 2 vert. axis instead of one.

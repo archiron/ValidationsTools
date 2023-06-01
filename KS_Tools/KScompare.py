@@ -234,7 +234,7 @@ for ind in df1.index:
     #print(val)
     pictureName = pathKS + 'comparison_KS_values_' + branch + '_{:03d}'.format(nbFiles) +'.png' # 
     print(pictureName)
-    title = r"$\bf{" + branch + "}$" + ' : Comparison of KS diff values as function of releases.'
+    title = r"$\bf{" + branch + "}$" + ' : KS diff values vs releases.'
     createCompLossesPicture(labels,val, pictureName, title)
     #if ind == 2:
     #    break
@@ -248,7 +248,7 @@ for ind in df2.index:
     #print(val)
     pictureName = pathKS + 'comparison_pValues_' + branch + '_{:03d}'.format(nbFiles) +'.png' # 
     print(pictureName)
-    title = r"$\bf{" + branch + "}$" + ' : Comparison of KS pValues as function of releases.'
+    title = r"$\bf{" + branch + "}$" + ' : KS pValues vs releases.'
     createCompPValuesPicture(labels,val, pictureName, title)
     #if ind == 2:
     #    break
