@@ -166,7 +166,7 @@ checkFolder(pathNb_files)
 #    print(elem)
 sortedRels = sorted(rels, key = lambda x: x[0]) # gives an array with releases sorted
 
-for i in range(0, N_histos): # 1 N_histos histo for debug
+for i in range(0, N_histos): #, N_histos-1 1 N_histos histo for debug
     print(branches[i]) # print histo name
 
     for elem in sortedRels:

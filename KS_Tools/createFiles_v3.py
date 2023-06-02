@@ -224,7 +224,7 @@ for i in range(0, nbRels):
 '''
 tic = time.time()
 
-for i in range(0, N_histos):# range(N_histos - 1, N_histos):  # 1 N_histos histo for debug
+for i in range(0, N_histos):#, N_histos-1 range(N_histos - 1, N_histos):  # 1 N_histos histo for debug
     print('histo : {:s}'.format(branches[i])) # print histo name
     
     histo_rel = h_rel.Get(branches[i])

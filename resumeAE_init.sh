@@ -1,8 +1,8 @@
 #!/bin/sh
 # This file is called . generateAE_init.sh
 
-JobName="generateAE_serial_job_test" # for slurm
-output="/sps/cms/chiron/TEMP/generateAE_%j.log" # for slurm
+JobName="resumeAE_serial_job_test" # for slurm
+output="/sps/cms/chiron/TEMP/resumeAE_%j.log" # for slurm
 
 declare -a readarray
 
@@ -76,7 +76,7 @@ elif [[ "$Choice" == "PBS" ]]
     source /pbs/home/c/chiron/private/ValidationsTools/ValidationsTools/bin/activate 
     cd $LOG_SOURCE
 
-    sbatch -L sps -n 4 --mem=16000 -t 4-0:0:0 -J $JobName -o $output resumeAE.sh $LOG_AE_SOURCE $COMMON_SOURCE $FileName '20230522-175054'
+    sbatch -L sps -n 4 --mem=16000 -t 0-6:0:0 -J $JobName -o $output resumeAE.sh $LOG_AE_SOURCE $COMMON_SOURCE $FileName '20230601-104753'
     deactivate
 fi
 
