@@ -94,6 +94,7 @@ DB = DecisionBox()
 grKS = GraphicKS()
 rels = []
 tmp_branches = []
+#tmp_branches2 = []
 nb_ttl_histos = []
 
 N_histos = len(branches)
@@ -132,15 +133,45 @@ for item in rootFilesList:
             #s_tmp = fill_Snew(histo_rel)
             if (s_tmp.min() < 0.):
                 print('pbm whith histo %s, min < 0' % branches[i])
+                tmp_branch.append('KOKO')
             elif (np.floor(s_tmp.sum()) == 0.):
                 print('pbm whith histo %s, sum = 0' % branches[i])
+                tmp_branch.append('KOKO')
             else:
                 nbHistos += 1
                 tmp_branch.append(branches[i])
         else:
-            print('%s KO' % branches[i])
+            print('{:s} : {:s} KO'.format(item, branches[i]))
+            tmp_branch.append('KOKO')
     nb_ttl_histos.append(nbHistos)
     tmp_branches.append(tmp_branch)
+
+'''for item in rootFilesList:
+    tmp_branch = []
+    nbHistos = 0
+    b = (item.split('__')[2]).split('-')
+    rels.append([b[0], b[0][6:], item])
+    f_root = ROOT.TFile(pathDATA + item)
+    h_rel = getHisto(f_root, tp_1)
+    for i in range(0, N_histos): # 1 N_histos histo for debug
+        histo_rel = h_rel.Get(branches[i])
+        if (histo_rel):
+            d = getHistoConfEntry(histo_rel)
+            s_tmp = fill_Snew2(d, histo_rel)
+            if (s_tmp.min() < 0.):
+                print('pbm whith histo %s, min < 0' % branches[i])
+                tmp_branch.append('KOKO')
+            elif (np.floor(s_tmp.sum()) == 0.):
+                print('pbm whith histo %s, sum = 0' % branches[i])
+                tmp_branch.append('KOKO')
+            else:
+                nbHistos += 1
+                tmp_branch.append(branches[i])
+        else:
+            print('{:s} : {:s} KO'.format(item, branches[i]))
+            tmp_branch.append('KOKO')
+    tmp_branches2.append(tmp_branch)
+newBranches2 = optimizeBranches2(tmp_branches2)'''
 
 print('nb_ttl_histos : ', nb_ttl_histos)
 if(len(set(nb_ttl_histos))==1):
@@ -229,9 +260,9 @@ for i in range(0, N_histos):#, N_histos-1 range(N_histos - 1, N_histos):  # 1 N_
     
     histo_rel = h_rel.Get(branches[i])
     if (histo_rel):
-        print('%s OK' % branches[i])
+        print('\n%s OK' % branches[i])
         name = pathNb_evts + "histo_" + branches[i] + '_{:03d}'.format(nbFiles) + ".txt"
-        print('\n%d - %s' %(i, name))
+        print('\n{:d}/{:d} - {:s}'.format(i, N_histos - 1, name))
         df = pd.read_csv(name)
     
         # check the values data
