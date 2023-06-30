@@ -367,6 +367,7 @@ HL = [hidden_size_1, hidden_size_2, hidden_size_3, hidden_size_4, hidden_size_5,
 useHL = [useHL1, useHL2, useHL3, useHL4, useHL5, useHL6, useHL7] # useHL1/HL2 always = 1.
 HL, useHL = extractLayerList(HL, useHL)
 
+'''
 if useHL7 == 1:
     encoder=Encoder7(device,latent_size,Ncols,hidden_size_1,hidden_size_2,hidden_size_3,hidden_size_4,hidden_size_5,hidden_size_6,hidden_size_7)
     decoder=Decoder7(device,latent_size,Ncols,hidden_size_1,hidden_size_2,hidden_size_3,hidden_size_4,hidden_size_5,hidden_size_6,hidden_size_7)
@@ -397,6 +398,11 @@ else: # 2 layers
     decoder=Decoder2(device,latent_size,Ncols,hidden_size_1,hidden_size_2)
     textHisto += 'using <b>2</b> layers encoder/decoder<br>\n'
     nbLayer = 2
+'''
+encoder = simpleEncoder(device,latent_size, Ncols, HL)
+decoder = simpleDecoder(device,latent_size, Ncols, HL)
+nbLayer = len(HL)
+textHisto += 'using <b>' + '{:d}'.format(nbLayer) + '</b> layers encoder/decoder<br>\n'
 
 encoder.to(device)
 decoder.to(device)
@@ -406,11 +412,12 @@ params_to_optimize = [
 {'params': decoder.parameters()}
 ]
 
-optim=torch.optim.Adam(params_to_optimize,lr=lr,weight_decay=1e-05)
+optim = torch.optim.Adam(params_to_optimize,lr=lr,weight_decay=1e-05)
 history_da = {'train_loss':[],'test_loss':[]}
-L_out = []
+#L_out = []
 LatentValues_Train = []
 LatentValues_Test = []
+LatentValues = {'train_loss':[],'test_loss':[]} # torch tensor cpu
 
 # Ready for calculation
 encoderName = folderNameLoader + "/mono_encoder_{:01d}_".format(nbLayer) + branch + "_{:03d}".format(nbFiles) + ".pth"
@@ -442,17 +449,29 @@ if ( useEncoder == 1):
 else:
     textHisto += 'Calculating encoder/decoder<br>\n'
     for epoch in range(nb_epochs):
-        train_loss, encoded_out=train_epoch_den(encoder=encoder, decoder=decoder,device=device,
-            dataloader=train_loader, loss_fn=loss_fn,optimizer=optim)
-        test_loss, d_out, latent_out=test_epoch_den(encoder=encoder, decoder=decoder,device=device,
-            dataloader=test_loader, loss_fn=loss_fn)
-        L_out.append(d_out)
-        LatentValues_Train.append(encoded_out.detach().numpy())
+        train_loss, encoded_out = train_epoch_den2(encoder=encoder, decoder=decoder, device=device, dataloader=train_loader, loss_fn=loss_fn,optimizer=optim)
+        test_loss, _, latent_out = test_epoch_den2(encoder=encoder, decoder=decoder, device=device, dataloader=test_loader, loss_fn=loss_fn)
+        #L_out.append(d_out)
+        LatentValues_Train.append(encoded_out) # .detach().numpy()
         LatentValues_Test.append(latent_out)
         #r = (train_loss - test_loss) / (train_loss + test_loss)
         #print('epoch : %03d : tr_lo = %e : te_lo = %e : r = %e' % (epoch, train_loss, test_loss, r))
         history_da['train_loss'].append(train_loss)
         history_da['test_loss'].append(test_loss)
+
+        # train_loss : torch tensor cpu - float
+        # test_loss : torch tensor cpu - float
+        # encoded_out : torch tensor GPU - tuple 2 elements
+        # d_out : torch tensor GPU - liste
+        # latent_out : torch tensor GPU - tuple 2 elements
+
+        '''print('train_loss :', type(train_loss), train_loss)
+        print('test_loss :', type(test_loss), test_loss)
+        print('encoded_out :', type(encoded_out), encoded_out, len(encoded_out))
+        print('LatentValues_Train :', type(LatentValues_Train), LatentValues_Train, len(LatentValues_Train))
+        print('LatentValues_Test :', type(LatentValues_Test), LatentValues_Test, len(LatentValues_Test))
+        print('d_out :', type(d_out), d_out, len(d_out))
+        print('latent_out :', type(latent_out), latent_out, len(latent_out))'''
 
         '''bo1 = train_loss < epsilon #deja commenté
         bo2 = test_loss < epsilon#deja commenté
@@ -487,9 +506,9 @@ else:
         y_Train.append(LatentValues_Train[ind][1])
     
     for ind in range(0, len(LatentValues_Test)):
-        #print('Test ', ind, LatentValues_Test[ind][0])
-        x_Test.append(LatentValues_Test[ind][0].numpy()[0])
-        y_Test.append(LatentValues_Test[ind][0].numpy()[1])
+        x_Test.append(LatentValues_Test[ind][0]) #.numpy()[0]
+        y_Test.append(LatentValues_Test[ind][0]) #.numpy()[1]
+
     print('createLatentPictureTrainTest call')
     createLatentPictureTrainTest(x_Train,y_Train,x_Test,y_Test, pictureName, title)
     #createLatentPictureTrainTest(x_Test,y_Test,x_Test,y_Test, pictureName2, title)
@@ -554,28 +573,25 @@ for elem in linOp:
     optim=torch.optim.Adam(params_to_optimize,lr=lr,weight_decay=1e-05)
 
     # Forward pass: Compute predicted y by passing x to the model
-    new_loss, y_pred_new, latent_out = test_epoch_den(encoder=encoder,
-            decoder=decoder,device=device,
-            dataloader=test_loader_n,
-            loss_fn=loss_fn)
+    new_loss, y_pred_new, latent_out = test_epoch_den2(encoder=encoder, decoder=decoder, device=device, dataloader=test_loader_n, loss_fn=loss_fn)
 
     # Compute and print loss
     #print('new loss value : %e for %s' % (new_loss, rel))
     wPred.write('%e, %s\n' % (new_loss, rel))
     #textHisto += 'new loss value : {:e} for {:s}<br>\n'.format(new_loss, rel)
-    lossesVal.append([rel,new_loss.item()])
-    latentVal.append(latent_out[0].numpy())
+    lossesVal.append([rel,new_loss]) # .item()
+    latentVal.append(latent_out) # [0].numpy()
 
     pictureName = folderNamePict + '/predicted_new_curves_' + branch + '_' + rel[6:] + '_multi.png'
-    ### WARNING rel is the same for all comparisons !!!
-    creatPredPictLinLog(branch, Ncols, torch_tensor_entries_n, y_pred_new, new_loss, rel[6:], pictureName)
+    creatPredPictLinLog_V2(branch, Ncols, torch_tensor_entries_n, y_pred_new.cpu(), new_loss, rel[6:], pictureName)
 
     # write values into the predValues file (# export the y_pred_new values)
     text2write = rel + ',' + branch
-    for val in y_pred_new.numpy():
-        N=len(val)
-        for nn in range(0,N):
-            text2write += ',' + str(val[nn])
+    for val in y_pred_new: # .numpy()
+        #N=len(val)
+        #for nn in range(0,N):
+        #    text2write += ',' + str(val[nn])
+        text2write += ',' + str(val.item())
     LinesPred.append(text2write)
     text2write += '\n'
     wPredVal.write(text2write)

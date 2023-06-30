@@ -9,9 +9,8 @@ fi
 
 echo "chemin START : $1"
 echo "chemin WORK : $2"
-echo "chemin LIB : $3"
-echo "chemin COMMON : $4"
-echo "result folder : $5"
+echo "chemin COMMON : $3"
+echo "paths file : $4"
 
 #cd $LOG_SOURCE
 cd $1
@@ -20,9 +19,9 @@ cd $1
 #cd -
 
 #cd $2
-echo "executing $2/extractValues.py"
-python3 $2/extractValues.py $3 $4 $5
+echo "executing $2/extractValues.py $3 $4"
+python3 $2/extractValues.py $3 $4
 echo " "
-echo "executing $2/extractNewFilesValues.py $3 $4 $5"
-python3 $2/extractNewFilesValues.py $3 $4 $5
+echo "executing $2/extractNewFilesValues.py $3 $4"
+python3 $2/extractNewFilesValues.py $3 $4
 
