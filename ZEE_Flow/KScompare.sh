@@ -21,12 +21,12 @@ cd $1
 #cd -
 
 #cd $2
-#echo "executing $2/KScompare.py $3 $4"
-#python3 $2/KScompare.py $3 $4
+echo "executing $2/KScompare.py $3 $4"
+python3 $2/KScompare.py $3 $4
 echo " "
-#echo "executing $2/statpValues.py $3 $4"
+echo "executing $2/statpValues.py $3 $4"
+python3 $2/statpValues.py $3 $4
 echo " "
-#python3 $2/statpValues.py $3 $4
 echo "executing $2/statConfiance.py $3 $4"
 python3 $2/statConfiance.py $3 $4
 

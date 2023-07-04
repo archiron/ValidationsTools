@@ -73,6 +73,7 @@ do
 done
 let "var--"
 echo "nb datasets in datasets= $var"
+timeFolder2="$(date +"%Y%m%d-%H%M%S")_V2"
 
 if [[ "$Choice" == "LLR" ]] 
   then
@@ -120,10 +121,9 @@ elif [[ "$Choice" == "PBS" ]]
     for line in "${datasets[@]}"
     do
       if [[ $line == *"ElectronMcSignalValidator/"* ]]; then
-        #echo $line
         arrLine=(${line//dator/ })
         echo "${arrLine[1]}"
-        sbatch -L sps -n 4 --mem=16000 -t 4-0:0:0 -J $JobName -o $output generateAE.sh $LOG_AE_SOURCE $COMMON_SOURCE AEGeneration.py $FileName $var ${arrLine[1]} 'cpu' $timeFolder # $LOG_SOURCE 
+        sbatch -L sps -n 4 --mem=16000 -t 0-6:0:0 -J $JobName -o $output generateAE.sh $LOG_AE_SOURCE $COMMON_SOURCE AEGeneration_V2.py $FileName $var ${arrLine[1]} 'cpu' $timeFolder # $LOG_SOURCE 
       fi
     done
     deactivate
