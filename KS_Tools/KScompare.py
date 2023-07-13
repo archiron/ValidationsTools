@@ -73,7 +73,11 @@ from sources import *
 from graphicAutoEncoderFunctions import *
 from graphicFunctions import getHisto, getHistoConfEntry, fill_Snew2, fill_Snew
 
-pathNb_evts = pathBase + '/' + str(NB_EVTS)
+# extract release from source reference
+release = input_ref_file.split('__')[2].split('-')[0]
+print('extracted release : {:s}'.format(release))
+
+pathNb_evts = pathBase + '/' + '{:04d}'.format(NB_EVTS) + '/' + release
 pathNb_evts = checkFolderName(pathNb_evts)
 print('pathNb_evts : {:s}'.format(pathNb_evts))
 pathCase = pathNb_evts + checkFolderName(dfo.folder)

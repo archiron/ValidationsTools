@@ -75,6 +75,7 @@ from defaultStd import *
 from autoEncoders import *
 from controlFunctions import *
 from graphicAutoEncoderFunctions import *
+from sources import *
 
 from DecisionBox import *
 DB = DecisionBox()
@@ -87,6 +88,10 @@ diff1 = []
 rels = []
 histos1 = []
 
+# extract release from source reference
+release = input_ref_file.split('__')[2].split('-')[0]
+print('extracted release : {:s}'.format(release))
+
 # get the branches for ElectronMcSignalHistos.txt
 ######## ===== COMMON LINES ===== ########
 branches = []
@@ -98,7 +103,7 @@ cleanBranches(branches) # remove some histo wich have a pbm with KS.
 nbBranches = len(branches) # [0:8]
 print('there is {:03d} datasets'.format(nbBranches)) # 263 branches
 
-pathNb_evts = pathBase + '/' + str(NB_EVTS)
+pathNb_evts = pathBase + '/' + '{:04d}'.format(NB_EVTS) + '/' + release
 pathNb_evts = checkFolderName(pathNb_evts)
 print('pathNb_evts : {:s}'.format(pathNb_evts))
 

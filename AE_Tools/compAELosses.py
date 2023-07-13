@@ -57,8 +57,13 @@ import default as dfo
 from default import *
 from rootValues import NB_EVTS
 from controlFunctions import *
+from sources import *
 
-pathNb_evts = pathBase + '/' + str(NB_EVTS)
+# extract release from source reference
+release = input_ref_file.split('__')[2].split('-')[0]
+print('extracted release : {:s}'.format(release))
+
+pathNb_evts = pathBase + '/' + '{:04d}'.format(NB_EVTS) + '/' + release
 pathNb_evts = checkFolderName(pathNb_evts)
 print('pathNb_evts : {:s}'.format(pathNb_evts))
 

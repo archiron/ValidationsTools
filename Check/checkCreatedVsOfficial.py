@@ -81,7 +81,11 @@ from graphicAutoEncoderFunctions import GraphicKS
 from DecisionBox import DecisionBox
 from sources import *
 
-pathNb_evts = pathBase + '/' + str(NB_EVTS)
+# extract release from source reference
+release = input_ref_file.split('__')[2].split('-')[0]
+print('extracted release : {:s}'.format(release))
+
+pathNb_evts = pathBase + '/' + '{:04d}'.format(NB_EVTS) + '/' + release
 pathNb_evts = checkFolderName(pathNb_evts)
 print('pathNb_evts : {:s}'.format(pathNb_evts))
 pathCase = pathNb_evts + checkFolderName(dfo.folder)
@@ -135,13 +139,16 @@ for item in rootFilesList:
             #s_tmp = fill_Snew(histo_rel)
             if (s_tmp.min() < 0.):
                 print('pbm whith histo %s, min < 0' % branches[i])
+                tmp_branch.append('KOKO')
             elif (np.floor(s_tmp.sum()) == 0.):
                 print('pbm whith histo %s, sum = 0' % branches[i])
+                tmp_branch.append('KOKO')
             else:
                 nbHistos += 1
                 tmp_branch.append(branches[i])
         else:
             print('%s KO' % branches[i])
+            tmp_branch.append('KOKO')
     nb_ttl_histos.append(nbHistos)
     tmp_branches.append(tmp_branch)
 

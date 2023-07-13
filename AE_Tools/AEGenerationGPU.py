@@ -78,6 +78,7 @@ from defaultStd import *
 from autoEncoders import *
 from controlFunctions import *
 from graphicAutoEncoderFunctions import *
+from sources import *
 
 from DecisionBox import *
 DB = DecisionBox()
@@ -121,7 +122,11 @@ rels = []
 y_pred_n = []
 y_pred_o = []
 
-pathNb_evts = pathBase + '/' + str(NB_EVTS)
+# extract release from source reference
+release = input_ref_file.split('__')[2].split('-')[0]
+print('extracted release : {:s}'.format(release))
+
+pathNb_evts = pathBase + '/' + '{:04d}'.format(NB_EVTS) + '/' + release
 pathNb_evts = checkFolderName(pathNb_evts)
 print('pathNb_evts : {:s}'.format(pathNb_evts))
 

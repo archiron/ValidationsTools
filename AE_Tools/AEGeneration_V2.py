@@ -87,6 +87,7 @@ from defaultStd import *
 from autoEncoders import *
 from controlFunctions import *
 from graphicAutoEncoderFunctions import *
+from sources import *
 
 from DecisionBox import *
 DB = DecisionBox()
@@ -133,7 +134,11 @@ y_pred_o = []
 #nbBranches = len(branches) # [0:8]
 print('there is {:03d} datasets'.format(nbBranches))
 
-pathNb_evts = pathBase + '/' + str(NB_EVTS)
+# extract release from source reference
+release = input_ref_file.split('__')[2].split('-')[0]
+print('extracted release : {:s}'.format(release))
+
+pathNb_evts = pathBase + '/' + '{:04d}'.format(NB_EVTS) + '/' + release
 pathNb_evts = checkFolderName(pathNb_evts)
 print('pathNb_evts : {:s}'.format(pathNb_evts))
 
@@ -363,8 +368,8 @@ loss_fn=torch.nn.MSELoss()
 
 #define the network
 textHisto += 'define the network (encoder/decoder)<br>\n'
-HL = [hidden_size_1, hidden_size_2, hidden_size_3, hidden_size_4, hidden_size_5, hidden_size_6, hidden_size_7]
-useHL = [useHL1, useHL2, useHL3, useHL4, useHL5, useHL6, useHL7] # useHL1/HL2 always = 1.
+#HL = [hidden_size_1, hidden_size_2, hidden_size_3, hidden_size_4, hidden_size_5, hidden_size_6, hidden_size_7]
+#useHL = [useHL1, useHL2, useHL3, useHL4, useHL5, useHL6, useHL7] # useHL1/HL2 always = 1.
 HL, useHL = extractLayerList(HL, useHL)
 
 '''

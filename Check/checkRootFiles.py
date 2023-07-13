@@ -68,8 +68,12 @@ from DecisionBox import DecisionBox
 from default import *
 from sources import *
 
+# extract release from source reference
+release = input_ref_file.split('__')[2].split('-')[0]
+print('extracted release : {:s}'.format(release))
+
 #folder = pathBase + checkFolderName(dfo.folder)
-pathNb_evts = pathBase + '/' + str(NB_EVTS)
+pathNb_evts = pathBase + '/' + '{:04d}'.format(NB_EVTS) + '/' + release
 pathNb_evts = checkFolderName(pathNb_evts)
 print('pathNb_evts : {:s}'.format(pathNb_evts))
 pathCase = pathNb_evts + checkFolderName(dfo.folder)
@@ -121,20 +125,27 @@ for elem in fileList:
         histo_1 = h1.Get(branches[i])
         if (histo_1):
             #print('%s OK' % branches[i])
-            s_new = fill_Snew(histo_1)
+
+            d = getHistoConfEntry(histo_1)
+            #print("d = {}".format(d))
+
+            s_new = fill_Snew2(d, histo_1)
             Ntot_h1 = histo_1.GetEntries()
         
             # print min/max for the new curve
             #print('min : %f - max : %f' % (s_new.min(), s_new.max()))
             if (s_new.min() < 0.):
                 print('pbm whith histo %s, min < 0' % branches[i])
+                tmp_branch.append('KOKO')
             elif (np.floor(s_new.sum()) == 0.):
                 print('pbm whith histo %s, sum = 0' % branches[i])
+                tmp_branch.append('KOKO')
             else:
                 nbHistosPass1 += 1
                 tmp_branch.append(branches[i])
         else:
             print('%s KO' % branches[i])
+            tmp_branch.append('KOKO')
 
     nb_ttl_histos.append(nbHistosPass1)
     tmp_branches.append(tmp_branch)
@@ -171,20 +182,27 @@ for item in rootFilesList:
         histo_1 = h1.Get(branches[i])
         if (histo_1):
             #print('%s OK' % branches[i])
-            s_new = fill_Snew(histo_1)
+
+            d = getHistoConfEntry(histo_1)
+            #print("d = {}".format(d))
+
+            s_new = fill_Snew2(d, histo_1)
             Ntot_h1 = histo_1.GetEntries()
 
             # print min/max for the new curve
             #print('min : %f - max : %f' % (s_new.min(), s_new.max()))
             if (s_new.min() < 0.):
                 print('pbm whith histo %s, min < 0' % branches[i])
+                tmp_branch.append('KOKO')
             elif (np.floor(s_new.sum()) == 0.):
                 print('pbm whith histo %s, sum = 0' % branches[i])
+                tmp_branch.append('KOKO')
             else:
                 nbHistosPass1 += 1
                 tmp_branch.append(branches[i])
         else:
             print('%s KO' % branches[i])
+            tmp_branch.append('KOKO')
 
     nb_ttl_histos.append(nbHistosPass1)
     tmp_branches.append(tmp_branch)
@@ -231,13 +249,16 @@ for elem in fileList:
             #print('min : %f - max : %f' % (s_new.min(), s_new.max()))
             if (s_new.min() < 0.):
                 print('pbm whith histo %s, min < 0' % branches[i])
+                tmp_branch.append('KOKO')
             elif (np.floor(s_new.sum()) == 0.):
                 print('pbm whith histo %s, sum = 0' % branches[i])
+                tmp_branch.append('KOKO')
             else:
                 nbHistosPass2 += 1
                 tmp_branch.append(branches[i])
         else:
             print('%s KO' % branches[i])
+            tmp_branch.append('KOKO')
 
     nb_ttl_histos.append(nbHistosPass2)
     tmp_branches.append(tmp_branch)
@@ -285,13 +306,16 @@ for item in rootFilesList:
             #print('min : %f - max : %f' % (s_new.min(), s_new.max()))
             if (s_new.min() < 0.):
                 print('pbm whith histo %s, min < 0' % branches[i])
+                tmp_branch.append('KOKO')
             elif (np.floor(s_new.sum()) == 0.):
                 print('pbm whith histo %s, sum = 0' % branches[i])
+                tmp_branch.append('KOKO')
             else:
                 nbHistosPass2 += 1
                 tmp_branch.append(branches[i])
         else:
             print('%s KO PASS 2' % branches[i])
+            tmp_branch.append('KOKO')
 
     nb_ttl_histos.append(nbHistosPass2)
     tmp_branches.append(tmp_branch)
