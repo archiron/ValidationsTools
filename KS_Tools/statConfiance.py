@@ -65,7 +65,8 @@ import default as df
 from default import *
 from rootValues import NB_EVTS
 from controlFunctions import *
-from graphicFunctions import createHistoPicture
+#from graphicFunctions import createHistoPicture
+from graphicAutoEncoderFunctions import createSimplePicture2
 from functions import Tools
 from sources import *
 
@@ -111,6 +112,8 @@ for item in rootFilesList:
     rels.append([b[0], b[0][6:]])
 
 sortedRels = sorted(rels, key = lambda x: x[0]) # gives an array with releases sorted
+#for rel in sortedRels:
+#    print(rel)
 
 stats = []
 # get the .txt files into the DBox folder
@@ -151,8 +154,8 @@ for item in textFilesList:
         print(release)
         stats.append([shN, release, c1, c2, c3])
 
-#sortedStats = sorted(stats, key = lambda x: x[0]) # gives an array with releases sorted
-for elem in stats:
+sortedStats = sorted(stats, key = lambda x: x[1]) # gives an array with releases sorted
+for elem in sortedStats:
     print(elem)
 
 N = len(stats)
@@ -161,6 +164,7 @@ print('rels : {:d}'.format(len(sortedRels)))
 
 stats2 = []
 for elem in sortedRels:
+    #print('#####\n{:s}\n#####'.format(elem[1]))
     C1 = 0 # sum of all c1 for a release
     C2 = 0 # sum of all c1 for a release
     C3 = 0 # sum of all c1 for a release
@@ -171,14 +175,31 @@ for elem in sortedRels:
     nb3 = 0
     rel = elem[1]
     for item in stats:
+        #print('#####\n{:s}\n#####'.format(item[1]))
         if (rel == item[1]):
+            #print('{:s} IS in {:s}'.format(item[1], rel))
             nb1 += 1
             nb2 += 1
             nb3 += 1
             C1 += float(item[2])
             C2 += float(item[3])
             C3 += float(item[4])
-    stats2.append([rel, C1/nb1, C2/nb2, C3/nb3])
+        #else:
+        #    print('{:s} not in {:s}'.format(rel, item[1]))
+    m_value = (C1/nb1 + C2/nb2 + C3/nb3) / 3.
+    stats2.append([rel, C1/nb1, C2/nb2, C3/nb3, m_value])
+
+pictureName = pathDBox + 'comparison_C_values_' + '_{:03d}'.format(nbFiles) +'.png' # 
+title = ' C values vs releases.'
+x = []
+y = []
+for elem in stats2:
+    x.append(elem[0])
+    y.append(elem[4])
+print(y)
+axisLabels = ['releases', 'means']
+print('')
+createSimplePicture2(title, y, axisLabels, pictureName, x)
 
 for elem in stats2:
     print(elem)
