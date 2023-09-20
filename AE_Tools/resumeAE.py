@@ -187,6 +187,10 @@ createComplexPicture2(sortedRels, aa, ['nb of values', 'pred losses values'], fi
 pathKS = pathNb_files + '/KS/'
 checkFolder(pathKS)
 print('\KS folder name : {:s}'.format(pathKS))
+folderPictures = pathNb_files + '/KS/' + AEfolderName + '/' + timeFolder
+checkFolder(folderPictures)
+print('\picture folder name : {:s}'.format(folderPictures))
+
 loopMaxValue = len(sortedRels)
 for i in range(0, loopMaxValue):
     print('{:s}\n'.format(sortedRels[i]))
@@ -218,17 +222,14 @@ aa2 = pValues2.to_numpy().transpose()
 aa3 = pValues3.to_numpy().transpose()
 
 for ind in range(0,loopMaxValue):
-    fileName = pathKS + '/Summary_pV1_releaseEvolution.png'
+    fileName = folderPictures + '/Summary_pV1_releaseEvolution.png'
     createComplexPicture2(sortedRels, aa1, ['nb of values', 'pValues 1'], fileName, histos1)
-    fileName = pathKS + '/Summary_pV2_releaseEvolution.png'
+    fileName = folderPictures + '/Summary_pV2_releaseEvolution.png'
     createComplexPicture2(sortedRels, aa2, ['nb of values', 'pValues 2'], fileName, histos1)
-    fileName = pathKS + '/Summary_pV3_releaseEvolution.png'
+    fileName = folderPictures + '/Summary_pV3_releaseEvolution.png'
     createComplexPicture2(sortedRels, aa3, ['nb of values', 'pValues 3'], fileName, histos1)
 
 ####### Differences #######
-folderPictures = pathNb_files + '/KS/' + AEfolderName + '/' + timeFolder
-checkFolder(folderPictures)
-print('\picture folder name : {:s}'.format(folderPictures))
 differences = pd.DataFrame()
 loopMaxValue = len(sortedRels)
 branch2 = {}
