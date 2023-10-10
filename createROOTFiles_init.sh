@@ -18,7 +18,7 @@ do
     Choice=${SUB^^};
   fi
 done
-if [[ "$Choice" == "LLR" ]] 
+if [[ "$Choice" == "KINS" ]] 
   then
       $Choice='LLR'
 fi
