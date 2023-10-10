@@ -11,14 +11,17 @@ echo "actual path : $aa"
 
 STR=$aa
 Choice='Local'
-for SUB in 'llr' 'pbs' 'cern'
+for SUB in 'llr' 'pbs' 'cern' 'kins'
 do
   if [[ "$STR" == *"$SUB"* ]]; then
     echo "It's $SUB there.";
     Choice=${SUB^^};
   fi
 done
-
+if [[ "$Choice" == "LLR" ]] 
+  then
+      $Choice='LLR'
+fi
 echo "Choice is : $Choice"
 
 FileName1="rootValues.py"
