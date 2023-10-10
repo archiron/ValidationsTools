@@ -21,7 +21,7 @@ done
 echo "Choice is : $Choice"
 if [[ "$Choice" == "KINS" ]] 
   then
-      $Choice='LLR'
+      Choice='LLR'
 fi
 echo "Choice is : $Choice"
 
