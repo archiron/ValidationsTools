@@ -18,6 +18,7 @@ do
     Choice=${SUB^^};
   fi
 done
+echo "Choice is : $Choice"
 if [[ "$Choice" == "KINS" ]] 
   then
       $Choice='LLR'
