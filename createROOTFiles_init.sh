@@ -48,7 +48,7 @@ echo "NB_EVTS : $NB_EVTS =="
 
 FileName2="sources.py"
 echo $FileName2
-readarray releases -t array < $aaCommonFiles/$FileName2
+readarray releases -t array < $aa/CommonFiles/$FileName2
 release="${releases[17]}"
 tt=${release//input_ref_file = \'DQM_V}
 tt=${tt//\'}
@@ -63,7 +63,7 @@ echo "release = $release"
 
 FileName="paths$Choice.py"
 echo $FileName
-readarray toto -t array < $aaCommonFiles/$FileName
+readarray toto -t array < $aa/CommonFiles/$FileName
 N=${#toto[@]}
 echo "N= $N"
 
