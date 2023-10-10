@@ -26,7 +26,7 @@ echo "Choice is : $Choice"
 
 FileName1="rootValues.py"
 echo $FileName1
-readarray toor -t array < CommonFiles/$FileName1
+readarray toor -t array < $aa/CommonFiles/$FileName1
 N1=${#toor[@]}
 echo "N1= $N1"
 
@@ -48,7 +48,7 @@ echo "NB_EVTS : $NB_EVTS =="
 
 FileName2="sources.py"
 echo $FileName2
-readarray releases -t array < CommonFiles/$FileName2
+readarray releases -t array < $aaCommonFiles/$FileName2
 release="${releases[17]}"
 tt=${release//input_ref_file = \'DQM_V}
 tt=${tt//\'}
@@ -63,7 +63,7 @@ echo "release = $release"
 
 FileName="paths$Choice.py"
 echo $FileName
-readarray toto -t array < CommonFiles/$FileName
+readarray toto -t array < $aaCommonFiles/$FileName
 N=${#toto[@]}
 echo "N= $N"
 
