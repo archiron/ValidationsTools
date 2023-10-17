@@ -11,23 +11,19 @@ echo "actual path : $aa"
 
 STR=$aa
 Choice='Local'
-for SUB in 'llr' 'pbs' 'cern' 'kins'
+for SUB in 'llr' 'pbs' 'cern'
 do
   if [[ "$STR" == *"$SUB"* ]]; then
     echo "It's $SUB there.";
     Choice=${SUB^^};
   fi
 done
-echo "Choice is : $Choice"
-if [[ "$Choice" == "KINS" ]] 
-  then
-      Choice='LLR'
-fi
+
 echo "Choice is : $Choice"
 
 FileName1="rootValues.py"
 echo $FileName1
-readarray toor -t array < $aa/CommonFiles/$FileName1
+readarray toor -t array < CommonFiles/$FileName1
 N1=${#toor[@]}
 echo "N1= $N1"
 
@@ -49,7 +45,7 @@ echo "NB_EVTS : $NB_EVTS =="
 
 FileName2="sources.py"
 echo $FileName2
-readarray releases -t array < $aa/CommonFiles/$FileName2
+readarray releases -t array < CommonFiles/$FileName2
 release="${releases[17]}"
 tt=${release//input_ref_file = \'DQM_V}
 tt=${tt//\'}
@@ -64,29 +60,14 @@ echo "release = $release"
 
 FileName="paths$Choice.py"
 echo $FileName
-readarray toto -t array < $aa/CommonFiles/$FileName
+readarray toto -t array < CommonFiles/$FileName
 N=${#toto[@]}
 echo "N= $N"
 
-# Get local (LAST) Release used
-#for item in `ls -drt ZEE_Flow/*/` 
-#do
-#  printf "   %s\n" $item
-#  release=$item
-#done
-#release=${release%?}
-#release=${release//\/}
-#release=${release//ZEE_Flow/}
-#echo $release
-
-#LOG_SOURCE="${toto[15]}"
 LOG_SOURCE=$aa
 LOG_SOURCE=${LOG_SOURCE//LOG_SOURCE=}
 LOG_SOURCE=${LOG_SOURCE//\"}
 LOG_SOURCE="${LOG_SOURCE}/ZEE_Flow/${release}/src/Kolmogorov"
-#LOG_OUTPUT="$aa/${toto[16]}"
-#LOG_OUTPUT=${LOG_OUTPUT//LOG_OUTPUT=}
-#LOG_OUTPUT=${LOG_OUTPUT//\"}
 RESULTFOLDER="${toto[17]}"
 RESULTFOLDER=${RESULTFOLDER//RESULTFOLDER=}
 RESULTFOLDER=${RESULTFOLDER//\"}
@@ -94,7 +75,11 @@ RESULTFOLDER=$(printf $RESULTFOLDER)
 RESULTRELEASE=$(printf "/%s" $release)
 RESULTAPPEND=$(printf "/%04d" $NB_EVTS)
 RESULTFOLDER="${RESULTFOLDER}${RESULTAPPEND}${RESULTRELEASE}"
-#echo "LOG_OUTPUT : $LOG_OUTPUT"
+LOG_OUTPUT="${toto[16]}"
+LOG_OUTPUT=${LOG_OUTPUT//LOG_OUTPUT=}
+LOG_OUTPUT=${LOG_OUTPUT//\"}
+LOG_OUTPUT=$(printf $LOG_OUTPUT)
+echo "LOG_OUTPUT : $LOG_OUTPUT"
 echo "LOG_SOURCE : $LOG_SOURCE"
 echo "RESULTFOLDER : $RESULTFOLDER"
 

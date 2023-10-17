@@ -32,15 +32,15 @@ echo "N= $N"
 LOG_SOURCE="$aa/${toto[15]}"
 LOG_SOURCE=${LOG_SOURCE//LOG_SOURCE=}
 LOG_SOURCE=${LOG_SOURCE//\"}
-#LOG_OUTPUT="${toto[15]}"
+#LOG_OUTPUT="${toto[16]}"
 #LOG_OUTPUT=${LOG_OUTPUT//LOG_OUTPUT=}
 #LOG_OUTPUT=${LOG_OUTPUT//\"}
-RESULTFOLDER="${toto[15]}"
-RESULTFOLDER=${RESULTFOLDER//RESULTFOLDER=}
-RESULTFOLDER=${RESULTFOLDER//\"}
-LOG_KS_SOURCE="$aa/${toto[18]}"
-LOG_KS_SOURCE=${LOG_KS_SOURCE//LOG_KS_SOURCE=}
-LOG_KS_SOURCE=${LOG_KS_SOURCE//\"}
+#RESULTFOLDER="${toto[15]}"
+#RESULTFOLDER=${RESULTFOLDER//RESULTFOLDER=}
+#RESULTFOLDER=${RESULTFOLDER//\"}
+#LOG_KS_SOURCE="$aa/${toto[18]}"
+#LOG_KS_SOURCE=${LOG_KS_SOURCE//LOG_KS_SOURCE=}
+#LOG_KS_SOURCE=${LOG_KS_SOURCE//\"}
 #LIB_SOURCE="${toto[19]}"
 #LIB_SOURCE=${LIB_SOURCE//LIB_SOURCE=}
 #LIB_SOURCE=${LIB_SOURCE//\"}
@@ -52,10 +52,11 @@ LOG_AE_SOURCE=${LOG_AE_SOURCE//LOG_AE_SOURCE=}
 LOG_AE_SOURCE=${LOG_AE_SOURCE//\"}
 
 echo "LOG_SOURCE : $LOG_SOURCE"
-echo "LOG_OUTPUT : $LOG_OUTPUT"
-echo "RESULTFOLDER : $RESULTFOLDER"
+#echo "LOG_OUTPUT : $LOG_OUTPUT"
+#echo "RESULTFOLDER : $RESULTFOLDER"
+#echo "LOG_KS_SOURCE : $LOG_KS_SOURCE"
 echo "LOG_AE_SOURCE : $LOG_AE_SOURCE"
-echo "LIB_SOURCE : $LIB_SOURCE"
+#echo "LIB_SOURCE : $LIB_SOURCE"
 echo "COMMON_SOURCE : $COMMON_SOURCE"
 
 readarray datasets -t array < ChiLib/HistosConfigFiles/ElectronMcSignalHistos.txt # $Chilib_path
@@ -65,14 +66,14 @@ var=0
 for line in "${datasets[@]}"
 do
   if [[ $line == *"ElectronMcSignalValidator/"* ]]; then
-    echo $line
+    #echo $line
     arrLine=(${line//dator/ })
-    echo "${arrLine[1]} - $var"
+    #echo "${arrLine[1]} - $var"
     let "var++"
   fi
 done
-let "var--"
 echo "nb datasets in datasets= $var"
+let "var--"
 timeFolder2="$(date +"%Y%m%d-%H%M%S")_V2"
 
 if [[ "$Choice" == "LLR" ]] 
@@ -87,46 +88,48 @@ if [[ "$Choice" == "LLR" ]]
     module load python/3.7.0
     cd $LOG_SOURCE
     options="-reserv" # -short -long -reserv
-    #/opt/exp_soft/cms/t3/t3submit -8c $options generateAE.sh $LOG_AE_SOURCE $COMMON_SOURCE AEGeneration.py $FileName ''
-    #/opt/exp_soft/cms/t3/t3submit -8c $options generateAE.sh $LOG_AE_SOURCE $COMMON_SOURCE resumeAE.py $FileName ''
-    #/opt/exp_soft/cms/t3/t3submit -8c $options generateAE.sh $LOG_AE_SOURCE $COMMON_SOURCE AEGen-V1.py $FileName 'even'
-    #/opt/exp_soft/cms/t3/t3submit -8c $options generateAE.sh $LOG_AE_SOURCE $COMMON_SOURCE AEGen-V1.py $FileName 'odd'
-    #/opt/exp_soft/cms/t3/t3submit -8c $options generateAE.sh $LOG_AE_SOURCE $COMMON_SOURCE AEGen-V1.py $FileName 'both' # odd + even
-    #/opt/exp_soft/cms/t3/t3submit -8c $options generateAE.sh $LOG_AE_SOURCE $COMMON_SOURCE AEGen-V2.py $FileName ''
-    #/opt/exp_soft/cms/t3/t3submit -8c $options generateAE.sh $LOG_AE_SOURCE $COMMON_SOURCE AEGen-V3.py $FileName 'cpu'
-    #/opt/exp_soft/cms/t3/t3submit -8c $options generateAE.sh $LOG_AE_SOURCE $COMMON_SOURCE AEGen-V4.py $FileName 'cpu' # $LOG_SOURCE 
+
+    # initialization of the temps folders
+    /opt/exp_soft/cms/t3/t3submit -8c $options initAE.sh $LOG_AE_SOURCE $COMMON_SOURCE $FileName
+    sleep 30
+    #process_id=$!
+    #echo "PID: $process_id"
+    #wait #$process_id
+
     for line in "${datasets[@]}"
     do
       if [[ $line == *"ElectronMcSignalValidator/"* ]]; then
         #echo $line
         arrLine=(${line//dator/ })
         echo "${arrLine[1]}"
-        /opt/exp_soft/cms/t3/t3submit -8c $options generateAE.sh $LOG_AE_SOURCE $COMMON_SOURCE AEGeneration.py $FileName $var ${arrLine[1]} 'cpu' $timeFolder # $LOG_SOURCE 
+        /opt/exp_soft/cms/t3/t3submit -8c $options generateAE.sh $LOG_AE_SOURCE $COMMON_SOURCE AEGeneration_V2.py $FileName $var ${arrLine[1]} 'cpu' $timeFolder # $LOG_SOURCE 
       fi
     done
 elif [[ "$Choice" == "PBS" ]] 
   then
     echo "PBS"
-    module load Programming_Languages/python/3.9.1
-    source /pbs/home/c/chiron/private/ValidationsTools/ValidationsTools/bin/activate 
+    #module load Programming_Languages/python/3.9.1
+    #source /pbs/home/c/chiron/private/ValidationsTools/ValidationsTools/bin/activate 
     cd $LOG_SOURCE
-    #sbatch -L sps -n 4 --mem=16000 -t 4-0:0:0 -J $JobName -o $output generateAE.sh $LOG_AE_SOURCE $COMMON_SOURCE AEGeneration.py $FileName ''
-    #sbatch -L sps -n 4 --mem=16000 -t 4-0:0:0 -J $JobName -o $output generateAE.sh $LOG_AE_SOURCE $COMMON_SOURCE resumeAE.py $FileName ''
-    #sbatch -L sps -n 4 --mem=16000 -t 4-0:0:0 -J $JobName -o $output generateAE.sh $LOG_AE_SOURCE $COMMON_SOURCE AEGen-V1.py $FileName 'even'
-    #sbatch -L sps -n 4 --mem=16000 -t 4-0:0:0 -J $JobName -o $output generateAE.sh $LOG_AE_SOURCE $COMMON_SOURCE AEGen-V1.py $FileName 'odd'
-    #sbatch -L sps -n 4 --mem=16000 -t 4-0:0:0 -J $JobName -o $output generateAE.sh $LOG_AE_SOURCE $COMMON_SOURCE AEGen-V1.py $FileName 'both'
-    #sbatch -L sps -n 4 --mem=16000 -t 4-0:0:0 -J $JobName -o $output generateAE.sh $LOG_AE_SOURCE $COMMON_SOURCE AEGen-V2.py $FileName ''
-    #sbatch -L sps -n 4 --mem=16000 -t 4-0:0:0 -J $JobName -o $output generateAE.sh $LOG_AE_SOURCE $COMMON_SOURCE AEGen-V3.py $FileName 'cpu'
-    #sbatch -L sps -n 4 --mem=16000 -t 4-0:0:0 -J $JobName -o $output generateAE.sh $LOG_AE_SOURCE $COMMON_SOURCE AEGen-V4.py $FileName 'cpu' # $LOG_SOURCE 
+    
+    # initialization of the temps folders
+    sbatch -L sps -n 4 --mem=16000 -t 0-0:20:0 -J $JobName -o $output initAE.sh $LOG_AE_SOURCE $COMMON_SOURCE $FileName
+    sleep 30
+    process_id=$!
+    echo "PID: $process_id"
+    wait $process_id
+
     for line in "${datasets[@]}"
     do
       if [[ $line == *"ElectronMcSignalValidator/"* ]]; then
+        #echo $line
         arrLine=(${line//dator/ })
         echo "${arrLine[1]}"
-        sbatch -L sps -n 4 --mem=16000 -t 0-6:0:0 -J $JobName -o $output generateAE.sh $LOG_AE_SOURCE $COMMON_SOURCE AEGeneration_V2.py $FileName $var ${arrLine[1]} 'cpu' $timeFolder # $LOG_SOURCE 
+        sbatch -L sps -n 4 --mem=16000 -t 0-3:0:0 -J $JobName -o $output generateAE.sh $LOG_AE_SOURCE $COMMON_SOURCE AEGeneration_V2.py $FileName $var ${arrLine[1]} 'cpu' $timeFolder # $LOG_SOURCE 
       fi
     done
-    deactivate
+
+    #deactivate
 fi
 
 echo "END"

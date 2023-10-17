@@ -16,6 +16,7 @@ import importlib
 import importlib.machinery
 import importlib.util
 from pathlib import Path
+import time
 
 #import seaborn # only with cmsenv on cca.in2p3.fr
 
@@ -74,6 +75,8 @@ loader.exec_module( blo )
 print('DATA_SOURCE : %s' % blo.DATA_SOURCE)
 pathBase = blo.RESULTFOLDER 
 print('result path : {:s}'.format(pathBase))
+pathOutput = blo.LOG_OUTPUT
+print('output path : {:s}'.format(pathOutput))
 
 pathChiLib = pathLIBS + '/' + blo.LIB_SOURCE
 print('Lib path : {:s}'.format(pathChiLib))
@@ -124,6 +127,8 @@ def createAutoEncoderRef(nbFiles, nbBranches, device, lr, epsilon, hidden_size_1
     Text.append('</table>\n')
     Text.append('<br>\n')
     return Text
+
+tic = time.time()
 
 arrayKSValues = []
 rels = []
@@ -177,9 +182,11 @@ print(KSlistFiles, len(KSlistFiles))
 for item in KSlistFiles:
     print('file : %s' % item)
     aa = item.split('__')[0]
-    fileName = pathNb_files + '/' + item
+    #fileName = pathNb_files + '/' + item
+    fileName = pathOutput + '/' + branch + '/' + item
     file1 = open(fileName, 'r')
     bb = file1.readlines()
+    file1.close()
     for elem in bb:
         tmp = []
         cc = elem.split(' : ')
@@ -196,10 +203,12 @@ else:
     print('we have the same number of KS files than releases')
 
 #load data from branchesHistos_NewFiles.txt file ..
-fileName = pathNb_files + "/branchesHistos_NewFiles.txt"
+#fileName = pathNb_files + "/branchesHistos_NewFiles.txt"
+fileName = pathOutput+ '/' + branch + "/branchesHistos_NewFiles.txt"
 print('%s' % fileName)
 file1 = open(fileName, 'r')
 Lines = file1.readlines()
+file1.close()
 
 if torch.cuda.is_available():
     device = torch.device("cuda:0")
@@ -695,10 +704,12 @@ labels = sortedRels
 labels1 = []
 val1 = []
 for ll in labels:
-    predKSValues = pathNb_files + "/histo_differences_KScurve_" + ll[1] + "__{:03d}".format(nbFiles) + ".txt"
+    #predKSValues = pathNb_files + "/histo_differences_KScurve_" + ll[1] + "__{:03d}".format(nbFiles) + ".txt"
+    predKSValues = pathOutput + branch + "/histo_differences_KScurve_" + ll[1] + "__{:03d}".format(nbFiles) + ".txt"
     print("values file : %s" % predKSValues)
     wPredKSVal = open(predKSValues, 'r')
     LinesKSVal = wPredKSVal.readlines()
+    wPredKSVal.close()
     #for l in range(0,len(LinesKSVal)):
     #    print('{:02d}/{:02d} : {:s}'.format(l,259,LinesKSVal[l]))
     wPredKSVal.close()
@@ -777,5 +788,9 @@ wLoss.close()
 fHisto = open(resumeHisto, 'w')  # web page
 fHisto.write(textHisto)
 fHisto.close()
+
+toc = time.time()
+print('Done in {:.4f} seconds'.format(toc-tic))
+
 print('end')
 
