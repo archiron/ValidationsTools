@@ -64,6 +64,15 @@ if os.path.exists(Name): #
     #os.removedirs(Name) # remove folder Name
     shutil.rmtree(Name) # remove folder Name
 
+NameCommons = pathOutput + '/CommonFiles'
+print('{:s}\n'.format(NameCommons))
+if os.path.exists(NameCommons): # 
+    shutil.rmtree(NameCommons) # remove folder Name
+NameChiLib = pathOutput + '/ChiLib'
+print('{:s}\n'.format(NameChiLib))
+if os.path.exists(NameChiLib): # 
+    shutil.rmtree(NameChiLib) # remove folder Name
+
 toc = time.time()
 print('Done in {:.4f} seconds'.format(toc-tic))
 

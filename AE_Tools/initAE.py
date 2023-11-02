@@ -53,6 +53,7 @@ loader.exec_module( blo )
 pathBase = blo.RESULTFOLDER 
 print('result path : {:s}'.format(pathBase))
 pathOutput = blo.LOG_OUTPUT
+#pathOutput = '/home/llr/info/chiron_u/public/tmp' # LLR
 print('output path : {:s}'.format(pathOutput))
 
 pathChiLib = pathLIBS + '/' + blo.LIB_SOURCE # checkFolderName(blo.LIB_SOURCE) # sys.argv[1]
@@ -86,6 +87,7 @@ print('pathNb_evts : {:s}'.format(pathNb_evts))
 
 # get list of generated ROOT files
 rootPath = pathNb_evts # for CC
+#rootPath = "/data_CMS/cms/chiron/ROOT_Files/CMSSW_12_1_0_pre5-ROOTFiles_0950" # LLR
 rootFilesList_0 = getListFiles(rootPath, 'root')
 print('there is ' + '{:04d}'.format(len(rootFilesList_0)) + ' generated ROOT files')
 nbFiles = change_nbFiles(len(rootFilesList_0), nbFiles)
@@ -93,8 +95,8 @@ nbFiles = change_nbFiles(len(rootFilesList_0), nbFiles)
 pathCase = pathNb_evts + checkFolderName(dfo.folder)
 pathNb_files = pathCase + '/{:03d}'.format(nbFiles)
 print('pathNb_files path : {:s}'.format(pathNb_files))
-data_res = pathNb_files + '/AE_RESULTS/'
-print('data_res path : {:s}'.format(data_res))
+#data_res = pathNb_files + '/AE_RESULTS/'
+#print('data_res path : {:s}'.format(data_res))
 
 t = datetime.datetime.today()
 tic= time.time()
@@ -124,7 +126,36 @@ for i in range(0, loopMaxValue):
         target = Name + '/' + item
         shutil.copyfile(original, target)
 
-    # mettre ChiLib ??
+    # ChiLib
+    NameChiLib = pathOutput + '/ChiLib'
+    print('{:s}\n'.format(NameChiLib))
+    if not os.path.exists(NameChiLib): # create folder Name
+        os.makedirs(NameChiLib) # create folder Name
+    else:
+        print('exist {:s}\n'.format(NameChiLib))
+
+    tmp = getListFiles(pathChiLib, 'py')
+    for item in tmp:
+        print('file : %s' % item)
+        original = pathChiLib + '/' + item
+        target = NameChiLib + '/' + item
+        shutil.copyfile(original, target)
+
+    # Commons
+    NameCommons = pathOutput + '/CommonFiles'
+    print('{:s}\n'.format(NameCommons))
+    if not os.path.exists(NameCommons): # create folder Name
+        os.makedirs(NameCommons) # create folder Name
+    else:
+        print('exist {:s}\n'.format(NameCommons))
+
+    tmp = getListFiles(pathCommonFiles, 'py')
+    for item in tmp:
+        print('file : %s' % item)
+        original = pathCommonFiles + '/' + item
+        target = NameCommons + '/' + item
+        shutil.copyfile(original, target)
+
 
 toc = time.time()
 print('Done in {:.4f} seconds'.format(toc-tic))

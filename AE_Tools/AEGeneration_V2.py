@@ -79,6 +79,7 @@ pathOutput = blo.LOG_OUTPUT
 print('output path : {:s}'.format(pathOutput))
 
 pathChiLib = pathLIBS + '/' + blo.LIB_SOURCE
+pathChiLib = pathOutput + '/ChiLib'
 print('Lib path : {:s}'.format(pathChiLib))
 sys.path.append(pathChiLib)
 sys.path.append(pathCommonFiles)
@@ -87,10 +88,10 @@ import default as dfo
 from default import *
 from rootValues import NB_EVTS
 from defaultStd import *
+from sources import *
 from autoEncoders import *
 from controlFunctions import *
 from graphicAutoEncoderFunctions import *
-from sources import *
 
 from DecisionBox import *
 DB = DecisionBox()
@@ -129,7 +130,7 @@ def createAutoEncoderRef(nbFiles, nbBranches, device, lr, epsilon, hidden_size_1
     return Text
 
 tic = time.time()
-
+print('After all imports & initializations : {:.4f} seconds'.format(tic))
 arrayKSValues = []
 rels = []
 
@@ -462,6 +463,8 @@ if ( useEncoder == 1):
         decoder = torch.load(decoderName)
 else:
     textHisto += 'Calculating encoder/decoder<br>\n'
+    tec = time.time()
+    print('Calculating encoder/decoder : {:.4f} seconds'.format(tec))
     for epoch in range(nb_epochs):
         train_loss, encoded_out = train_epoch_den2(encoder=encoder, decoder=decoder, device=device, dataloader=train_loader, loss_fn=loss_fn,optimizer=optim)
         test_loss, _, latent_out = test_epoch_den2(encoder=encoder, decoder=decoder, device=device, dataloader=test_loader, loss_fn=loss_fn)
@@ -492,6 +495,8 @@ else:
         if (bo1 and bo2):#deja commenté
             break'''#deja commenté
 
+    tec = time.time()
+    print('After encoder/decoder : {:.4f} seconds'.format(tec))
     r = (train_loss - test_loss) / (train_loss + test_loss)
     print('epoch : %03d : tr_lo = %e : te_lo = %e : r = %e' % (epoch, train_loss, test_loss, r))
     textHisto += 'epoch : {:03d} : train_loss = {:e} : test_loss = {:e}<br>\n'.format(epoch, train_loss, test_loss)
@@ -538,6 +543,8 @@ else:
     print('coefficient losses : {:1.4e}'.format(rr) + ' - {:1.4e}'.format(ss))
 
 # Ready for prediction
+tec = time.time()
+print('Prediction : {:.4f} seconds'.format(tec))
 print('using %s\n' % encoderName)
 textHisto += 'Using {:s} for prediction<br>\n'.format(encoderName)
 textHisto += '<br>\n'
@@ -610,6 +617,8 @@ for elem in linOp:
     text2write += '\n'
     wPredVal.write(text2write)
 
+tec = time.time()
+print('End of prediction : {:.4f} seconds'.format(tec))
 labels = []
 val = []
 x = []
@@ -790,6 +799,7 @@ fHisto.write(textHisto)
 fHisto.close()
 
 toc = time.time()
+print('End : {:.4f} seconds'.format(toc))
 print('Done in {:.4f} seconds'.format(toc-tic))
 
 print('end')
