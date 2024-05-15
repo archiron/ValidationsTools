@@ -79,7 +79,6 @@ pathOutput = blo.LOG_OUTPUT
 print('output path : {:s}'.format(pathOutput))
 
 pathChiLib = pathLIBS + '/' + blo.LIB_SOURCE
-pathChiLib = pathOutput + '/ChiLib'
 print('Lib path : {:s}'.format(pathChiLib))
 sys.path.append(pathChiLib)
 sys.path.append(pathCommonFiles)
@@ -88,10 +87,10 @@ import default as dfo
 from default import *
 from rootValues import NB_EVTS
 from defaultStd import *
-from sources import *
 from autoEncoders import *
 from controlFunctions import *
 from graphicAutoEncoderFunctions import *
+from sources import *
 
 from DecisionBox import *
 DB = DecisionBox()
@@ -130,7 +129,7 @@ def createAutoEncoderRef(nbFiles, nbBranches, device, lr, epsilon, hidden_size_1
     return Text
 
 tic = time.time()
-print('After all imports & initializations : {:.4f} seconds'.format(tic))
+
 arrayKSValues = []
 rels = []
 
@@ -383,36 +382,36 @@ textHisto += 'define the network (encoder/decoder)<br>\n'
 HL, useHL = extractLayerList(HL, useHL)
 
 '''
-if useHL7 == 1:
-    encoder=Encoder7(device,latent_size,Ncols,hidden_size_1,hidden_size_2,hidden_size_3,hidden_size_4,hidden_size_5,hidden_size_6,hidden_size_7)
-    decoder=Decoder7(device,latent_size,Ncols,hidden_size_1,hidden_size_2,hidden_size_3,hidden_size_4,hidden_size_5,hidden_size_6,hidden_size_7)
-    textHisto += 'using <b>4</b> layers encoder/decoder<br>\n'
-    nbLayer = 4
-elif useHL6 == 1:
-    encoder=Encoder6(device,latent_size,Ncols,hidden_size_1,hidden_size_2,hidden_size_3,hidden_size_4,hidden_size_5,hidden_size_6)
-    decoder=Decoder6(device,latent_size,Ncols,hidden_size_1,hidden_size_2,hidden_size_3,hidden_size_4,hidden_size_5,hidden_size_6)
-    textHisto += 'using <b>4</b> layers encoder/decoder<br>\n'
-    nbLayer = 4
-elif useHL5 == 1:
-    encoder=Encoder5(device,latent_size,Ncols,hidden_size_1,hidden_size_2,hidden_size_3,hidden_size_4,hidden_size_5)
-    decoder=Decoder5(device,latent_size,Ncols,hidden_size_1,hidden_size_2,hidden_size_3,hidden_size_4,hidden_size_5)
-    textHisto += 'using <b>3</b> layers encoder/decoder<br>\n'
-    nbLayer = 3
-elif useHL4 == 1:
-    encoder=Encoder4(device,latent_size,Ncols,hidden_size_1,hidden_size_2,hidden_size_3,hidden_size_4)
-    decoder=Decoder4(device,latent_size,Ncols,hidden_size_1,hidden_size_2,hidden_size_3,hidden_size_4)
-    textHisto += 'using <b>4</b> layers encoder/decoder<br>\n'
-    nbLayer = 4
-elif useHL3 == 1:
-    encoder=Encoder3(device,latent_size,Ncols,hidden_size_1,hidden_size_2,hidden_size_3)
-    decoder=Decoder3(device,latent_size,Ncols,hidden_size_1,hidden_size_2,hidden_size_3)
-    textHisto += 'using <b>3</b> layers encoder/decoder<br>\n'
-    nbLayer = 3
-else: # 2 layers
-    encoder=Encoder2(device,latent_size,Ncols,hidden_size_1,hidden_size_2)
-    decoder=Decoder2(device,latent_size,Ncols,hidden_size_1,hidden_size_2)
-    textHisto += 'using <b>2</b> layers encoder/decoder<br>\n'
-    nbLayer = 2
+    if useHL7 == 1:
+        encoder=Encoder7(device,latent_size,Ncols,hidden_size_1,hidden_size_2,hidden_size_3,hidden_size_4,hidden_size_5,hidden_size_6,hidden_size_7)
+        decoder=Decoder7(device,latent_size,Ncols,hidden_size_1,hidden_size_2,hidden_size_3,hidden_size_4,hidden_size_5,hidden_size_6,hidden_size_7)
+        textHisto += 'using <b>4</b> layers encoder/decoder<br>\n'
+        nbLayer = 4
+    elif useHL6 == 1:
+        encoder=Encoder6(device,latent_size,Ncols,hidden_size_1,hidden_size_2,hidden_size_3,hidden_size_4,hidden_size_5,hidden_size_6)
+        decoder=Decoder6(device,latent_size,Ncols,hidden_size_1,hidden_size_2,hidden_size_3,hidden_size_4,hidden_size_5,hidden_size_6)
+        textHisto += 'using <b>4</b> layers encoder/decoder<br>\n'
+        nbLayer = 4
+    elif useHL5 == 1:
+        encoder=Encoder5(device,latent_size,Ncols,hidden_size_1,hidden_size_2,hidden_size_3,hidden_size_4,hidden_size_5)
+        decoder=Decoder5(device,latent_size,Ncols,hidden_size_1,hidden_size_2,hidden_size_3,hidden_size_4,hidden_size_5)
+        textHisto += 'using <b>3</b> layers encoder/decoder<br>\n'
+        nbLayer = 3
+    elif useHL4 == 1:
+        encoder=Encoder4(device,latent_size,Ncols,hidden_size_1,hidden_size_2,hidden_size_3,hidden_size_4)
+        decoder=Decoder4(device,latent_size,Ncols,hidden_size_1,hidden_size_2,hidden_size_3,hidden_size_4)
+        textHisto += 'using <b>4</b> layers encoder/decoder<br>\n'
+        nbLayer = 4
+    elif useHL3 == 1:
+        encoder=Encoder3(device,latent_size,Ncols,hidden_size_1,hidden_size_2,hidden_size_3)
+        decoder=Decoder3(device,latent_size,Ncols,hidden_size_1,hidden_size_2,hidden_size_3)
+        textHisto += 'using <b>3</b> layers encoder/decoder<br>\n'
+        nbLayer = 3
+    else: # 2 layers
+        encoder=Encoder2(device,latent_size,Ncols,hidden_size_1,hidden_size_2)
+        decoder=Decoder2(device,latent_size,Ncols,hidden_size_1,hidden_size_2)
+        textHisto += 'using <b>2</b> layers encoder/decoder<br>\n'
+        nbLayer = 2
 '''
 encoder = simpleEncoder(device,latent_size, Ncols, HL)
 decoder = simpleDecoder(device,latent_size, Ncols, HL)
@@ -463,8 +462,6 @@ if ( useEncoder == 1):
         decoder = torch.load(decoderName)
 else:
     textHisto += 'Calculating encoder/decoder<br>\n'
-    tec = time.time()
-    print('Calculating encoder/decoder : {:.4f} seconds'.format(tec))
     for epoch in range(nb_epochs):
         train_loss, encoded_out = train_epoch_den2(encoder=encoder, decoder=decoder, device=device, dataloader=train_loader, loss_fn=loss_fn,optimizer=optim)
         test_loss, _, latent_out = test_epoch_den2(encoder=encoder, decoder=decoder, device=device, dataloader=test_loader, loss_fn=loss_fn)
@@ -483,20 +480,18 @@ else:
         # latent_out : torch tensor GPU - tuple 2 elements
 
         '''print('train_loss :', type(train_loss), train_loss)
-        print('test_loss :', type(test_loss), test_loss)
-        print('encoded_out :', type(encoded_out), encoded_out, len(encoded_out))
-        print('LatentValues_Train :', type(LatentValues_Train), LatentValues_Train, len(LatentValues_Train))
-        print('LatentValues_Test :', type(LatentValues_Test), LatentValues_Test, len(LatentValues_Test))
-        print('d_out :', type(d_out), d_out, len(d_out))
-        print('latent_out :', type(latent_out), latent_out, len(latent_out))'''
+            print('test_loss :', type(test_loss), test_loss)
+            print('encoded_out :', type(encoded_out), encoded_out, len(encoded_out))
+            print('LatentValues_Train :', type(LatentValues_Train), LatentValues_Train, len(LatentValues_Train))
+            print('LatentValues_Test :', type(LatentValues_Test), LatentValues_Test, len(LatentValues_Test))
+            print('d_out :', type(d_out), d_out, len(d_out))
+            print('latent_out :', type(latent_out), latent_out, len(latent_out))'''
 
         '''bo1 = train_loss < epsilon #deja commenté
         bo2 = test_loss < epsilon#deja commenté
         if (bo1 and bo2):#deja commenté
             break'''#deja commenté
 
-    tec = time.time()
-    print('After encoder/decoder : {:.4f} seconds'.format(tec))
     r = (train_loss - test_loss) / (train_loss + test_loss)
     print('epoch : %03d : tr_lo = %e : te_lo = %e : r = %e' % (epoch, train_loss, test_loss, r))
     textHisto += 'epoch : {:03d} : train_loss = {:e} : test_loss = {:e}<br>\n'.format(epoch, train_loss, test_loss)
@@ -543,8 +538,6 @@ else:
     print('coefficient losses : {:1.4e}'.format(rr) + ' - {:1.4e}'.format(ss))
 
 # Ready for prediction
-tec = time.time()
-print('Prediction : {:.4f} seconds'.format(tec))
 print('using %s\n' % encoderName)
 textHisto += 'Using {:s} for prediction<br>\n'.format(encoderName)
 textHisto += '<br>\n'
@@ -617,8 +610,6 @@ for elem in linOp:
     text2write += '\n'
     wPredVal.write(text2write)
 
-tec = time.time()
-print('End of prediction : {:.4f} seconds'.format(tec))
 labels = []
 val = []
 x = []
@@ -799,7 +790,6 @@ fHisto.write(textHisto)
 fHisto.close()
 
 toc = time.time()
-print('End : {:.4f} seconds'.format(toc))
 print('Done in {:.4f} seconds'.format(toc-tic))
 
 print('end')

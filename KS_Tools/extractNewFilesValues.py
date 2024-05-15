@@ -12,7 +12,7 @@
 #                                                                              
 ################################################################################
 
-import os,sys,shutil
+import sys
 import importlib
 import importlib.machinery
 import importlib.util
@@ -60,7 +60,7 @@ import default as dfo
 from default import *
 from rootValues import NB_EVTS
 from controlFunctions import *
-from graphicFunctions import getHisto, getHistoConfEntry, fill_Snew2 #, fill_Snew
+from graphicFunctions import getHisto, getHistoConfEntry, fill_Snew2
 from sources import *
 
 import numpy as np
@@ -81,6 +81,8 @@ print("func_ExtractNewFilesValues")
 pathNb_evts = pathBase + '/' + '{:04d}'.format(NB_EVTS) + '/' + release
 pathNb_evts = checkFolderName(pathNb_evts)
 print('pathNb_evts : {:s}'.format(pathNb_evts))
+pathROOTFiles = blo.pathROOT + "/" + release
+print('pathROOTFiles : {:s}'.format(pathROOTFiles))
 
 # these line for daltonians !
 #seaborn.set_palette('colorblind')
@@ -90,7 +92,7 @@ pathDATA = checkFolderName(pathDATA)
 print(pathDATA)
 
 # get list of generated ROOT files
-rootFilesList_0 = getListFiles(pathNb_evts, 'root')
+rootFilesList_0 = getListFiles(pathROOTFiles, 'root')
 if (len(rootFilesList_0) ==0 ):
     print('there is no generated ROOT files')
     exit()

@@ -18,7 +18,7 @@ nbFiles = 1000
 # be careful to not forget the '/' at the end of the path
 #folder = 'Extraction_18/' # 200
 
-folder = 'DEV_02/'#'TMP_Extraction_25/' # 200
+folder = 'DEV_08/' # CMSSW_12_5_0_pre4 90 evts 50 fichiers
 
 # nb of bins for sampling
 nbins = 100 

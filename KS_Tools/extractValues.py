@@ -11,7 +11,7 @@
 #                                                                              
 ################################################################################
 
-import os,sys,shutil
+import sys
 import importlib
 import importlib.machinery
 import importlib.util
@@ -61,10 +61,6 @@ from controlFunctions import *
 from graphicFunctions import getHisto, getHistoConfEntry
 from sources import *
 
-# extract release from source reference
-release = input_ref_file.split('__')[2].split('-')[0]
-print('extracted release : {:s}'.format(release))
-
 # get the branches for ElectronMcSignalHistos.txt
 ######## ===== COMMON LINES ===== ########
 branches = []
@@ -74,7 +70,7 @@ cleanBranches(branches) # remove some histo wich have a pbm with KS.
 ######## ===== COMMON LINES ===== ########
 
 print("func_Extract")
-pathNb_evts = pathBase + '/' + '{:04d}'.format(NB_EVTS) + '/' + release
+pathNb_evts = pathBase + '/' + str(NB_EVTS)
 pathNb_evts = checkFolderName(pathNb_evts)
 print('pathNb_evts : {:s}'.format(pathNb_evts))
 
