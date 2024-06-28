@@ -58,7 +58,7 @@ if [[ "$Choice" == "LLR" ]]
     echo "LLR"
     source /opt/exp_soft/llr/root/v6.24.04-el7-gcc9xx-py370/etc/init.sh
     cd $LOG_SOURCE
-    #/opt/exp_soft/cms/t3/t3submit -8c -long KScompare.sh $LOG_SOURCE $LOG_KS_SOURCE $COMMON_SOURCE $FileName
+    #/opt/exp_soft/cms/t3/t3submit -8c -long KScompare.sh $LOG_SOURCE $LOG_KS_SOURCE $COMMON_SOURCE $FileName # -mail chiron@llr.in2p3.fr 
     #/opt/exp_soft/cms/t3/t3submit -8c -short KScompare.sh $LOG_SOURCE $LOG_KS_SOURCE $COMMON_SOURCE $FileName
     /opt/exp_soft/cms/t3/t3submit -8c -reserv KScompare.sh $LOG_SOURCE $LOG_KS_SOURCE $COMMON_SOURCE $FileName
 elif [[ "$Choice" == "PBS" ]] 

@@ -68,7 +68,7 @@ if [[ "$Choice" == "LLR" ]]
     module load python/3.7.0
     cd $LOG_SOURCE
     options="-reserv" # -short -long -reserv
-    /opt/exp_soft/cms/t3/t3submit -8c $options resumeAE.sh $LOG_AE_SOURCE $COMMON_SOURCE $FileName '20230522-175054' 
+    /opt/exp_soft/cms/t3/t3submit -8c $options resumeAE.sh $LOG_AE_SOURCE $COMMON_SOURCE $FileName '20230522-175054' # -mail chiron@llr.in2p3.fr 
 elif [[ "$Choice" == "PBS" ]] 
   then
     echo "PBS"
@@ -76,7 +76,7 @@ elif [[ "$Choice" == "PBS" ]]
     source /pbs/home/c/chiron/private/ValidationsTools/ValidationsTools/bin/activate 
     cd $LOG_SOURCE
 
-    sbatch -L sps -n 4 --mem=16000 -t 0-6:0:0 -J $JobName -o $output resumeAE.sh $LOG_AE_SOURCE $COMMON_SOURCE $FileName '20230601-104753'
+    sbatch -L sps -n 4 --mem=16000 -t 0-6:0:0 -J $JobName -o $output resumeAE.sh $LOG_AE_SOURCE $COMMON_SOURCE $FileName '20230525-091823'
     deactivate
 fi
 

@@ -90,11 +90,11 @@ if [[ "$Choice" == "LLR" ]]
     options="-reserv" # -short -long -reserv
 
     # initialization of the temps folders
-    /opt/exp_soft/cms/t3/t3submit -8c $options initAE.sh $LOG_AE_SOURCE $COMMON_SOURCE $FileName
-    sleep 30
-    #process_id=$!
-    #echo "PID: $process_id"
-    #wait #$process_id
+    /opt/exp_soft/cms/t3/t3submit -8c $options initAE.sh $LOG_AE_SOURCE $COMMON_SOURCE $FileName # -mail chiron@llr.in2p3.fr 
+    #sleep 30
+    process_id=$!
+    echo "PID: $process_id"
+    wait $process_id
 
     for line in "${datasets[@]}"
     do
@@ -102,19 +102,19 @@ if [[ "$Choice" == "LLR" ]]
         #echo $line
         arrLine=(${line//dator/ })
         echo "${arrLine[1]}"
-        /opt/exp_soft/cms/t3/t3submit -8c $options generateAE.sh $LOG_AE_SOURCE $COMMON_SOURCE AEGeneration_V2.py $FileName $var ${arrLine[1]} 'cpu' $timeFolder # $LOG_SOURCE 
+        #/opt/exp_soft/cms/t3/t3submit -8c $options generateAE.sh $LOG_AE_SOURCE $COMMON_SOURCE AEGeneration_V2.py $FileName $var ${arrLine[1]} 'cpu' $timeFolder # $LOG_SOURCE  # -mail chiron@llr.in2p3.fr 
       fi
     done
 elif [[ "$Choice" == "PBS" ]] 
   then
     echo "PBS"
-    #module load Programming_Languages/python/3.9.1
-    #source /pbs/home/c/chiron/private/ValidationsTools/ValidationsTools/bin/activate 
+    module load Programming_Languages/python/3.9.1
+    source /pbs/home/c/chiron/private/ValidationsTools/ValidationsTools/bin/activate 
     cd $LOG_SOURCE
     
     # initialization of the temps folders
     sbatch -L sps -n 4 --mem=16000 -t 0-0:20:0 -J $JobName -o $output initAE.sh $LOG_AE_SOURCE $COMMON_SOURCE $FileName
-    sleep 30
+    #sleep 30
     process_id=$!
     echo "PID: $process_id"
     wait $process_id
@@ -129,7 +129,7 @@ elif [[ "$Choice" == "PBS" ]]
       fi
     done
 
-    #deactivate
+    deactivate
 fi
 
 echo "END"

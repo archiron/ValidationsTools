@@ -58,9 +58,9 @@ if [[ "$Choice" == "LLR" ]]
     echo "LLR"
     source /opt/exp_soft/llr/root/v6.24.04-el7-gcc9xx-py370/etc/init.sh
     cd $LOG_SOURCE
-    #/opt/exp_soft/cms/t3/t3submit -8c -long extractValues.sh $LOG_SOURCE $LOG_KS_SOURCE $LIB_SOURCE $COMMON_SOURCE $RESULTFOLDER
-    #/opt/exp_soft/cms/t3/t3submit -8c -short extractValues.sh $LOG_SOURCE $LOG_KS_SOURCE $LIB_SOURCE $COMMON_SOURCE $RESULTFOLDER
-    /opt/exp_soft/cms/t3/t3submit -8c -reserv extractValues.sh $LOG_SOURCE $LOG_KS_SOURCE $LIB_SOURCE $COMMON_SOURCE $RESULTFOLDER
+    /opt/exp_soft/cms/t3/t3submit -16c -long extractValues.sh $LOG_SOURCE $LOG_KS_SOURCE $COMMON_SOURCE $FileName # -mail chiron@llr.in2p3.fr 
+    #/opt/exp_soft/cms/t3/t3submit -8c -short extractValues.sh $LOG_SOURCE $LOG_KS_SOURCE $COMMON_SOURCE $FileName
+    #/opt/exp_soft/cms/t3/t3submit -8c -reserv extractValues.sh $LOG_SOURCE $LOG_KS_SOURCE $COMMON_SOURCE $FileName
 elif [[ "$Choice" == "PBS" ]] 
   then
     echo "PBS"
@@ -69,7 +69,7 @@ elif [[ "$Choice" == "PBS" ]]
     module load Compilers/gcc/9.3.1
     module load DataManagement/xrootd/4.8.1
     module load Analysis/root/6.24.06
-    sbatch -L sps -n 8 --mem=8000 -t 4-0:0:0 -J $JobName -o $output extractValues.sh $LOG_SOURCE $LOG_KS_SOURCE $LIB_SOURCE $COMMON_SOURCE $RESULTFOLDER
+    sbatch -L sps -n 8 --mem=8000 -t 4-0:0:0 -J $JobName -o $output extractValues.sh $LOG_SOURCE $LOG_KS_SOURCE $COMMON_SOURCE $FileName
 fi
 
 echo "END"

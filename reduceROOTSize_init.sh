@@ -39,57 +39,33 @@ NB_EVTS="${toor[17]}"
 NB_EVTS=${NB_EVTS//NB_EVTS = }
 NB_EVTS=${NB_EVTS//\"}
 NB_EVTS=${NB_EVTS::-1}
-echo "Nbegin : $Nbegin =="
-echo "Nend : $Nend =="
-echo "NB_EVTS : $NB_EVTS =="
-
-FileName2="sources.py"
-echo $FileName2
-readarray releases -t array < CommonFiles/$FileName2
-release="${releases[17]}"
-tt=${release//input_ref_file = \'DQM_V}
-tt=${tt//\'}
-tt=${tt//__DQMIO.root}
-tt=${tt/__C/ C}
-read -a strarr1 <<< "$tt"
-vv=${strarr1[1]}
-vv=${vv/-/ }
-read -a strarr2 <<< "$vv"
-release=${strarr2[0]}
-echo "release = $release"
+echo "Nbegin : $Nbegin=="
+echo "Nend : $Nend=="
+echo "NB_EVTS : $NB_EVTS=="
 
 FileName="paths$Choice.py"
 echo $FileName
 readarray toto -t array < CommonFiles/$FileName
 N=${#toto[@]}
 echo "N= $N"
-
-# Get local (LAST) Release used
-#for item in `ls -drt ZEE_Flow/*/` 
-#do
-#  printf "   %s\n" $item
-#  release=$item
-#done
-#release=${release%?}
-#echo $release
+#echo ${toto[@]}
 
 LOG_SOURCE="$aa/${toto[15]}"
 #LOG_SOURCE=$aa
 LOG_SOURCE=${LOG_SOURCE//LOG_SOURCE=}
 LOG_SOURCE=${LOG_SOURCE//\"}
 #LOG_SOURCE="${LOG_SOURCE}/${release}/src/Kolmogorov"
-#LOG_OUTPUT="$aa/${toto[16]}"
-#LOG_OUTPUT=${LOG_OUTPUT//LOG_OUTPUT=}
-#LOG_OUTPUT=${LOG_OUTPUT//\"}
+LOG_OUTPUT="$aa/${toto[16]}"
+LOG_OUTPUT=${LOG_OUTPUT//LOG_OUTPUT=}
+LOG_OUTPUT=${LOG_OUTPUT//\"}
 RESULTFOLDER="${toto[17]}"
 RESULTFOLDER=${RESULTFOLDER//RESULTFOLDER=}
 RESULTFOLDER=${RESULTFOLDER//\"}
 RESULTFOLDER=$(printf $RESULTFOLDER)
-RESULTRELEASE=$(printf "/%s" $release)
 RESULTAPPEND=$(printf "/%04d" $NB_EVTS)
-RESULTFOLDER="${RESULTFOLDER}${RESULTAPPEND}${RESULTRELEASE}"
+RESULTFOLDER="${RESULTFOLDER}${RESULTAPPEND}"
 echo "LOG_SOURCE : $LOG_SOURCE"
-#echo "LOG_OUTPUT : $LOG_OUTPUT"
+echo "LOG_OUTPUT : $LOG_OUTPUT"
 echo "RESULTFOLDER : $RESULTFOLDER"
 
 if [[ "$Choice" == "LLR" ]] 
@@ -99,7 +75,7 @@ if [[ "$Choice" == "LLR" ]]
     cd $LOG_SOURCE
     for i in $(eval echo "{$Nbegin..$Nend}") 
     do
-      #/opt/exp_soft/cms/t3/t3submit -8c -long reduceROOTSize.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER
+      #/opt/exp_soft/cms/t3/t3submit -8c -long reduceROOTSize.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER # -mail chiron@llr.in2p3.fr 
       #/opt/exp_soft/cms/t3/t3submit -8c -short reduceROOTSize.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER
       /opt/exp_soft/cms/t3/t3submit -8c -reserv reduceROOTSize.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER
     done

@@ -76,11 +76,7 @@ from graphicAutoEncoderFunctions import GraphicKS
 from DecisionBox import DecisionBox
 from sources import *
 
-# extract release from source reference
-release = input_ref_file.split('__')[2].split('-')[0]
-print('extracted release : {:s}'.format(release))
-
-pathNb_evts = pathBase + '/' + '{:04d}'.format(NB_EVTS) + '/' + release
+pathNb_evts = pathBase + '/' + str(NB_EVTS)
 pathNb_evts = checkFolderName(pathNb_evts)
 print('pathNb_evts : {:s}'.format(pathNb_evts))
 #folder = checkFolderName(dfo.folder)
@@ -98,7 +94,6 @@ DB = DecisionBox()
 grKS = GraphicKS()
 rels = []
 tmp_branches = []
-#tmp_branches2 = []
 nb_ttl_histos = []
 
 N_histos = len(branches)
@@ -137,45 +132,15 @@ for item in rootFilesList:
             #s_tmp = fill_Snew(histo_rel)
             if (s_tmp.min() < 0.):
                 print('pbm whith histo %s, min < 0' % branches[i])
-                tmp_branch.append('KOKO')
             elif (np.floor(s_tmp.sum()) == 0.):
                 print('pbm whith histo %s, sum = 0' % branches[i])
-                tmp_branch.append('KOKO')
             else:
                 nbHistos += 1
                 tmp_branch.append(branches[i])
         else:
-            print('{:s} : {:s} KO'.format(item, branches[i]))
-            tmp_branch.append('KOKO')
+            print('%s KO' % branches[i])
     nb_ttl_histos.append(nbHistos)
     tmp_branches.append(tmp_branch)
-
-'''for item in rootFilesList:
-    tmp_branch = []
-    nbHistos = 0
-    b = (item.split('__')[2]).split('-')
-    rels.append([b[0], b[0][6:], item])
-    f_root = ROOT.TFile(pathDATA + item)
-    h_rel = getHisto(f_root, tp_1)
-    for i in range(0, N_histos): # 1 N_histos histo for debug
-        histo_rel = h_rel.Get(branches[i])
-        if (histo_rel):
-            d = getHistoConfEntry(histo_rel)
-            s_tmp = fill_Snew2(d, histo_rel)
-            if (s_tmp.min() < 0.):
-                print('pbm whith histo %s, min < 0' % branches[i])
-                tmp_branch.append('KOKO')
-            elif (np.floor(s_tmp.sum()) == 0.):
-                print('pbm whith histo %s, sum = 0' % branches[i])
-                tmp_branch.append('KOKO')
-            else:
-                nbHistos += 1
-                tmp_branch.append(branches[i])
-        else:
-            print('{:s} : {:s} KO'.format(item, branches[i]))
-            tmp_branch.append('KOKO')
-    tmp_branches2.append(tmp_branch)
-newBranches2 = optimizeBranches2(tmp_branches2)'''
 
 print('nb_ttl_histos : ', nb_ttl_histos)
 if(len(set(nb_ttl_histos))==1):
@@ -249,13 +214,13 @@ redGreen1 = [[0 for c in range(2)] for r in range(nbRels)]
 redGreen2 = [[0 for c in range(2)] for r in range(nbRels)]
 redGreen3 = [[0 for c in range(2)] for r in range(nbRels)]
 '''
-print('{:d}/2 '.format(nbRels))
-for i in range(0, nbRels):
-    for j in range(0, 2):
-        print('{:d}/{:d} : {:d}'.format(i,j,redGreen1[i][j]))
-for i in range(0, nbRels):
-    for j in range(0, 2):
-        print('{:d}/{:d} : {:d}'.format(i,j,redGreen2[i][j]))
+    print('{:d}/2 '.format(nbRels))
+    for i in range(0, nbRels):
+        for j in range(0, 2):
+            print('{:d}/{:d} : {:d}'.format(i,j,redGreen1[i][j]))
+    for i in range(0, nbRels):
+        for j in range(0, 2):
+            print('{:d}/{:d} : {:d}'.format(i,j,redGreen2[i][j]))
 '''
 tic = time.time()
 
@@ -264,9 +229,9 @@ for i in range(0, N_histos):#, N_histos-1 range(N_histos - 1, N_histos):  # 1 N_
     
     histo_rel = h_rel.Get(branches[i])
     if (histo_rel):
-        print('\n%s OK' % branches[i])
+        print('%s OK' % branches[i])
         name = pathNb_evts + "histo_" + branches[i] + '_{:03d}'.format(nbFiles) + ".txt"
-        print('\n{:d}/{:d} - {:s}'.format(i, N_histos - 1, name))
+        print('\n%d - %s' %(i, name))
         df = pd.read_csv(name)
     
         # check the values data
@@ -412,14 +377,15 @@ for i in range(0, N_histos):#, N_histos-1 range(N_histos - 1, N_histos):  # 1 N_
             plt_entries = df_entries.plot(kind='line')
             fig = plt_entries.get_figure()
             fig.clf()
-            # create the integrated curve
-            curves = []
-            for k in range(0,Nrows):
-                series0 = df_entries.iloc[k,:]
-                curves = DB.funcKS(series0)
-                plt.plot(curves)
-            fig.savefig(pathKS + '/cumulative_curve_' + branches[i] + "_" + rel + '.png')
-            fig.clf()
+            # create the integrated curve -> no more used.
+            '''curves = []
+                for k in range(0,Nrows):
+                    series0 = df_entries.iloc[k,:]
+                    curves = DB.funcKS(series0)
+                    plt.plot(curves)
+                fig.savefig(pathKS + '/cumulative_curve_' + branches[i] + "_" + rel + '.png')
+                fig.clf()
+            '''
         
             # ================================ #
             # create the mean curve of entries #
@@ -493,44 +459,45 @@ for i in range(0, N_histos):#, N_histos-1 range(N_histos - 1, N_histos):  # 1 N_
             [nb_green1, nb_red1] = grKS.createKSttlDiffPicture(totalDiff, nbins, diffMax0,'KS diff. 1', fileName1, pValue, I_max)
 
             # Kolmogoroff-Smirnov curve 2
-            seriesTotalDiff2 = pd.DataFrame(totalDiff2, columns=['KSDiff'])
-            print('\ndiffMin0/sTD.min 1 : %f/%f' % (diffMax0, seriesTotalDiff2.values.min()))
-            print('\ndiffMax0/sTD.max 2 : %f/%f' % (diffMax0, seriesTotalDiff2.values.max()))
+            '''seriesTotalDiff2 = pd.DataFrame(totalDiff2, columns=['KSDiff'])
+                print('\ndiffMin0/sTD.min 1 : %f/%f' % (diffMax0, seriesTotalDiff2.values.min()))
+                print('\ndiffMax0/sTD.max 2 : %f/%f' % (diffMax0, seriesTotalDiff2.values.max()))
 
-            count, division = np.histogram(seriesTotalDiff2, bins=nbins)
-            div_min = np.amin(division)
-            div_max = np.amax(division)
-            KSDiffHistoname2 = pathNb_files + '/KSDiffHistoValues_2_' + branches[i] + "_" + rel + '.txt'
-            wKSDiff2 = open(KSDiffHistoname2, 'w')
-            wKSDiff2.write(' '.join("{:10.04e}".format(x) for x in count))
-            wKSDiff2.write('\n')
-            wKSDiff2.write(' '.join("{:10.04e}".format(x) for x in division))
-            wKSDiff2.write('\n')
-            wKSDiff2.close()
-        
-            # Get the max of the integral
-            I_max2 = DB.integralpValue(division, count, 0.)
-            ##print('\nMax. integral 2 : %0.4e for nbins=%d' % (I_max2, nbins))
-            # print the min/max values of differences
-            ##print('Kolmogoroff-Smirnov min value : %0.4e - max value : %0.4e | diff value : %e \n' % (div_min, div_max, x2))
-            pValue2 = DB.integralpValue(division, count, diffMax0)
-            #print(division)
-            #print(count)
-            # save the KS curves
-            wKS2.write('%e, %d\n' % (I_max2, nbins))
-            wKS2.write('%e, %e\n' % (div_min, div_max))
-            wKS2.write(' '.join("{:10.04e}".format(x) for x in count))
-            wKS2.write('\n')
-            wKS2.write(' '.join("{:10.04e}".format(x) for x in division))
-            wKS2.write('\n')
-            wKS2.write(' '.join("{:10.04e}".format(x) for x in yellowCurve2 )) # random curve
-            wKS2.write('\n')
-            wKS2.write(' '.join("{:10.04e}".format(x) for x in yellowCurveCum2 ))
-            wKS2.write('\n')
-            wKS2.close()
+                count, division = np.histogram(seriesTotalDiff2, bins=nbins)
+                div_min = np.amin(division)
+                div_max = np.amax(division)
+                KSDiffHistoname2 = pathNb_files + '/KSDiffHistoValues_2_' + branches[i] + "_" + rel + '.txt'
+                wKSDiff2 = open(KSDiffHistoname2, 'w')
+                wKSDiff2.write(' '.join("{:10.04e}".format(x) for x in count))
+                wKSDiff2.write('\n')
+                wKSDiff2.write(' '.join("{:10.04e}".format(x) for x in division))
+                wKSDiff2.write('\n')
+                wKSDiff2.close()
+            
+                # Get the max of the integral
+                I_max2 = DB.integralpValue(division, count, 0.)
+                ##print('\nMax. integral 2 : %0.4e for nbins=%d' % (I_max2, nbins))
+                # print the min/max values of differences
+                ##print('Kolmogoroff-Smirnov min value : %0.4e - max value : %0.4e | diff value : %e \n' % (div_min, div_max, x2))
+                pValue2 = DB.integralpValue(division, count, diffMax0)
+                #print(division)
+                #print(count)
+                # save the KS curves
+                wKS2.write('%e, %d\n' % (I_max2, nbins))
+                wKS2.write('%e, %e\n' % (div_min, div_max))
+                wKS2.write(' '.join("{:10.04e}".format(x) for x in count))
+                wKS2.write('\n')
+                wKS2.write(' '.join("{:10.04e}".format(x) for x in division))
+                wKS2.write('\n')
+                wKS2.write(' '.join("{:10.04e}".format(x) for x in yellowCurve2 )) # random curve
+                wKS2.write('\n')
+                wKS2.write(' '.join("{:10.04e}".format(x) for x in yellowCurveCum2 ))
+                wKS2.write('\n')
+                wKS2.close()
 
-            fileName2 = pathKS + '/KS-ttlDiff_2_' + branches[i] + "_" + rel + '.png'
-            [nb_green2, nb_red2] = grKS.createKSttlDiffPicture(totalDiff2, nbins, diffMax0,'KS diff. 2', fileName2, pValue2, I_max2)
+                fileName2 = pathKS + '/KS-ttlDiff_2_' + branches[i] + "_" + rel + '.png'
+                [nb_green2, nb_red2] = grKS.createKSttlDiffPicture(totalDiff2, nbins, diffMax0,'KS diff. 2', fileName2, pValue2, I_max2)
+            '''
 
             # Kolmogoroff-Smirnov curve 3
             seriesTotalDiff3 = pd.DataFrame(totalDiff3, columns=['new'])

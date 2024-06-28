@@ -68,7 +68,7 @@ if [[ "$Choice" == "LLR" ]]
     module load python/3.7.0
     cd $LOG_SOURCE
     options="-reserv" # -short -long -reserv
-    /opt/exp_soft/cms/t3/t3submit -8c $options compAELosses.sh $LOG_AE_SOURCE $COMMON_SOURCE $FileName 
+    /opt/exp_soft/cms/t3/t3submit -8c $options compAELosses.sh $LOG_AE_SOURCE $COMMON_SOURCE $FileName # -mail chiron@llr.in2p3.fr 
 elif [[ "$Choice" == "PBS" ]] 
   then
     echo "PBS"

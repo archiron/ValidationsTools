@@ -39,9 +39,9 @@ NB_EVTS="${toor[17]}"
 NB_EVTS=${NB_EVTS//NB_EVTS = }
 NB_EVTS=${NB_EVTS//\"}
 NB_EVTS=${NB_EVTS::-1}
-echo "Nbegin : $Nbegin =="
-echo "Nend : $Nend =="
-echo "NB_EVTS : $NB_EVTS =="
+echo "Nbegin : $Nbegin=="
+echo "Nend : $Nend=="
+echo "NB_EVTS : $NB_EVTS=="
 
 FileName2="sources.py"
 echo $FileName2
@@ -75,11 +75,7 @@ RESULTFOLDER=$(printf $RESULTFOLDER)
 RESULTRELEASE=$(printf "/%s" $release)
 RESULTAPPEND=$(printf "/%04d" $NB_EVTS)
 RESULTFOLDER="${RESULTFOLDER}${RESULTAPPEND}${RESULTRELEASE}"
-LOG_OUTPUT="${toto[16]}"
-LOG_OUTPUT=${LOG_OUTPUT//LOG_OUTPUT=}
-LOG_OUTPUT=${LOG_OUTPUT//\"}
-LOG_OUTPUT=$(printf $LOG_OUTPUT)
-echo "LOG_OUTPUT : $LOG_OUTPUT"
+#echo "LOG_OUTPUT : $LOG_OUTPUT"
 echo "LOG_SOURCE : $LOG_SOURCE"
 echo "RESULTFOLDER : $RESULTFOLDER"
 
@@ -93,7 +89,7 @@ if [[ "$Choice" == "LLR" ]]
     eval `scramv1 runtime -sh`
     for i in $(eval echo "{$Nbegin..$Nend}") 
     do
-      #/opt/exp_soft/cms/t3/t3submit -8c -long createROOTFiles.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER
+      #/opt/exp_soft/cms/t3/t3submit -8c -long createROOTFiles.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER # -mail chiron@llr.in2p3.fr 
       #/opt/exp_soft/cms/t3/t3submit -8c -short createROOTFiles.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER
       /opt/exp_soft/cms/t3/t3submit -8c -reserv createROOTFiles.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER $initialSEED
     done

@@ -61,7 +61,10 @@ from controlFunctions import *
 from graphicFunctions import getHisto, getHistoConfEntry
 from sources import *
 
-# get the branches for ElectronMcSignalHistos.txt
+# extract release from source reference
+release = input_ref_file.split('__')[2].split('-')[0]
+print('extracted release : {:s}'.format(release))
+
 ######## ===== COMMON LINES ===== ########
 branches = []
 source = pathChiLib + "/HistosConfigFiles/ElectronMcSignalHistos.txt"
@@ -70,9 +73,12 @@ cleanBranches(branches) # remove some histo wich have a pbm with KS.
 ######## ===== COMMON LINES ===== ########
 
 print("func_Extract")
-pathNb_evts = pathBase + '/' + str(NB_EVTS)
+pathNb_evts = pathBase + '/' + '{:04d}'.format(NB_EVTS) + '/' + release
 pathNb_evts = checkFolderName(pathNb_evts)
 print('pathNb_evts : {:s}'.format(pathNb_evts))
+pathROOTFiles = blo.pathROOT + "/" + release
+pathROOTFiles = checkFolderName(pathROOTFiles)
+print('pathROOTFiles : {:s}'.format(pathROOTFiles))
 
 wr = []
 histos = {}
@@ -83,7 +89,7 @@ histos = {}
 for leaf in branches:
     histos[leaf] = []
     
-fileList = getListFiles(pathNb_evts) # get the list of the root files in the folderName folder
+fileList = getListFiles(pathROOTFiles) # get the list of the root files in the folderName folder
 if (len(fileList) ==0 ):
     print('there is no generated ROOT files')
     exit()
@@ -96,8 +102,8 @@ print(fileList)
 nbFiles = change_nbFiles(len(fileList), nbFiles)
 
 for elem in fileList:
-    input_file = pathNb_evts + str(elem.split()[0])
-    name_1 = input_file.replace(pathNb_evts, '').replace('DQM_V0001_R000000001__Global__CMSSW_X_Y_Z__RECO_', '').replace('.root', '')
+    input_file = pathROOTFiles + str(elem.split()[0])
+    name_1 = input_file.replace(pathROOTFiles, '').replace('DQM_V0001_R000000001__Global__CMSSW_X_Y_Z__RECO_', '').replace('.root', '')
     print('\n %s - name_1 : %s' % (input_file, name_1))
     #print('\n %s - name_1 : %s' % (input_file, colorText(name_1, 'lightyellow')))
     
@@ -150,7 +156,7 @@ i_leaf = 0
 for leaf in branches:
     histo = h1.Get(leaf)
     if (histo):
-        fileName = pathNb_evts + 'histo_' + str(leaf) + '_' + '{:03d}'.format(nbFiles) + '.txt'
+        fileName = pathROOTFiles + 'histo_' + str(leaf) + '_' + '{:03d}'.format(nbFiles) + '.txt'
         print('fileName : %s' % fileName)
         wr.append(open(fileName, 'w'))
         nb_max = len(histos[leaf][0]) - 1
