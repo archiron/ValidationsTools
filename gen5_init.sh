@@ -2,7 +2,7 @@
 # This file is called . createFiles_init.sh
 
 JobName="createFiles_serial_job_test" # for slurm
-output="/sps/cms/chiron/TEMP/createFiles_%j.log" # for slurm
+output="/sps/cms/chiron/TEMP/gen5_%j.log" # for slurm
 
 declare -a readarray
 
@@ -30,18 +30,12 @@ echo "N= $N"
 LOG_SOURCE="$aa/${toto[15]}"
 LOG_SOURCE=${LOG_SOURCE//LOG_SOURCE=}
 LOG_SOURCE=${LOG_SOURCE//\"}
-#LOG_OUTPUT="${toto[15]}"
-#LOG_OUTPUT=${LOG_OUTPUT//LOG_OUTPUT=}
-#LOG_OUTPUT=${LOG_OUTPUT//\"}
 RESULTFOLDER="${toto[17]}"
 RESULTFOLDER=${RESULTFOLDER//RESULTFOLDER=}
 RESULTFOLDER=${RESULTFOLDER//\"}
 LOG_KS_SOURCE="$aa/${toto[18]}"
 LOG_KS_SOURCE=${LOG_KS_SOURCE//LOG_KS_SOURCE=}
 LOG_KS_SOURCE=${LOG_KS_SOURCE//\"}
-#LIB_SOURCE="${toto[19]}"
-#LIB_SOURCE=${LIB_SOURCE//LIB_SOURCE=}
-#LIB_SOURCE=${LIB_SOURCE//\"}
 COMMON_SOURCE="$aa/${toto[20]}"
 COMMON_SOURCE=${COMMON_SOURCE//COMMON_SOURCE=}
 COMMON_SOURCE=${COMMON_SOURCE//\"}
@@ -56,23 +50,22 @@ echo "COMMON_SOURCE : $COMMON_SOURCE"
 if [[ "$Choice" == "LLR" ]] 
   then
     echo "LLR"
+    
     module purge
     module use /opt/exp_soft/vo.gridcl.fr/software/modules/
     module use /opt/exp_soft/vo.llr.in2p3.fr/modulefiles_el7
-    module use /opt/exp_soft/vo.llr.in2p3.fr/modulefiles
-    module load python/3.7.0
-    #module load python/3.12.4
-    module load compilers/gcc/11.x.x
+    #module use /opt/exp_soft/vo.llr.in2p3.fr/modulefiles
     
-    source /opt/exp_soft/llr/root/v6.24.04-el7-gcc9xx-py370/etc/init.sh
-    #source /opt/exp_soft/llr/root/v6.28.04-el7-gcc9xx-py370/etc/init.sh
-    #source /opt/exp_soft/llr/root/v6.32.02-el7-gcc11xx-py3124/etc/init.sh
+    #module load python/3.7.0
+    module load python/3.12.4
+    
+    source /opt/exp_soft/llr/root/v6.32.02-el7-gcc11xx-py3124/etc/init.sh
+    #source /opt/exp_soft/llr/root/v6.24.04-el7-gcc9xx-py370/etc/init.sh
 
     cd $LOG_SOURCE
-    #/opt/exp_soft/cms/t3/t3submit -8c -long createFiles.sh $LOG_SOURCE $LOG_KS_SOURCE $COMMON_SOURCE $FileName # -mail chiron@llr.in2p3.fr 
-    /opt/exp_soft/cms/t3/t3submit -8c -short createFiles.sh $LOG_SOURCE $LOG_KS_SOURCE $COMMON_SOURCE $FileName
-    #. createFiles.sh $LOG_SOURCE $LOG_KS_SOURCE $COMMON_SOURCE $FileName
-    #/opt/exp_soft/cms/t3/t3submit -8c -reserv createFiles.sh $LOG_SOURCE $LOG_KS_SOURCE $COMMON_SOURCE $FileName
+    #/opt/exp_soft/cms/t3/t3submit -8c -long createFiles.sh $LOG_SOURCE $LOG_KS_SOURCE $COMMON_SOURCE $FileName
+    #/opt/exp_soft/cms/t3/t3submit -8c -short createFiles.sh $LOG_SOURCE $LOG_KS_SOURCE $COMMON_SOURCE $FileName
+    /opt/exp_soft/cms/t3/t3submit -8c -short gen5.sh $LOG_SOURCE $LOG_KS_SOURCE $COMMON_SOURCE $FileName
 elif [[ "$Choice" == "PBS" ]] 
   then
     echo "PBS"
@@ -81,7 +74,7 @@ elif [[ "$Choice" == "PBS" ]]
     module load Compilers/gcc/9.3.1
     module load DataManagement/xrootd/4.8.1
     module load Analysis/root/6.24.06
-    sbatch -L sps -n 2 --mem=8000 -t 4-0:0:0 -J $JobName -o $output createFiles.sh $LOG_SOURCE $LOG_KS_SOURCE $COMMON_SOURCE $FileName
+    sbatch -L sps -n 2 --mem=8000 -t 0-0:5:0 -J $JobName -o $output gen5.sh $LOG_SOURCE $LOG_KS_SOURCE $COMMON_SOURCE $FileName
 fi
 
 echo "END"

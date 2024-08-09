@@ -28,6 +28,7 @@ ROOT.gROOT.SetBatch(True)
 argv.remove( '-b-' )
 
 from ROOT import *
+root_version = ROOT.gROOT.GetVersion()
 
 if len(sys.argv) > 1:
     print(sys.argv)
@@ -43,6 +44,13 @@ else:
 
 import pandas as pd
 import matplotlib
+import numpy as np
+
+print('PANDAS     version : {}'.format(pd.__version__))
+print('PYTHON     version : {}'.format(sys.version))
+print("NUMPY      version : {}".format(np.__version__))
+print('MATPLOTLIB version : {}'.format(matplotlib.__version__))
+print("ROOT      version : {}".format(root_version))
 
 matplotlib.use('agg')
 
@@ -70,8 +78,10 @@ from default import *
 from rootValues import NB_EVTS
 from controlFunctions import *
 from sources import *
-from graphicAutoEncoderFunctions import *
-from graphicFunctions import getHisto, getHistoConfEntry, fill_Snew2, fill_Snew
+from graphicAutoEncoderFunctions import createCompLossesPicture, createCompPValuesPicture
+from graphicFunctions import Graphic
+
+gr = Graphic()
 
 # extract release from source reference
 release = input_ref_file.split('__')[2].split('-')[0]
@@ -81,6 +91,9 @@ pathNb_evts = pathBase + '/' + '{:04d}'.format(NB_EVTS) + '/' + release
 pathNb_evts = checkFolderName(pathNb_evts)
 print('pathNb_evts : {:s}'.format(pathNb_evts))
 pathCase = pathNb_evts + checkFolderName(dfo.folder)
+pathROOTFiles = blo.pathROOT + "/" + release
+pathROOTFiles = checkFolderName(pathROOTFiles)
+print('pathROOTFiles : {:s}'.format(pathROOTFiles))
 
 # get the branches for ElectronMcSignalHistos.txt
 ######## ===== COMMON LINES ===== ########
@@ -119,26 +132,23 @@ for item in rootFilesList:
     b = (item.split('__')[2]).split('-')
     rels.append([b[0], b[0][6:]])
     f_root = ROOT.TFile(pathDATA + item)
-    h1 = getHisto(f_root, tp_1)
+    h1 = gr.getHisto(f_root, tp_1)
     for i in range(0, N_histos): # 1 N_histos histo for debug
         histo_1 = h1.Get(branches[i])
         if (histo_1):
             print('%s OK' % branches[i])
-            d = getHistoConfEntry(histo_1)
-            s_tmp = fill_Snew2(d, histo_1)
+            d = gr.getHistoConfEntry(histo_1)
+            s_tmp = gr.fill_Snew2(d, histo_1)
             #s_tmp = fill_Snew(histo_1)
             if (s_tmp.min() < 0.):
                 print('pbm whith histo %s, min < 0' % branches[i])
-                tmp_branch.append('KOKO')
             elif (np.floor(s_tmp.sum()) == 0.):
                 print('pbm whith histo %s, sum = 0' % branches[i])
-                tmp_branch.append('KOKO')
             else:
                 nbHistos += 1
                 tmp_branch.append(branches[i])
         else:
             print('%s KO' % branches[i])
-            tmp_branch.append('KOKO')
     nb_ttl_histos.append(nbHistos)
     tmp_branches.append(tmp_branch)
 
@@ -160,7 +170,7 @@ print('N_histos : %d' % N_histos)
 sortedRels = sorted(rels, key = lambda x: x[0]) # gives an array with releases sorted
 
 # get list of generated ROOT files
-rootFilesList_0 = getListFiles(pathNb_evts, 'root')
+rootFilesList_0 = getListFiles(pathROOTFiles, 'root')
 print('there is ' + '{:03d}'.format(len(rootFilesList_0)) + ' generated ROOT files')
 nbFiles = change_nbFiles(len(rootFilesList_0), nbFiles)
 pathNb_files = pathCase + '{:03d}'.format(nbFiles)
@@ -263,4 +273,4 @@ for ind in df2.index:
 toc = time.time()
 print('Done in {:.4f} seconds'.format(toc-tic))
 
-
+print("Fin !")

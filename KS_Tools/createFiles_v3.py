@@ -45,6 +45,11 @@ import pandas as pd
 import numpy as np
 import matplotlib
 
+print('PANDAS     version : {}'.format(pd.__version__))
+print('PYTHON     version : {}'.format(sys.version))
+print("NUMPY      version : {}".format(np.__version__))
+print('MATPLOTLIB version : {}'.format(matplotlib.__version__))
+
 # import matplotlib.dates as md
 matplotlib.use('agg')
 from matplotlib import pyplot as plt
@@ -76,11 +81,9 @@ from graphicAutoEncoderFunctions import GraphicKS
 from DecisionBox import DecisionBox
 from sources import *
 
-pathNb_evts = pathBase + '/' + str(NB_EVTS)
-pathNb_evts = checkFolderName(pathNb_evts)
-print('pathNb_evts : {:s}'.format(pathNb_evts))
-#folder = checkFolderName(dfo.folder)
-pathCase = pathNb_evts + checkFolderName(dfo.folder)
+# extract release from source reference
+release = input_ref_file.split('__')[2].split('-')[0]
+print('extracted release : {:s}'.format(release))
 
 # get the branches for ElectronMcSignalHistos.txt
 ######## ===== COMMON LINES ===== ########
@@ -89,6 +92,15 @@ source = pathChiLib + "/HistosConfigFiles/ElectronMcSignalHistos.txt"
 branches = getBranches(tp_1, source)
 cleanBranches(branches) # remove some histo wich have a pbm with KS.
 ######## ===== COMMON LINES ===== ########
+
+pathNb_evts = pathBase + '/' + '{:04d}'.format(NB_EVTS) + '/' + release
+pathNb_evts = checkFolderName(pathNb_evts)
+print('pathNb_evts : {:s}'.format(pathNb_evts))
+#folder = checkFolderName(dfo.folder)
+pathCase = pathNb_evts + checkFolderName(dfo.folder)
+pathROOTFiles = blo.pathROOT + "/" + release
+pathROOTFiles = checkFolderName(pathROOTFiles)
+print('pathROOTFiles : {:s}'.format(pathROOTFiles))
 
 DB = DecisionBox()
 grKS = GraphicKS()
@@ -110,6 +122,25 @@ if not os.path.exists(pathCase):
 else:
     print('Folder %s already created\n' % pathCase)
 
+# get list of generated ROOT files
+rootFilesList_0 = getListFiles(pathROOTFiles) # get the list of the root files in the folderName folder
+if (len(rootFilesList_0) ==0 ):
+    print('there is no generated ROOT files')
+    exit()
+rootFilesList_0.sort()
+print('there is %d generated ROOT files' % len(rootFilesList_0))
+rootFilesList_0 = rootFilesList_0[0:nbFiles]
+print('file list :')
+print(rootFilesList_0)
+nbFiles = change_nbFiles(len(rootFilesList_0), nbFiles)
+
+pathNb_files = pathCase + '{:03d}'.format(nbFiles)
+pathNb_files = checkFolderName(pathNb_files)
+checkFolder(pathNb_files)
+pathKS = pathNb_files + 'KS'
+pathKS =checkFolderName(pathKS)
+checkFolder(pathKS)
+
 # get list of added ROOT files for comparison
 pathDATA = pathLIBS + '/' + blo.DATA_SOURCE # '/pbs/home/c/chiron/private/KS_Tools/GenExtract/DATA/NewFiles'
 rootFilesList = getListFiles(pathDATA, 'root')
@@ -117,7 +148,7 @@ print('we use the files :')
 for item in rootFilesList:
     tmp_branch = []
     nbHistos = 0
-    #print('\n%s' % item)
+    print('\n%s' % item)
     b = (item.split('__')[2]).split('-')
     #print('%s - %s' % (b[0], b[0][6:]))
     rels.append([b[0], b[0][6:], item])
@@ -156,18 +187,6 @@ if (len(branches) != len(newBranches)):
     branches = newBranches
     N_histos = len(branches)
 print('N_histos : %d' % N_histos)
-
-# get list of generated ROOT files
-rootFilesList_0 = getListFiles(pathNb_evts, 'root')
-print('there is ' + '{:03d}'.format(len(rootFilesList_0)) + ' ROOT files')
-nbFiles = change_nbFiles(len(rootFilesList_0), nbFiles)
-
-pathNb_files = pathCase + '{:03d}'.format(nbFiles)
-pathNb_files = checkFolderName(pathNb_files)
-checkFolder(pathNb_files)
-pathKS = pathNb_files + 'KS'
-pathKS =checkFolderName(pathKS)
-checkFolder(pathKS)
 
 source_dest = pathNb_files + "/ElectronMcSignalHistos.txt"
 shutil.copy2(source, source_dest)
@@ -231,6 +250,7 @@ for i in range(0, N_histos):#, N_histos-1 range(N_histos - 1, N_histos):  # 1 N_
     if (histo_rel):
         print('%s OK' % branches[i])
         name = pathNb_evts + "histo_" + branches[i] + '_{:03d}'.format(nbFiles) + ".txt"
+        name = pathROOTFiles + "histo_" + branches[i] + '_{:03d}'.format(nbFiles) + ".txt"
         print('\n%d - %s' %(i, name))
         df = pd.read_csv(name)
     
@@ -267,7 +287,7 @@ for i in range(0, N_histos):#, N_histos-1 range(N_histos - 1, N_histos):  # 1 N_
                 #totalDiff.append(DB.diffMAXKS3(series0, series1, sum0, sum1)[0]) # 9000, 9000
                 totalDiff.append(DB.diffMAXKS3(series0, series1)[0]) # 9000, 9000
 
-        print('ttl nb1 of couples 1 : %d' % nb1)
+        print('ttl nb of couples 1 : %d' % nb1)
 
         # create the datas for the p-Value graph
         # by comparing 1 curve with the others.
@@ -374,9 +394,11 @@ for i in range(0, N_histos):#, N_histos-1 range(N_histos - 1, N_histos):  # 1 N_
             print('ttl nb of couples 3 : %d' % nb3)
         
             # plot some datas
-            plt_entries = df_entries.plot(kind='line')
-            fig = plt_entries.get_figure()
-            fig.clf()
+            '''print(df_entries)
+                plt_entries = df_entries.plot(kind='line')
+                fig = plt_entries.get_figure()
+                fig.clf()
+            '''
             # create the integrated curve -> no more used.
             '''curves = []
                 for k in range(0,Nrows):
@@ -393,11 +415,8 @@ for i in range(0, N_histos):#, N_histos-1 range(N_histos - 1, N_histos):  # 1 N_
             mean_df_entries = df_entries.mean()
             mean_sum = mean_df_entries.sum()
                 
-            #diffMax1, posMax1 = DB.diffMAXKS3(mean_df_entries, s_new, mean_sum, Ntot_h_rel)
             diffMax1, posMax1, _ = DB.diffMAXKS3(mean_df_entries, s_new)
-            #diffMax2, posMax2 = DB.diffMAXKS3(series_reference, s_new, nbBins_reference, Ntot_h_rel)
             diffMax2, posMax2, _ = DB.diffMAXKS3(series_reference, s_new)
-            #diffMax3, posMax3 = DB.diffMAXKS3(s_new, s_KSref, Ntot_h_rel, Ntot_h_KSref)
             diffMax3, posMax3, _ = DB.diffMAXKS3(s_new, s_KSref)
             print("diffMax1 : %f - posMax1 : %f" % (diffMax1, posMax1))
             print("diffMax2 : %f - posMax2 : %f" % (diffMax2, posMax2))
@@ -405,7 +424,6 @@ for i in range(0, N_histos):#, N_histos-1 range(N_histos - 1, N_histos):  # 1 N_
             print('Ntot_h_rel : %d - Ntot_h_KSref : %d' % (Ntot_h_rel, Ntot_h_KSref))
 
             # diff max between new & old
-            #diffMax0, posMax0, sDKS = DB.diffMAXKS3(s_KSref, s_new, Ntot_h_KSref, Ntot_h_rel)
             diffMax0, posMax0, sDKS = DB.diffMAXKS3(s_KSref, s_new)
             print("diffMax0 : %f - posMax0 : %f" % (diffMax0, posMax0))
             wKS0_Files[ind_rel].write('%s : %e\n' % (branches[i], diffMax0))
@@ -421,6 +439,7 @@ for i in range(0, N_histos):#, N_histos-1 range(N_histos - 1, N_histos):  # 1 N_
             yellowCurveCum3 = DB.funcKS(s_new)
 
             # Kolmogoroff-Smirnov curve
+            print('Kolmogoroff-Smirnov curve 1')
             seriesTotalDiff1 = pd.DataFrame(totalDiff, columns=['KSDiff'])
             KSDiffname1 = pathNb_files + '/KSDiffValues_1_' + branches[i] + "_" + rel+ '.txt' # csv imposed by pd.to_csv + "_" + rel 
             df.to_csv(KSDiffname1)
@@ -459,47 +478,45 @@ for i in range(0, N_histos):#, N_histos-1 range(N_histos - 1, N_histos):  # 1 N_
             [nb_green1, nb_red1] = grKS.createKSttlDiffPicture(totalDiff, nbins, diffMax0,'KS diff. 1', fileName1, pValue, I_max)
 
             # Kolmogoroff-Smirnov curve 2
-            '''seriesTotalDiff2 = pd.DataFrame(totalDiff2, columns=['KSDiff'])
-                print('\ndiffMin0/sTD.min 1 : %f/%f' % (diffMax0, seriesTotalDiff2.values.min()))
-                print('\ndiffMax0/sTD.max 2 : %f/%f' % (diffMax0, seriesTotalDiff2.values.max()))
+            print('Kolmogoroff-Smirnov curve 2')
+            seriesTotalDiff2 = pd.DataFrame(totalDiff2, columns=['KSDiff'])
+            print('\ndiffMin0/sTD.min 1 : %f/%f' % (diffMax0, seriesTotalDiff2.values.min()))
+            print('\ndiffMax0/sTD.max 2 : %f/%f' % (diffMax0, seriesTotalDiff2.values.max()))
 
-                count, division = np.histogram(seriesTotalDiff2, bins=nbins)
-                div_min = np.amin(division)
-                div_max = np.amax(division)
-                KSDiffHistoname2 = pathNb_files + '/KSDiffHistoValues_2_' + branches[i] + "_" + rel + '.txt'
-                wKSDiff2 = open(KSDiffHistoname2, 'w')
-                wKSDiff2.write(' '.join("{:10.04e}".format(x) for x in count))
-                wKSDiff2.write('\n')
-                wKSDiff2.write(' '.join("{:10.04e}".format(x) for x in division))
-                wKSDiff2.write('\n')
-                wKSDiff2.close()
+            count, division = np.histogram(seriesTotalDiff2, bins=nbins)
+            div_min = np.amin(division)
+            div_max = np.amax(division)
+            KSDiffHistoname2 = pathNb_files + '/KSDiffHistoValues_2_' + branches[i] + "_" + rel + '.txt'
+            wKSDiff2 = open(KSDiffHistoname2, 'w')
+            wKSDiff2.write(' '.join("{:10.04e}".format(x) for x in count))
+            wKSDiff2.write('\n')
+            wKSDiff2.write(' '.join("{:10.04e}".format(x) for x in division))
+            wKSDiff2.write('\n')
+            wKSDiff2.close()
+        
+            # Get the max of the integral
+            I_max2 = DB.integralpValue(division, count, 0.)
+            # print the min/max values of differences
+            pValue2 = DB.integralpValue(division, count, diffMax0)
+            # save the KS curves
+            wKS2.write('%e, %d\n' % (I_max2, nbins))
+            wKS2.write('%e, %e\n' % (div_min, div_max))
+            wKS2.write(' '.join("{:10.04e}".format(x) for x in count))
+            wKS2.write('\n')
+            wKS2.write(' '.join("{:10.04e}".format(x) for x in division))
+            wKS2.write('\n')
+            wKS2.write(' '.join("{:10.04e}".format(x) for x in yellowCurve2 )) # random curve
+            wKS2.write('\n')
+            wKS2.write(' '.join("{:10.04e}".format(x) for x in yellowCurveCum2 ))
+            wKS2.write('\n')
+            wKS2.close()
+
+            #fileName2 = pathKS + '/KS-ttlDiff_2_' + branches[i] + "_" + rel + '.png'
+            #[nb_green2, nb_red2] = grKS.createKSttlDiffPicture(totalDiff2, nbins, diffMax0,'KS diff. 2', fileName2, pValue2, I_max2)
             
-                # Get the max of the integral
-                I_max2 = DB.integralpValue(division, count, 0.)
-                ##print('\nMax. integral 2 : %0.4e for nbins=%d' % (I_max2, nbins))
-                # print the min/max values of differences
-                ##print('Kolmogoroff-Smirnov min value : %0.4e - max value : %0.4e | diff value : %e \n' % (div_min, div_max, x2))
-                pValue2 = DB.integralpValue(division, count, diffMax0)
-                #print(division)
-                #print(count)
-                # save the KS curves
-                wKS2.write('%e, %d\n' % (I_max2, nbins))
-                wKS2.write('%e, %e\n' % (div_min, div_max))
-                wKS2.write(' '.join("{:10.04e}".format(x) for x in count))
-                wKS2.write('\n')
-                wKS2.write(' '.join("{:10.04e}".format(x) for x in division))
-                wKS2.write('\n')
-                wKS2.write(' '.join("{:10.04e}".format(x) for x in yellowCurve2 )) # random curve
-                wKS2.write('\n')
-                wKS2.write(' '.join("{:10.04e}".format(x) for x in yellowCurveCum2 ))
-                wKS2.write('\n')
-                wKS2.close()
-
-                fileName2 = pathKS + '/KS-ttlDiff_2_' + branches[i] + "_" + rel + '.png'
-                [nb_green2, nb_red2] = grKS.createKSttlDiffPicture(totalDiff2, nbins, diffMax0,'KS diff. 2', fileName2, pValue2, I_max2)
-            '''
 
             # Kolmogoroff-Smirnov curve 3
+            print('Kolmogoroff-Smirnov curve 3')
             seriesTotalDiff3 = pd.DataFrame(totalDiff3, columns=['new'])
             print('\ndiffMin0/sTD.min 3 : %f/%f' % (diffMax0, seriesTotalDiff3.values.min()))
             print('diffMax0/sTD.max 3 : %f/%f' % (diffMax0, seriesTotalDiff3.values.max()))
@@ -517,12 +534,8 @@ for i in range(0, N_histos):#, N_histos-1 range(N_histos - 1, N_histos):  # 1 N_
         
             # Get the max of the integral
             I_max3 = DB.integralpValue(division, count, 0.)
-            ##print('\nMax. integral 3 : %0.4e for nbins=%d' % (I_max3, nbins))
             # print the min/max values of differences
-            ##print('Kolmogoroff-Smirnov min value : %0.4e - max value : %0.4e | diff value : %e \n' % (div_min, div_max, x3))
             pValue3 = DB.integralpValue(division, count, diffMax0)
-            #print(division)
-            #print(count)
             # print the p-Value
             print('\nunormalized p_Value : %0.4e for nbins=%d' % (pValue, nbins))
             print('normalized p_Value : %0.4e for nbins=%d' % (pValue/I_max, nbins))

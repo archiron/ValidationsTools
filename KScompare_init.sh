@@ -56,11 +56,16 @@ echo "COMMON_SOURCE : $COMMON_SOURCE"
 if [[ "$Choice" == "LLR" ]] 
   then
     echo "LLR"
+    module purge
+    module use /opt/exp_soft/vo.gridcl.fr/software/modules/
+    module use /opt/exp_soft/vo.llr.in2p3.fr/modulefiles_el7
+    module use /opt/exp_soft/vo.llr.in2p3.fr/modulefiles
+    module load python/3.7.0
     source /opt/exp_soft/llr/root/v6.24.04-el7-gcc9xx-py370/etc/init.sh
     cd $LOG_SOURCE
     #/opt/exp_soft/cms/t3/t3submit -8c -long KScompare.sh $LOG_SOURCE $LOG_KS_SOURCE $COMMON_SOURCE $FileName # -mail chiron@llr.in2p3.fr 
-    #/opt/exp_soft/cms/t3/t3submit -8c -short KScompare.sh $LOG_SOURCE $LOG_KS_SOURCE $COMMON_SOURCE $FileName
-    /opt/exp_soft/cms/t3/t3submit -8c -reserv KScompare.sh $LOG_SOURCE $LOG_KS_SOURCE $COMMON_SOURCE $FileName
+    /opt/exp_soft/cms/t3/t3submit -8c -short KScompare.sh $LOG_SOURCE $LOG_KS_SOURCE $COMMON_SOURCE $FileName
+    #/opt/exp_soft/cms/t3/t3submit -8c -reserv KScompare.sh $LOG_SOURCE $LOG_KS_SOURCE $COMMON_SOURCE $FileName
 elif [[ "$Choice" == "PBS" ]] 
   then
     echo "PBS"

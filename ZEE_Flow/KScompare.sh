@@ -22,18 +22,8 @@ cd $1
 
 #cd $2
 echo "executing $2/KScompare.py $3 $4"
-python3 $2/KScompare.py $3 $4
+#python3 $2/KScompare.py $3 $4
 echo " "
 echo "executing $2/statpValues.py $3 $4"
 python3 $2/statpValues.py $3 $4
-echo " "
-echo "executing $2/statConfiance.py $3 $4"
-python3 $2/statConfiance.py $3 $4
-
-#python3 $2/extrGT.py
-#echo "executing $1/extrGT.py"
-#python3 $2/createFiles_v2.py
-#echo "executing $2/createFiles_v2.py"
-#python3 $2/zeeMapDiff.py
-#echo "executing $2/zeeMapDiff.py"
 

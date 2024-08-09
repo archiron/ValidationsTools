@@ -14,7 +14,7 @@
 ################################################################################
 
 from genericpath import exists
-import os,sys
+import sys
 import importlib
 import importlib.machinery
 import importlib.util
@@ -30,6 +30,7 @@ ROOT.gROOT.SetBatch(True)
 argv.remove( '-b-' )
 
 from ROOT import *
+root_version = ROOT.gROOT.GetVersion()
 
 if len(sys.argv) > 1:
     print(sys.argv)
@@ -42,6 +43,15 @@ if len(sys.argv) > 1:
 else:
     print("rien")
     pathBase = ''
+
+import numpy as np
+import matplotlib
+
+#print('PANDAS     version : {}'.format(pd.__version__))
+print('PYTHON     version : {}'.format(sys.version))
+print("NUMPY      version : {}".format(np.__version__))
+print('MATPLOTLIB version : {}'.format(matplotlib.__version__))
+print("ROOT      version : {}".format(root_version))
 
 # these line for daltonians !
 #seaborn.set_palette('colorblind')
@@ -66,8 +76,11 @@ import default as df
 from default import *
 from rootValues import NB_EVTS
 from controlFunctions import *
-from graphicFunctions import createHistoPicture
+from graphicFunctions import Graphic
 from sources import *
+
+gr = Graphic()
+gr.initRoot()
 
 # extract release from source reference
 release = input_ref_file.split('__')[2].split('-')[0]
@@ -79,9 +92,12 @@ pathNb_evts = checkFolderName(pathNb_evts)
 print('pathNb_evts : {:s}'.format(pathNb_evts))
 ######## ===== COMMON LINES ===== ########
 pathCase = pathNb_evts + checkFolderName(df.folder)
+pathROOTFiles = blo.pathROOT + "/" + release
+pathROOTFiles = checkFolderName(pathROOTFiles)
+print('pathROOTFiles : {:s}'.format(pathROOTFiles))
 
 # get list of generated ROOT files
-rootFilesList_0 = getListFiles(pathNb_evts, 'root')
+rootFilesList_0 = getListFiles(pathROOTFiles, 'root')
 print('there is ' + '{:03d}'.format(len(rootFilesList_0)) + ' ROOT files')
 nbFiles = change_nbFiles(len(rootFilesList_0), nbFiles)
 
@@ -106,6 +122,8 @@ for item in rootFilesList:
 
 sortedRels = sorted(rels, key = lambda x: x[0]) # gives an array with releases sorted
 
+tic = time.time()
+
 for elem in sortedRels:
     print(elem)
     rel = elem[1]
@@ -126,9 +144,12 @@ for elem in sortedRels:
         histo2.Fill(float(a[2])) # pvalue2
         histo3.Fill(float(a[3])) # pvalue3
     
-    createHistoPicture(histo1, pathKS + 'KS_1_' + rel + '.png')
-    createHistoPicture(histo2, pathKS + 'KS_2_' + rel + '.png')
-    createHistoPicture(histo3, pathKS + 'KS_3_' + rel + '.png')
+    gr.createHistoPicture(histo1, pathKS + 'KS_1_' + rel + '.png')
+    gr.createHistoPicture(histo2, pathKS + 'KS_2_' + rel + '.png')
+    gr.createHistoPicture(histo3, pathKS + 'KS_3_' + rel + '.png')
+
+toc = time.time()
+print('Done in {:.4f} seconds'.format(toc-tic))
 
 print("Fin !")
 

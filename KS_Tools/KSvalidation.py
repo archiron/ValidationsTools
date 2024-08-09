@@ -27,12 +27,13 @@ ROOT.gROOT.SetBatch(True)
 argv.remove( '-b-' )
 
 from ROOT import *
+root_version = ROOT.gROOT.GetVersion()
 
 if len(sys.argv) > 1:
     print(sys.argv)
     print("step 4 - arg. 0 :", sys.argv[0]) # name of the script
-    print("step 4 - arg. 2 :", sys.argv[1]) # COMMON files path
-    print("step 4 - arg. 4 :", sys.argv[2]) # FileName for paths
+    print("step 4 - arg. 1 :", sys.argv[1]) # COMMON files path
+    print("step 4 - arg. 2 :", sys.argv[2]) # FileName for paths
     pathCommonFiles = sys.argv[1]
     filePaths = sys.argv[2]
     pathLIBS = sys.argv[1][:-12]
@@ -43,6 +44,12 @@ else:
 import pandas as pd
 import numpy as np
 import matplotlib
+
+print('PANDAS     version : {}'.format(pd.__version__))
+print('PYTHON     version : {}'.format(sys.version))
+print("NUMPY      version : {}".format(np.__version__))
+print('MATPLOTLIB version : {}'.format(matplotlib.__version__))
+print("ROOT      version : {}".format(root_version))
 
 # import matplotlib.dates as md
 matplotlib.use('agg')
@@ -84,15 +91,11 @@ tl = Tools()
 gr = Graphic()
 valEnv_d = env_default()
 
+gr.initRoot()
+
 # extract release from source reference
 release = input_ref_file.split('__')[2].split('-')[0]
 print('extracted release : {:s}'.format(release))
-
-pathNb_evts = pathBase + '/' + '{:04d}'.format(NB_EVTS) + '/' + release
-pathNb_evts = checkFolderName(pathNb_evts)
-print('pathNb_evts : {:s}'.format(pathNb_evts))
-#folder = checkFolderName(dfo.folder)
-pathCase = pathNb_evts + checkFolderName(dfo.folder)
 
 # get the branches for ElectronMcSignalHistos.txt
 ######## ===== COMMON LINES ===== ########
@@ -101,6 +104,16 @@ source = pathChiLib + "/HistosConfigFiles/ElectronMcSignalHistos.txt"
 branches = getBranches(tp_1, source)
 cleanBranches(branches) # remove some histo wich have a pbm with KS.
 ######## ===== COMMON LINES ===== ########
+
+pathNb_evts = pathBase + '/' + '{:04d}'.format(NB_EVTS) + '/' + release
+pathNb_evts = checkFolderName(pathNb_evts)
+print('pathNb_evts : {:s}'.format(pathNb_evts))
+#folder = checkFolderName(dfo.folder)
+pathCase = pathNb_evts + checkFolderName(dfo.folder)
+print('pathCase : {:s}'.format(pathCase))
+pathROOTFiles = blo.pathROOT + "/" + release
+pathROOTFiles = checkFolderName(pathROOTFiles)
+print('pathROOTFiles : {:s}'.format(pathROOTFiles))
 
 rels = []
 tmp_branches = []
@@ -120,8 +133,30 @@ if not os.path.exists(pathCase):
 else:
     print('Folder %s already created\n' % pathCase)
 
+# get list of generated ROOT files
+rootFilesList_0 = getListFiles(pathROOTFiles) # get the list of the root files in the folderName folder
+if (len(rootFilesList_0) ==0 ):
+    print('there is no generated ROOT files')
+    exit()
+rootFilesList_0.sort()
+print('there is %d generated ROOT files' % len(rootFilesList_0))
+rootFilesList_0 = rootFilesList_0[0:nbFiles]
+#print('file list :')
+#print(rootFilesList_0)
+nbFiles = change_nbFiles(len(rootFilesList_0), nbFiles)
+
+pathNb_files = pathCase + '{:03d}'.format(nbFiles)
+pathNb_files = checkFolderName(pathNb_files)
+checkFolder(pathNb_files)
+folderNB = pathNb_files
+pathKS = pathNb_files + 'KS'
+pathKS =checkFolderName(pathKS)
+checkFolder(pathKS)
+print('pathKS : {:s}'.format(pathKS))
+
 # get list of added ROOT files for comparison
 pathDATA = pathLIBS + '/' + blo.DATA_SOURCE # '/pbs/home/c/chiron/private/KS_Tools/GenExtract/DATA/NewFiles'
+print('pathDATA : {:s}'.format(pathDATA))
 rootFilesList = getListFiles(pathDATA, 'root')
 print('we use the files :')
 for item in rootFilesList:
@@ -131,26 +166,23 @@ for item in rootFilesList:
     b = (item.split('__')[2]).split('-')
     rels.append([b[0], b[0][6:], item])
     f_root = ROOT.TFile(pathDATA + item)
-    h_rel = getHisto(f_root, tp_1)
+    h_rel = gr.getHisto(f_root, tp_1)
     for i in range(0, N_histos): # 1 N_histos histo for debug
         histo_rel = h_rel.Get(branches[i])
         if (histo_rel):
             #print('%s OK' % branches[i])
-            d = getHistoConfEntry(histo_rel)
+            d = gr.getHistoConfEntry(histo_rel)
             s_tmp = fill_Snew2(d, histo_rel)
             #s_tmp = fill_Snew(histo_rel)
             if (s_tmp.min() < 0.):
                 print('pbm whith histo %s, min < 0' % branches[i])
-                tmp_branch.append('KOKO')
             elif (np.floor(s_tmp.sum()) == 0.):
                 print('pbm whith histo %s, sum = 0' % branches[i])
-                tmp_branch.append('KOKO')
             else:
                 nbHistos += 1
                 tmp_branch.append(branches[i])
         else:
             print('%s KO' % branches[i])
-            tmp_branch.append('KOKO')
     nb_ttl_histos.append(nbHistos)
     tmp_branches.append(tmp_branch)
 
@@ -169,28 +201,16 @@ if (len(branches) != len(newBranches)):
     N_histos = len(branches)
 print('N_histos : %d' % N_histos)
 
-# get list of generated ROOT files
-rootFilesList_0 = getListFiles(pathNb_evts, 'root')
-print('there is ' + '{:03d}'.format(len(rootFilesList_0)) + ' ROOT files')
-nbFiles = change_nbFiles(len(rootFilesList_0), nbFiles)
-
-pathNb_files = pathCase + '{:03d}'.format(nbFiles)
-pathNb_files = checkFolderName(pathNb_files)
-checkFolder(pathNb_files)
-folderNB = pathNb_files
-pathKS = pathNb_files + 'KS'
-pathKS =checkFolderName(pathKS)
-checkFolder(pathKS)
-
 sortedRels = sorted(rels, key = lambda x: x[0]) # gives an array with releases sorted
 
 pathDBox = pathKS + 'DBox'
 pathDBox =checkFolderName(pathDBox)
 checkFolder(pathDBox)
+print('pathDBox : {:s}'.format(pathDBox))
 
 f_KSref = ROOT.TFile(pathDATA + input_ref_file)
 print('we use the %s file as KS reference' % input_ref_file)
-h_KSref = getHisto(f_KSref, tp_1)
+h_KSref = gr.getHisto(f_KSref, tp_1)
 Release = input_ref_file.split('-')[0]
 Release = Release.split('__')[2]
 shortRelease = Release[6:] # get the KS reference release without the "CMSSW_"
@@ -211,13 +231,16 @@ for i in range(0, len(histoArray)): #, len(histoArray) - 1 range(len(histoArray)
     
     short_histo_name, short_histo_names, histo_positions = tl.shortHistoName(histoArray[i])
     histo_rel = h_rel.Get(short_histo_names[0])
+    print('appel histo2')
+    histo_2 = h_KSref.Get(short_histo_names[0])
+    print('fin appel histo2')
     if (histo_rel):
         print('%s OK' % short_histo_names[0])
         ycFlag = False
         print('\nshort histo name : {:s}'.format(short_histo_names[0]))
         
         for elem in sortedRels:
-            print('release : %s' %elem)
+            print('=== release : %s' %elem)
             rel = elem[1]
             file = elem[2]
 
@@ -231,11 +254,13 @@ for i in range(0, len(histoArray)): #, len(histoArray) - 1 range(len(histoArray)
             # get the "new" root file datas
             input_rel_file = file
             f_rel = ROOT.TFile(pathDATA + input_rel_file)
-            h1 = getHisto(f_rel, tp_1)
+            print('we use the %s file as KS relative' % input_rel_file)
+            h1 = gr.getHisto(f_rel, tp_1)
             histo_1 = h1.Get(short_histo_names[0]) #
-            histo_2 = h_KSref.Get(short_histo_names[0]) #
+            #histo_2 = h_KSref.Get(short_histo_names[0]) #
 
             if ( i == 0 ): # we create the config file only once !
+                print('case i=0')
                 datas = []
                 datas.append('ZEE_14') # we only work with ZEE_14
                 datas.append('RECO') # only RECO. PU later
@@ -249,13 +274,17 @@ for i in range(0, len(histoArray)): #, len(histoArray) - 1 range(len(histoArray)
                 datas.append('')
                 datas.append('ElectronMcSignalHistos.txt') # can be other histo file
                 tl.createDefinitionsFile(datas, config_target_name)
+                #print('calling DB.generateExplanation')
                 DB.generateExplanation(pathDBox)
 
             if (histo_2):
+                print('case histo_2 for {}'.format(short_histo_name))
                 fHisto = open(pathDBox + short_histo_name + '_' + rel + '.txt', 'w') # web page
+                #fHisto = open(pathNb_files + short_histo_name + '_' + rel + '.txt', 'w') # web page
                 fHisto.write('<table border="1" bordercolor=green cellpadding="2" style="margin-left:auto;margin-right:auto">' + '\n')
                 KS_Path1 = pathDBox.replace('/sps/cms/chiron/Validations/', 'https://llrvalidation.in2p3.fr/') # /sps/cms/chiron/Validations/ /data_CMS/cms/chiron/Validations/
-                KS_Path0 = folderNB # 
+                #KS_Path0 = pathDBox # folderNB
+                KS_Path0 = pathNb_files
                 KS_values_1 = DB.decisionBox1(short_histo_names[0], histo_1, histo_2, KS_Path0, rel, nbFiles) # , shortRelease
                 KS_values_2 = DB.decisionBox2(short_histo_names[0], histo_1, histo_2, KS_Path0, rel, nbFiles) # , shortRelease
                 KS_values_3 = DB.decisionBox3(short_histo_names[0], histo_1, histo_2, KS_Path0, rel, nbFiles) # , shortRelease
@@ -273,8 +302,8 @@ for i in range(0, len(histoArray)): #, len(histoArray) - 1 range(len(histoArray)
                 gr.PictureChoice(histo_1, histo_2, histo_positions[1], histo_positions[2], gif_name, 0) # 
 
                 if ycFlag:
-                    gr.PictureChoice_DB( histo_1, histo_2, histo_positions[1], histo_positions[2], png_name, 0, yellowCurves)
-                    gr.PictureChoice_DB3(histo_1, histo_2, histo_positions[1], histo_positions[2], png_cumul_name, 0, yellowCurvesCum)
+                    #gr.PictureChoice_DB( histo_1, histo_2, histo_positions[1], histo_positions[2], png_name, 0, yellowCurves)
+                    #gr.PictureChoice_DB3(histo_1, histo_2, histo_positions[1], histo_positions[2], png_cumul_name, 0, yellowCurvesCum)
 
                     percentage = 0.05
                     #if ( KS_values_1[4] >= percentage ):
@@ -286,8 +315,10 @@ for i in range(0, len(histoArray)): #, len(histoArray) - 1 range(len(histoArray)
                 #KS_V = [KS_values_1]
                 Names = [short_histo_name, gif_name, short_histo_names[0], short_png_name, short_png_cumul_name]
                 DB.DBwebPage2(fHisto, Names, KS_V, DB_picture, KS_Path1, ycFlag) # , KS_Path0, rel, shortReference, self.webURL, self.shortWebFolder, dataSetFolder
-
-        fHisto.close()
+                
+                fHisto.close()
+            
+            ROOT.TFile.Close(f_rel)
     else:
         print('%s KO' % short_histo_names[0])
 
