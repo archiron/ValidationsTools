@@ -72,12 +72,12 @@ print('Lib path : {:s}'.format(pathChiLib))
 sys.path.append(pathChiLib)
 sys.path.append(pathCommonFiles)
 
-import default as df
-from default import *
+import validationsDefault as df
+from validationsDefault import *
 from rootValues import NB_EVTS
 from controlFunctions import *
 from graphicFunctions import Graphic
-from sources import *
+from filesSources import *
 
 gr = Graphic()
 gr.initRoot()

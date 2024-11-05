@@ -2,8 +2,8 @@
 #-*-coding: utf-8 -*-
 
 ################################################################################
-# zeeKSCompare: create one file per release with max diff for each histo
-# for different egamma validation releases
+# createFiles: create file for Kolmogorov-Smirnov maximum diff
+# for egamma validation comparison                              
 #
 # MUST be launched with the cmsenv cmd after a cmsrel cmd !!
 #                                                                              
@@ -11,30 +11,29 @@
 #                                                                              
 ################################################################################
 
-from genericpath import exists
 import os,sys
 import importlib
 import importlib.machinery
 import importlib.util
-import time
-
-from sys import argv
 
 #import seaborn # only with cmsenv on cca.in2p3.fr
+
+# lines below are only for func_Extract
+from sys import argv
 
 argv.append( '-b-' )
 import ROOT
 ROOT.gROOT.SetBatch(True)
 argv.remove( '-b-' )
 
-from ROOT import *
+from ROOT import kWhite, kBlue, kBlack, kRed, gStyle, TCanvas, gPad
 root_version = ROOT.gROOT.GetVersion()
 
 if len(sys.argv) > 1:
     print(sys.argv)
     print("step 4 - arg. 0 :", sys.argv[0]) # name of the script
-    print("step 4 - arg. 2 :", sys.argv[1]) # COMMON files path
-    print("step 4 - arg. 4 :", sys.argv[2]) # FileName for paths
+    print("step 4 - arg. 1 :", sys.argv[1]) # COMMON files path
+    print("step 4 - arg. 2 :", sys.argv[2]) # FileName for paths
     pathCommonFiles = sys.argv[1]
     filePaths = sys.argv[2]
     pathLIBS = sys.argv[1][:-12]
@@ -42,22 +41,24 @@ else:
     print("rien")
     pathBase = ''
 
-import pandas as pd
-import matplotlib
+#import pandas as pd
 import numpy as np
+import matplotlib
 
-print('PANDAS     version : {}'.format(pd.__version__))
+#print('PANDAS     version : {}'.format(pd.__version__))
 print('PYTHON     version : {}'.format(sys.version))
 print("NUMPY      version : {}".format(np.__version__))
 print('MATPLOTLIB version : {}'.format(matplotlib.__version__))
 print("ROOT      version : {}".format(root_version))
 
+# import matplotlib.dates as md
 matplotlib.use('agg')
+from matplotlib import pyplot as plt
 
 # these line for daltonians !
 #seaborn.set_palette('colorblind')
 
-print("func_Extract")
+print("\nKSvalidation-ter")
 
 # Import module
 loader = importlib.machinery.SourceFileLoader( filePaths, pathCommonFiles+filePaths )
@@ -69,7 +70,6 @@ pathBase = blo.RESULTFOLDER
 print('result path : {:s}'.format(pathBase))
 
 pathChiLib = pathLIBS + '/' + blo.LIB_SOURCE # checkFolderName(blo.LIB_SOURCE) # sys.argv[1]
-print('Lib path : {:s}'.format(pathChiLib))
 sys.path.append(pathChiLib)
 sys.path.append(pathCommonFiles)
 
@@ -77,31 +77,56 @@ import validationsDefault as dfo
 from validationsDefault import *
 from rootValues import NB_EVTS
 from controlFunctions import *
-from filesSources import *
-from graphicAutoEncoderFunctions import createCompLossesPicture, createCompPValuesPicture
+from graphicFunctions import *
 from graphicFunctions import Graphic
+from DecisionBox import DecisionBox 
+from filesSources import *
+from fonctions import Tools
+from valEnv_default import env_default
 
+'''def shortHistoName(elem):
+    histo_names = elem.split("/")
+    #histo_name = histo_names[0]
+    histoShortNames = histo_names[1]
+    histo_pos = histoShortNames
+    histo_positions = histo_pos.split()
+    short_histo_names = histoShortNames.split(" ")
+    short_histo_name = short_histo_names[0].replace("h_", "")
+    if "ele_" in short_histo_name:
+        short_histo_name = short_histo_name.replace("ele_", "")
+    if "scl_" in short_histo_name:
+        short_histo_name = short_histo_name.replace("scl_", "")
+    if "bcl_" in short_histo_name:
+        short_histo_name = short_histo_name.replace("bcl_", "")
+    return short_histo_name, short_histo_names, histo_positions'''
+
+sys.path.append(os.getcwd()) # path where you work
+
+DB = DecisionBox()
+tl = Tools()
 gr = Graphic()
+valEnv_d = env_default()
+
+gr.initRoot()
 
 # extract release from source reference
 release = input_ref_file.split('__')[2].split('-')[0]
 print('extracted release : {:s}'.format(release))
 
-pathNb_evts = pathBase + '/' + '{:04d}'.format(NB_EVTS) + '/' + release
-pathNb_evts = checkFolderName(pathNb_evts)
-print('pathNb_evts : {:s}'.format(pathNb_evts))
-pathCase = pathNb_evts + checkFolderName(dfo.folder)
-pathROOTFiles = blo.pathROOT + "/" + release
-pathROOTFiles = checkFolderName(pathROOTFiles)
-print('pathROOTFiles : {:s}'.format(pathROOTFiles))
-
 # get the branches for ElectronMcSignalHistos.txt
-######## ===== COMMON LINES ===== ########
 branches = []
 source = pathChiLib + "/HistosConfigFiles/ElectronMcSignalHistos.txt"
 branches = getBranches(tp_1, source)
 cleanBranches(branches) # remove some histo wich have a pbm with KS.
-######## ===== COMMON LINES ===== ########
+
+pathNb_evts = pathBase + '/' + '{:04d}'.format(NB_EVTS) + '/' + release
+pathNb_evts = checkFolderName(pathNb_evts)
+print('pathNb_evts : {:s}'.format(pathNb_evts))
+pathCase = pathNb_evts + checkFolderName(dfo.folder)
+print('pathCase : {:s}'.format(pathCase))
+pathROOTFiles = blo.pathROOT + "/" + release
+pathROOTFiles = checkFolderName(pathROOTFiles)
+print('pathROOTFiles : {:s}'.format(pathROOTFiles))
 
 rels = []
 tmp_branches = []
@@ -109,7 +134,7 @@ nb_ttl_histos = []
 
 N_histos = len(branches)
 print('N_histos : %d' % N_histos)
-    
+
 # create folder 
 if not os.path.exists(pathCase):
     try:
@@ -121,25 +146,43 @@ if not os.path.exists(pathCase):
 else:
     print('Folder %s already created\n' % pathCase)
 
-# get list of the added ROOT files
+# get list of generated ROOT files
+#rootFilesList_0 = getListFiles(pathROOTFiles) # get the list of the root files in the folderName folder
+#if (len(rootFilesList_0) ==0 ):
+#    print('there is no generated ROOT files')
+#    exit()
+#rootFilesList_0.sort()
+#print('there is %d generated ROOT files' % len(rootFilesList_0))
+#rootFilesList_0 = rootFilesList_0[0:nbFiles]
+nbFiles = 1000 #change_nbFiles(len(rootFilesList_0), nbFiles)
+
+pathNb_files = pathCase + '{:03d}'.format(nbFiles)
+pathNb_files = checkFolderName(pathNb_files)
+checkFolder(pathNb_files)
+folderNB = pathNb_files
+pathKS = pathNb_files + 'KS'
+pathKS =checkFolderName(pathKS)
+checkFolder(pathKS)
+print('pathKS : {:s}'.format(pathKS))
+
+# get list of added ROOT files for comparison
 pathDATA = pathLIBS + '/' + blo.DATA_SOURCE # '/pbs/home/c/chiron/private/KS_Tools/GenExtract/DATA/NewFiles'
+print('pathDATA : {:s}'.format(pathDATA))
 rootFilesList = getListFiles(pathDATA, 'root')
 print('we use the files :')
 for item in rootFilesList:
     tmp_branch = []
     nbHistos = 0
-    print('%s' % item)
     b = (item.split('__')[2]).split('-')
-    rels.append([b[0], b[0][6:]])
+    rels.append([b[0], b[0][6:], item])
     f_root = ROOT.TFile(pathDATA + item)
-    h1 = gr.getHisto(f_root, tp_1)
+    h_rel = gr.getHisto(f_root, tp_1)
     for i in range(0, N_histos): # 1 N_histos histo for debug
-        histo_1 = h1.Get(branches[i])
-        if (histo_1):
-            print('%s OK' % branches[i])
-            d = gr.getHistoConfEntry(histo_1)
-            s_tmp = gr.fill_Snew2(d, histo_1)
-            #s_tmp = fill_Snew(histo_1)
+        histo_rel = h_rel.Get(branches[i])
+        if (histo_rel):
+            d = gr.getHistoConfEntry(histo_rel)
+            #d = getHistoConfEntry(histo_rel)
+            s_tmp = fill_Snew2(d, histo_rel)
             if (s_tmp.min() < 0.):
                 print('pbm whith histo %s, min < 0' % branches[i])
             elif (np.floor(s_tmp.sum()) == 0.):
@@ -168,109 +211,44 @@ if (len(branches) != len(newBranches)):
 print('N_histos : %d' % N_histos)
 
 sortedRels = sorted(rels, key = lambda x: x[0]) # gives an array with releases sorted
+print('sortedRels[0] = {}'.format(sortedRels[0]))
 
-# get list of generated ROOT files
-rootFilesList_0 = getListFiles(pathROOTFiles, 'root')
-print('there is ' + '{:03d}'.format(len(rootFilesList_0)) + ' generated ROOT files')
-nbFiles = change_nbFiles(len(rootFilesList_0), nbFiles)
-pathNb_files = pathCase + '{:03d}'.format(nbFiles)
-pathNb_files = checkFolderName(pathNb_files)
-print('pathNb_files après check : %s' % pathNb_files)
-checkFolder(pathNb_files)
-pathKS = pathNb_files + 'KS'
-pathKS =checkFolderName(pathKS)
-print('folder KS après check : %s' % pathKS)
-checkFolder(pathKS)
+pathDBox = pathKS + 'DBox'
+pathDBox =checkFolderName(pathDBox)
+checkFolder(pathDBox)
+print('pathDBox : {:s}'.format(pathDBox))
 
-tic = time.time()
+f2 = ROOT.TFile(pathDATA + input_ref_file)
+h2 = gr.getHisto(f2, tp_1)
 
-df1 = pd.DataFrame()
-df2 = pd.DataFrame()
+# get histoConfig file
+histoArray = []
+hCF = pathChiLib + '/HistosConfigFiles/ElectronMcSignalHistos.txt'
+fCF = open(hCF, 'r') # histo Config file
+for line in fCF:
+    if (len(line) != 0):
+        if "/" in line:
+            histoArray.append(line)
 
 for elem in sortedRels:
-    print(elem)
+    print('=== release : {}'.format(elem))
     rel = elem[1]
+    file = elem[2]
 
-    # get the KS file datas
-    KS_diffName = pathNb_files + "/histo_differences_KScurve" + "_" + rel + "_" + '_{:03d}'.format(nbFiles) + ".txt"
-    pValue_Name = pathNb_files + "/histo_pValues" + "_" + rel + ".txt"
-    if exists(KS_diffName):
-        print('%s existe'%KS_diffName)
-    else:
-        print('%s n\'existe pas'%KS_diffName)
-    if exists(KS_diffName):
-        print('%s existe'%pValue_Name)
-    else:
-        print('%s n\'existe pas'%pValue_Name)
+    # get the "new" root file datas
+    f_rel = ROOT.TFile(pathDATA + file)
+    print('we use the {} file as KS relative'.format(file))
+    h1 = gr.getHisto(f_rel, tp_1)
 
-    wKS0 = open(KS_diffName, 'r').readlines()
-    wKS1 = open(pValue_Name, 'r').readlines()
-    print(len(wKS0))
-    print(len(wKS1))
-    tmpArr1 = []
-    tmpArr2 = []
-    for line in wKS0:
-        #print(len(line))
-        aa = line.split(' : ')
-        print(aa[0])
-        tmpArr1.append(aa[0])
-        tmpArr2.append(float(aa[1][:-1]))
-    df1['index'] = tmpArr1
-    df1[rel] = tmpArr2
+    for i in range(0, len(histoArray)): 
+        print(histoArray[i]) # print histo name
+        
+        short_histo_name, short_histo_names, histo_positions = tl.shortHistoName(histoArray[i])
+        histo_2 = h2.Get(short_histo_names[0])
+        histo_1 = h1.Get(short_histo_names[0])
+        gif_name = pathDBox + short_histo_names[0] + '_' + rel + ".gif"
+        gr.createPicture2b(histo_1, histo_2, gif_name, 0)
+            
+    ROOT.TFile.Close(f_rel)
 
-    tmpArr1 = []
-    tmpArr2 = []
-    tmpArr3 = []
-    tmpArr4 = []
-    for line in wKS1:
-        #print(len(line))
-        aa = line.split(', ')
-        tmpArr1.append(aa[0])
-        tmpArr2.append(float(aa[1]))
-        tmpArr3.append(float(aa[2]))
-        tmpArr4.append(float(aa[3]))#[:-1]
-    df2['index'] = tmpArr1
-    df2[rel+'_pV1'] = tmpArr2
-    df2[rel+'_pV2'] = tmpArr3
-    df2[rel+'_pV3'] = tmpArr4 
-
-print(df1.head(5))
-print()
-print(df2.head(5))
-    
-labels = list(df1)[1:]
-print(labels)
-(N_histos, _) = df1.shape
-
-for ind in df1.index:
-    print(ind)
-    a = df1.iloc[ind].to_numpy()
-    branch = a[0]
-    print(branch)
-    val = list(a[1:])
-    #print(val)
-    pictureName = pathKS + 'comparison_KS_values_' + branch + '_{:03d}'.format(nbFiles) +'.png' # 
-    print(pictureName)
-    title = r"$\bf{" + branch + "}$" + ' : KS diff values vs releases.'
-    createCompLossesPicture(labels,val, pictureName, title)
-    #if ind == 2:
-    #    break
-
-for ind in df2.index:
-    print(ind)
-    a = df2.iloc[ind].to_numpy()
-    branch = a[0]
-    print(branch)
-    val = list(a[1:])
-    #print(val)
-    pictureName = pathKS + 'comparison_pValues_' + branch + '_{:03d}'.format(nbFiles) +'.png' # 
-    print(pictureName)
-    title = r"$\bf{" + branch + "}$" + ' : KS pValues vs releases.'
-    createCompPValuesPicture(labels,val, pictureName, title)
-    #if ind == 2:
-    #    break
-
-toc = time.time()
-print('Done in {:.4f} seconds'.format(toc-tic))
-
-print("Fin !")
+print("Fin !\n")

@@ -67,13 +67,13 @@ Chilib_path = workPath + '/' + blo.LIB_SOURCE # checkFolderName(blo.LIB_SOURCE) 
 sys.path.append(Chilib_path)
 sys.path.append(commonPath)
 
-import default as dfo
-from default import *
+import validationsDefault as dfo
+from validationsDefault import *
 from rootValues import NB_EVTS
 from controlFunctions import *
 from graphicFunctions import getHisto, getHistoConfEntry, fill_Snew2, fill_Snew
 from DecisionBox import DecisionBox
-from sources import *
+from filesSources import *
 
 resultPath += '/' + str(NB_EVTS)
 resultPath = checkFolderName(resultPath)
@@ -219,7 +219,7 @@ for elem in sortedRels:
     wKSp = open(KS_pValues, 'w')
 
     h_rel = getHisto(f_rel, tp_1)
-    for i in range(0, N_histos): # 1 N_histos histo for debug
+    for i in range(0, 3): # 1 N_histos histo for debug
         print(branches[i]) # print histo name
         histo_rel = h_rel.Get(branches[i])
         if (histo_rel):

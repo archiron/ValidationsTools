@@ -2,7 +2,7 @@
 #-*-coding: utf-8 -*-
 
 ################################################################################
-# sources.py : list of ROOT files to be used with zeeExtract tools
+# filesSources.py : list of ROOT files to be used with zeeExtract tools
 # for egamma validation comparison                              
 # 
 # MUST be launched with the cmsenv cmd after a cmsrel cmd !!

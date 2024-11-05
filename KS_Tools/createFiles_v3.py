@@ -22,12 +22,16 @@ import time
 # lines below are only for func_Extract
 from sys import argv
 
-argv.append( '-b-' )
+#argv.append( '-b-' )
 import ROOT
 ROOT.gROOT.SetBatch(True)
-argv.remove( '-b-' )
+ROOT.gErrorIgnoreLevel = ROOT.kFatal # ROOT.kBreak # 
+ROOT.PyConfig.DisableRootLogon = True
+ROOT.PyConfig.IgnoreCommandLineOptions = True
+#argv.remove( '-b-' )
 
-from ROOT import *
+from ROOT import gROOT
+root_version = ROOT.gROOT.GetVersion()
 
 if len(sys.argv) > 1:
     print(sys.argv)
@@ -72,14 +76,14 @@ pathChiLib = pathLIBS + '/' + blo.LIB_SOURCE # checkFolderName(blo.LIB_SOURCE) #
 sys.path.append(pathChiLib)
 sys.path.append(pathCommonFiles)
 
-import default as dfo
-from default import *
+import validationsDefault as dfo
+from validationsDefault import *
 from rootValues import NB_EVTS
 from controlFunctions import *
-from graphicFunctions import getHisto, getHistoConfEntry, fill_Snew2 #, fill_Snew
+from graphicFunctions import Graphic
 from graphicAutoEncoderFunctions import GraphicKS
 from DecisionBox import DecisionBox
-from sources import *
+from filesSources import *
 
 # extract release from source reference
 release = input_ref_file.split('__')[2].split('-')[0]
@@ -104,6 +108,8 @@ print('pathROOTFiles : {:s}'.format(pathROOTFiles))
 
 DB = DecisionBox()
 grKS = GraphicKS()
+gr = Graphic()
+
 rels = []
 tmp_branches = []
 nb_ttl_histos = []
@@ -153,13 +159,13 @@ for item in rootFilesList:
     #print('%s - %s' % (b[0], b[0][6:]))
     rels.append([b[0], b[0][6:], item])
     f_root = ROOT.TFile(pathDATA + item)
-    h_rel = getHisto(f_root, tp_1)
+    h_rel = gr.getHisto(f_root, tp_1)
     for i in range(0, N_histos): # 1 N_histos histo for debug
         histo_rel = h_rel.Get(branches[i])
         if (histo_rel):
             #print('%s OK' % branches[i])
-            d = getHistoConfEntry(histo_rel)
-            s_tmp = fill_Snew2(d, histo_rel)
+            d = gr.getHistoConfEntry(histo_rel)
+            s_tmp = gr.fill_Snew2(d, histo_rel)
             #s_tmp = fill_Snew(histo_rel)
             if (s_tmp.min() < 0.):
                 print('pbm whith histo %s, min < 0' % branches[i])
@@ -204,7 +210,7 @@ print('we use the %s file as KS reference' % input_ref_file)
 if (ind_reference == -1): 
     ind_reference = np.random.randint(0, nbFiles)
 print('reference ind. : %d' % ind_reference)
-h_KSref = getHisto(f_KSref, tp_1)
+h_KSref = gr.getHisto(f_KSref, tp_1)
 print(h_KSref)
 
 wKS0_Files = []
@@ -340,7 +346,7 @@ for i in range(0, N_histos):#, N_histos-1 range(N_histos - 1, N_histos):  # 1 N_
             nb_red3 = 0
             nb_green3 = 0
 
-            h_rel = getHisto(f_rel, tp_1)
+            h_rel = gr.getHisto(f_rel, tp_1)
             histo_rel = h_rel.Get(branches[i])
 
             #ii=0

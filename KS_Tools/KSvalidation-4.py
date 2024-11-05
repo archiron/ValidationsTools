@@ -11,7 +11,7 @@
 #                                                                              
 ################################################################################
 
-import os,sys
+import os, sys
 import importlib
 import importlib.machinery
 import importlib.util
@@ -19,7 +19,7 @@ import importlib.util
 #import seaborn # only with cmsenv on cca.in2p3.fr
 
 # lines below are only for func_Extract
-from sys import argv
+#from sys import argv
 
 #argv.append( '-b-' )
 import ROOT
@@ -30,31 +30,35 @@ ROOT.PyConfig.IgnoreCommandLineOptions = True
 #argv.remove( '-b-' )
 
 from ROOT import gROOT
-root_version = ROOT.gROOT.GetVersion()
+root_version = gROOT.GetVersion()
 
 if len(sys.argv) > 1:
     print(sys.argv)
     print("step 4 - arg. 0 :", sys.argv[0]) # name of the script
-    print("step 4 - arg. 2 :", sys.argv[1]) # COMMON files path
-    print("step 4 - arg. 4 :", sys.argv[2]) # FileName for paths
+    print("step 4 - arg. 1 :", sys.argv[1]) # COMMON files path
+    print("step 4 - arg. 2 :", sys.argv[2]) # FileName for paths
     pathCommonFiles = sys.argv[1]
     filePaths = sys.argv[2]
     pathLIBS = sys.argv[1][:-12]
 else:
     print("rien")
+    pathBase = ''
 
 import pandas as pd
 import numpy as np
 import matplotlib
 
+print('PANDAS     version : {}'.format(pd.__version__))
+print('PYTHON     version : {}'.format(sys.version))
+print("NUMPY      version : {}".format(np.__version__))
+print('MATPLOTLIB version : {}'.format(matplotlib.__version__))
+print("ROOT      version : {}".format(root_version))
+
 # import matplotlib.dates as md
-matplotlib.use('agg')
-from matplotlib import pyplot as plt
+#matplotlib.use('agg')
+#from matplotlib import pyplot as plt
 
-# these line for daltonians !
-#seaborn.set_palette('colorblind')
-
-print("\nKShistos")
+print("\nKSvalidation")
 
 # Import module
 loader = importlib.machinery.SourceFileLoader( filePaths, pathCommonFiles+filePaths )
@@ -65,19 +69,29 @@ print('DATA_SOURCE : %s' % blo.DATA_SOURCE)
 pathBase = blo.RESULTFOLDER 
 print('result path : {:s}'.format(pathBase))
 
-pathChiLib = pathLIBS + '/' + blo.LIB_SOURCE # checkFolderName(blo.LIB_SOURCE) # sys.argv[1]
+pathChiLib = pathLIBS + '/' + blo.LIB_SOURCE 
 sys.path.append(pathChiLib)
 sys.path.append(pathCommonFiles)
+print(sys.path)
 
 import validationsDefault as dfo
 from validationsDefault import *
 from rootValues import NB_EVTS
 from controlFunctions import *
 from graphicFunctions import Graphic
-from DecisionBox import DecisionBox
-from filesSources import *
+from DecisionBox import DecisionBox 
+from filesSources import input_ref_file
+from fonctions import Tools
+from valEnv_default import env_default
 
+sys.path.append(os.getcwd()) # path where you work
+
+DB = DecisionBox()
+tl = Tools()
 gr = Graphic()
+valEnv_d = env_default()
+
+gr.initRoot()
 
 # extract release from source reference
 release = input_ref_file.split('__')[2].split('-')[0]
@@ -127,32 +141,36 @@ if (len(rootFilesList_0) ==0 ):
 rootFilesList_0.sort()
 print('there is %d generated ROOT files' % len(rootFilesList_0))
 rootFilesList_0 = rootFilesList_0[0:nbFiles]
-print('file list :')
-print(rootFilesList_0)
+#print('file list :')
+#print(rootFilesList_0)
 nbFiles = change_nbFiles(len(rootFilesList_0), nbFiles)
 
 pathNb_files = pathCase + '{:03d}'.format(nbFiles)
 pathNb_files = checkFolderName(pathNb_files)
 checkFolder(pathNb_files)
-print('pathNb_files : {:s}'.format(pathNb_files))
+folderNB = pathNb_files
+pathKS = pathNb_files + 'KS'
+pathKS =checkFolderName(pathKS)
+checkFolder(pathKS)
+print('pathKS : {:s}'.format(pathKS))
 
 # get list of added ROOT files for comparison
 pathDATA = pathLIBS + '/' + blo.DATA_SOURCE # '/pbs/home/c/chiron/private/KS_Tools/GenExtract/DATA/NewFiles'
+print('pathDATA : {:s}'.format(pathDATA))
 rootFilesList = getListFiles(pathDATA, 'root')
 print('we use the files :')
 for item in rootFilesList:
     tmp_branch = []
     nbHistos = 0
-    print('\n%s' % item)
+    print('\nfile rel %s' % item)
     b = (item.split('__')[2]).split('-')
-    #print('%s - %s' % (b[0], b[0][6:]))
     rels.append([b[0], b[0][6:], item])
     f_root = ROOT.TFile(pathDATA + item)
     h_rel = gr.getHisto(f_root, tp_1)
     for i in range(0, N_histos): # 1 N_histos histo for debug
         histo_rel = h_rel.Get(branches[i])
         if (histo_rel):
-            print('%s OK' % branches[i])
+            #print('%s OK' % branches[i])
             d = gr.getHistoConfEntry(histo_rel)
             s_tmp = gr.fill_Snew2(d, histo_rel)
             #s_tmp = fill_Snew(histo_rel)
@@ -167,6 +185,7 @@ for item in rootFilesList:
             print('%s KO' % branches[i])
     nb_ttl_histos.append(nbHistos)
     tmp_branches.append(tmp_branch)
+    f_root.Close()
 
 print('nb_ttl_histos : ', nb_ttl_histos)
 if(len(set(nb_ttl_histos))==1):
@@ -183,111 +202,68 @@ if (len(branches) != len(newBranches)):
     N_histos = len(branches)
 print('N_histos : %d' % N_histos)
 
-#print('-')
-#for elem in rels:
-#    print(elem)
 sortedRels = sorted(rels, key = lambda x: x[0]) # gives an array with releases sorted
 
-for i in range(0, N_histos): #, N_histos-1 1 N_histos histo for debug
-    print(branches[i]) # print histo name
+pathDBox = pathKS + 'DBox'
+pathDBox =checkFolderName(pathDBox)
+checkFolder(pathDBox)
+print('pathDBox : {:s}'.format(pathDBox))
 
+f_KSref = ROOT.TFile(pathDATA + input_ref_file)
+print('we use the %s file as KS reference' % input_ref_file)
+h_KSref = gr.getHisto(f_KSref, tp_1)
+Release = input_ref_file.split('-')[0]
+Release = Release.split('__')[2]
+shortRelease = Release[6:] # get the KS reference release without the "CMSSW_"
+
+# get histoConfig file
+histoArray = []
+hCF = pathChiLib + '/HistosConfigFiles/ElectronMcSignalHistos.txt'
+fCF = open(hCF, 'r') # histo Config file
+for line in fCF:
+    if (len(line) != 0):
+        if "/" in line:
+            histoArray.append(line)
+            #print(line)
+print('len(histoArray) : {:d} - N_histos : {:d}'.format(len(histoArray), N_histos))
+
+for i in range(0, len(histoArray)): #, len(histoArray) - 1 range(len(histoArray) - 1, len(histoArray)): # 1 N_histos histo for debug len(histoArray)
+    print('histo name[{:d}] : {:s}'.format(i, histoArray[i])) # print histo name
+    
+    short_histo_name, short_histo_names, histo_positions = tl.shortHistoName(histoArray[i])
+    print('short histo name : {:s}'.format(short_histo_name))
+    for elem3 in histo_positions:
+        print('histo positions : {:s}'.format(elem3))
+
+    histo_2 = h_KSref.Get(short_histo_names[0])
+
+    ycFlag = False
+    print('short histo name : {:s}\n'.format(short_histo_names[0]))
+    
     for elem in sortedRels:
+        print('=== release : %s' %elem)
         rel = elem[1]
-        KSDiffHistoName1 = pathNb_files + '/KSDiffHistoValues_1_' + branches[i] + "_" + rel + '.txt'
-        KSDiffHistoName3 = pathNb_files + '/KSDiffHistoValues_3_' + branches[i] + "_" + rel + '.txt'
-        #print('KSDiffHistoName 1 : {:s}'.format(KSDiffHistoName1))
-        #print('KSDiffHistoName 3 : {:s}'.format(KSDiffHistoName3))
+        pict_name = pathDBox + short_histo_names[0] + '_' + rel + ".png"
 
-        wKSDiff1 = open(KSDiffHistoName1, 'r')
-        Lines1 = wKSDiff1.readlines()
-        wKSDiff1.close()
-        ord1 = Lines1[0].split()
-        ord1 = np.asarray(ord1).astype(float)
-        abs1 = Lines1[1].split()
-        abs1 = np.asarray(abs1).astype(float)
-        abs11 = []
-        for j in range(0, len(abs1)-1):
-            abs11.append((abs1[j]+abs1[j+1])/2)
-        wKSDiff3 = open(KSDiffHistoName3, 'r')
-        Lines3 = wKSDiff3.readlines()
-        wKSDiff3.close()
-        ord3 = Lines3[0].split()
-        ord3 = np.asarray(ord3).astype(float)
-        abs3 = Lines3[1].split()
-        abs3 = np.asarray(abs3).astype(float)
-        abs31 = []
-        for j in range(0, len(abs3)-1):
-            abs31.append((abs3[j]+abs3[j+1])/2)
+        # get the "new" root file datas
+        input_rel_file = elem[2]
+        f_rel = ROOT.TFile(pathDATA + input_rel_file)
+        print('we use the %s file as KS relative' % input_rel_file)
+        h1 = gr.getHisto(f_rel, tp_1)
+        histo_1 = h1.Get(short_histo_names[0]) #
+        if (histo_1):
+            print('histo 1 OK for {:s}'.format(short_histo_names[0]))
+            
+            if (histo_2):
+                print('OK for histo_2 with {}'.format(short_histo_name))
+                gr.PictureChoice(histo_1, histo_2, histo_positions[1], histo_positions[2], pict_name, 0)
+                #gr.PictureChoiceb(histo_1, histo_2, pict_name, 0)
+                
+            else:
+                print('{:s} does not exist for {:s}'.format(short_histo_name, input_ref_file))
+        else:
+            print('{:s} does not exist for {:s}'.format(short_histo_names[0], input_rel_file))
         
-        longu = len(abs11)
-        ord_1 = []
-        abs_1 = []
-        for j in range(0, longu-1):
-            if ( ord1[j] != 0. ):
-                abs_1.append(abs11[j])
-                ord_1.append(ord1[j])
-
-        longu = len(abs31)
-        ord_3 = []
-        abs_3 = []
-        for j in range(0, longu-1):
-            if ( ord3[j] != 0. ):
-                abs_3.append(abs31[j])
-                ord_3.append(ord3[j])
-        
-        longu = len(abs_1)
-        x_cent1 = 0.
-        for j in range(0, longu-1):
-            x_cent1 += abs_1[j] * ord_1[j]
-        x_cent1 /= sum(ord_1)
-        dx_cent1 = 0.
-        for j in range(0, longu-1):
-            dx_cent1 += (abs_1[j] - x_cent1) * (abs_1[j] - x_cent1) * ord_1[j]
-        dx_cent1 = sqrt(dx_cent1/sum(ord_1))
-        longu = len(abs_3)
-        x_cent3 = 0.
-        for j in range(0, longu-1):
-            x_cent3 += abs_3[j] * ord_3[j]
-        x_cent3 /= sum(ord_3)
-        dx_cent3 = 0.
-        for j in range(0, longu-1):
-            dx_cent3 += (abs_3[j] - x_cent3) * (abs_3[j] - x_cent3) * ord_3[j]
-        dx_cent3 = sqrt(dx_cent3/sum(ord_3))
-        #print('x_cent 1 : {:f}'.format(x_cent1))
-        #print('dx_cent 1 : {:f}'.format(dx_cent1))
-        #print('x_cent 3 : {:f}'.format(x_cent3))
-        #print('dx_cent 3 : {:f}'.format(dx_cent3))
-
-        cx1 = []
-        cy1 = []
-        cx3 = []
-        cy3 = []
-        cx1.append(x_cent1 - dx_cent1)
-        cx1.append(x_cent1 + dx_cent1)
-        cx3.append(x_cent3 - dx_cent3)
-        cx3.append(x_cent3 + dx_cent3)
-        cy1.append(max(ord_1)/2.)
-        cy1.append(max(ord_1)/2.)
-        cy3.append(max(ord_3)/2.)
-        cy3.append(max(ord_3)/2.)
-
-        HistoFileName = pathNb_files + '/KSCompHisto_' + branches[i] + "_" + rel + '.png'
-        plt.clf()
-        plt.figure(figsize=(10, 5))
-        fig, ax1 = plt.subplots()
-        ax1.set_title(rel, x=0.50, y=1.05)
-        #plot_1 = ax1.plot(abs_1, ord_1, color='blue', marker='*', linestyle = 'None', label='KS 1')
-        plot_1 = ax1.step(abs_1, ord_1, where='mid', color='blue', marker='*', label='KS 1')
-        #plot_1 = ax1.stairs(abs_1, ord_1, fill=True, color='blue', marker='*', label='KS 1')
-        ax1.plot(cx1, cy1, color='blue', marker='*', linewidth=2)
-        ax2 = ax1.twinx()
-        #plot_2 = ax2.plot(abs_3, ord_3, color='green', marker='+', linestyle = 'None', label='KS 3')
-        plot_2 = ax2.step(abs_3, ord_3, where='mid', color='red', marker='+', label='KS 3')
-        ax2.plot(cx3, cy3, color='red', marker='+', linewidth=2)
-        lns = plot_1 + plot_2
-        labels2 = [l.get_label() for l in lns]
-        plt.legend(lns, labels2, loc=0)
-        plt.tight_layout()
-        plt.savefig(HistoFileName)
+        ROOT.TFile.Close(f_rel)
 
 print("Fin !\n")

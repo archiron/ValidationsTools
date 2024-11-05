@@ -56,12 +56,12 @@ print('pathCommonFiles : {:s}'.format(pathCommonFiles))
 sys.path.append(pathChiLib)
 sys.path.append(pathCommonFiles)
 
-import default as dfo
-from default import *
+import validationsDefault as dfo
+from validationsDefault import *
 from rootValues import NB_EVTS
 from controlFunctions import *
 from graphicFunctions import getHisto, getHistoConfEntry, fill_Snew2
-from sources import *
+from filesSources import *
 
 import numpy as np
 

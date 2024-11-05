@@ -14,14 +14,18 @@ echo "paths file : $4"
 
 cd $1
 
-echo "executing $2/createFiles_v3.py $3 $4"
-python3 $2/createFiles_v3.py $3 $4
-echo "executing $2/KShistos.py $3 $4"
-python3 $2/KShistos.py $3 $4
+#echo "executing $2/createFiles_v3.py $3 $4"
+#python3 $2/createFiles_v3.py $3 $4
+
+#echo "executing $2/KShistos.py $3 $4"
+#python3 $2/KShistos.py $3 $4
+
 echo "executing $2/KSvalidation.py $3 $4"
-#python3 $2/KSvalidation.py $3 $4
+python3 $2/KSvalidation.py $3 $4
 #echo "=====**********=====\n"
 #python3 $2/KSvalidation-bis.py $3 $4
 #echo "=====**********=====\n"
 #python3 $2/KSvalidation-ter.py $3 $4
+#echo "=====**********=====\n"
+#python3 $2/KSvalidation-4.py $3 $4
 

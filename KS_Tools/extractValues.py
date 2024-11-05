@@ -55,11 +55,11 @@ print('pathCommonFiles : {:s}'.format(pathCommonFiles))
 sys.path.append(pathChiLib)
 sys.path.append(pathCommonFiles)
 
-from default import *
+from validationsDefault import *
 from rootValues import NB_EVTS
 from controlFunctions import *
 from graphicFunctions import getHisto, getHistoConfEntry
-from sources import *
+from filesSources import *
 
 # extract release from source reference
 release = input_ref_file.split('__')[2].split('-')[0]
