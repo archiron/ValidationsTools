@@ -1,5 +1,10 @@
 #!/bin/sh
-# This file is called . createROOTFiles.sh
+# This file is called with : . createROOTFiles.sh
+# organization of the needed files
+# |
+# --> CommonFiles
+# |
+# --> your folder.
 
 JobName="createROOTFiles_serial_job_test" # for slurm
 output="/sps/cms/chiron/TEMP/createROOTFiles_%j.log" # for slurm
@@ -11,7 +16,7 @@ echo "actual path : $aa"
 
 STR=$aa
 Choice='Local'
-for SUB in 'llr' 'pbs' 'cern'
+for SUB in 'llr' 'pbs' 'cern' # llr: LLR lab, pbs: CC Lyon facility, cern: CERN lxplus
 do
   if [[ "$STR" == *"$SUB"* ]]; then
     echo "It's $SUB there.";
@@ -89,7 +94,7 @@ if [[ "$Choice" == "LLR" ]]
     eval `scramv1 runtime -sh`
     for i in $(eval echo "{$Nbegin..$Nend}") 
     do
-      #/opt/exp_soft/cms/t3/t3submit -8c -long createROOTFiles.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER # -mail chiron@llr.in2p3.fr 
+      #/opt/exp_soft/cms/t3/t3submit -8c -long createROOTFiles.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER 
       #/opt/exp_soft/cms/t3/t3submit -8c -short createROOTFiles.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER
       /opt/exp_soft/cms/t3/t3submit -8c -reserv createROOTFiles.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER $initialSEED
     done
