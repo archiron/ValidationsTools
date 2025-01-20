@@ -296,8 +296,8 @@ for i in range(0, len(histoArray)): #, len(histoArray) - 1 range(len(histoArray)
                     ycFlag = True'''
             
                 print('ycFlag : {:s}/{:s} : {:d}'.format(short_histo_names[0], rel, ycFlag))
-                #gr.PictureChoice(histo_1, histo_2, histo_positions[1], histo_positions[2], pict_name, 0)
-                gr.PictureChoiceb(histo_1, histo_2, pict_name, 0)
+                gr.PictureChoice(histo_1, histo_2, histo_positions[1], histo_positions[2], pict_name, 0)
+                #gr.PictureChoiceb(histo_1, histo_2, pict_name, 0)
 
                 '''if ycFlag:
                     #gr.PictureChoice_DB( histo_1, histo_2, histo_positions[1], histo_positions[2], png_name, 0, yellowCurves)

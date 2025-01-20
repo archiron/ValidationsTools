@@ -213,28 +213,41 @@ print('reference ind. : %d' % ind_reference)
 h_KSref = gr.getHisto(f_KSref, tp_1)
 print(h_KSref)
 
-wKS0_Files = []
-wKS__Files = []
-wKSp_Files = []
 for elem in sortedRels:
     rel = elem[1]
     
     KS_diffName = pathNb_files + "/histo_differences_KScurve" + "_" + rel + "_" + '_{:03d}'.format(nbFiles) + ".txt"
     print("KSname 1 : %s" % KS_diffName)
     wKS0 = open(KS_diffName, 'w')
-    wKS0_Files.append(wKS0)
+    wKS0.close()
+
+    KS_diffName_std = pathNb_files + "/histo_differences_KScurve" + "_" + rel + "_" + '_{:03d}'.format(nbFiles) + "-std.txt"
+    print("KSname 1 : %s" % KS_diffName_std)
+    wKS4 = open(KS_diffName_std, 'w')
+    wKS4.close()
+
+    KS_diffName_mean = pathNb_files + "/histo_differences_KScurve" + "_" + rel + "_" + '_{:03d}'.format(nbFiles) + "-mean.txt"
+    print("KSname 1 : %s" % KS_diffName_mean)
+    wKS5 = open(KS_diffName_mean, 'w')
+    wKS5.close()
 
     KS_resume = pathNb_files + "/histo_resume" + "_" + rel + ".txt"
     print("KSname 0 : %s" % KS_resume)
     wKS_ = open(KS_resume, 'w')
-    wKS__Files.append(wKS_)
+    wKS_.close()
 
     KS_pValues = pathNb_files + "/histo_pValues" + "_" + rel + ".txt"
     print("KSname 2 : %s" % KS_pValues)
     wKSp = open(KS_pValues, 'w')
-    wKSp_Files.append(wKSp)
+    wKSp.close()
 
 nbRels = len(sortedRels)
+ind_rel = 0
+'''
+for elem in sortedRels:
+    print('[ind_rel/nbRels] : [{:d}/{:d}] = {:s}'.format(ind_rel, nbRels, np.asarray(sortedRels[ind_rel])))
+    ind_rel += 1
+'''
 redGreen1 = [[0 for c in range(2)] for r in range(nbRels)]
 redGreen2 = [[0 for c in range(2)] for r in range(nbRels)]
 redGreen3 = [[0 for c in range(2)] for r in range(nbRels)]
@@ -432,7 +445,23 @@ for i in range(0, N_histos):#, N_histos-1 range(N_histos - 1, N_histos):  # 1 N_
             # diff max between new & old
             diffMax0, posMax0, sDKS = DB.diffMAXKS3(s_KSref, s_new)
             print("diffMax0 : %f - posMax0 : %f" % (diffMax0, posMax0))
-            wKS0_Files[ind_rel].write('%s : %e\n' % (branches[i], diffMax0))
+            print('ind rel : {:d} : {:s} : {:e}\n'.format(ind_rel, branches[i], diffMax0)) # OK
+            KS_diffName = pathNb_files + "/histo_differences_KScurve" + "_" + rel + "_" + '_{:03d}'.format(nbFiles) + ".txt"
+            wKS0 = open(KS_diffName, 'a')
+            wKS0.write('{:s} : {:e}\n'.format(branches[i], diffMax0))
+            wKS0.close()
+            diffMax4, posMax4, sDKS = DB.diffMAXKS4(s_KSref, s_new)
+            print("diffMax4 : %f - posMax4 : %f" % (diffMax4, posMax4))
+            KS_diffName_std = pathNb_files + "/histo_differences_KScurve" + "_" + rel + "_" + '_{:03d}'.format(nbFiles) + "-std.txt"
+            wKS4 = open(KS_diffName_std, 'a')
+            wKS4.write('{:s} : {:e}\n'.format(branches[i], diffMax4))
+            wKS4.close()
+            diffMax5, posMax5, sDKS = DB.diffMAXKS5(s_KSref, s_new)
+            print("diffMax5 : %f - posMax5 : %f" % (diffMax5, posMax5))
+            KS_diffName_mean = pathNb_files + "/histo_differences_KScurve" + "_" + rel + "_" + '_{:03d}'.format(nbFiles) + "-mean.txt"
+            wKS5 = open(KS_diffName_mean, 'a')
+            wKS5.write('{:s} : {:e}\n'.format(branches[i], diffMax5))
+            wKS5.close()
             print(s_new[0:8])
             print(s_KSref[0:8])
             print(sDKS[0:8]) # diff
@@ -479,6 +508,12 @@ for i in range(0, N_histos):#, N_histos-1 range(N_histos - 1, N_histos):  # 1 N_
             wKS1.write(' '.join("{:10.04e}".format(x) for x in yellowCurveCum1 ))
             wKS1.write('\n')
             wKS1.close()
+            # Get the max of the integral - std
+            I_max4 = DB.integralpValue(division, count, 0.)
+            pValue4 = DB.integralpValue(division, count, diffMax4)
+            # Get the max of the integral - mean
+            I_max5 = DB.integralpValue(division, count, 0.)
+            pValue5 = DB.integralpValue(division, count, diffMax5)
 
             fileName1 = pathKS + '/KS-ttlDiff_1_' + branches[i] + "_" + rel + '.png'
             [nb_green1, nb_red1] = grKS.createKSttlDiffPicture(totalDiff, nbins, diffMax0,'KS diff. 1', fileName1, pValue, I_max)
@@ -551,8 +586,18 @@ for i in range(0, N_histos):#, N_histos-1 range(N_histos - 1, N_histos):  # 1 N_
             # print the p-Value 3
             print('\nunormalized p_Value : %0.4e for nbins=%d' % (pValue3, nbins))
             print('normalized p_Value : %0.4e for nbins=%d' % (pValue3/I_max3, nbins))
+            # print the p-Value 4
+            print('\nunormalized p_Value : %0.4e for nbins=%d' % (pValue4, nbins))
+            print('normalized p_Value : %0.4e for nbins=%d' % (pValue4/I_max4, nbins))
+            # print the p-Value 5
+            print('\nunormalized p_Value : %0.4e for nbins=%d' % (pValue5, nbins))
+            print('normalized p_Value : %0.4e for nbins=%d' % (pValue5/I_max5, nbins))
 
-            wKSp_Files[ind_rel].write('%s, %e, %e, %e\n' % (branches[i], pValue/I_max, pValue2/I_max2, pValue3/I_max3))
+            KS_pValues = pathNb_files + "/histo_pValues" + "_" + rel + ".txt"
+            wKSp = open(KS_pValues, 'a')
+            wKSp.write('%s, %e, %e, %e, %e, %e\n' % (branches[i], pValue/I_max, pValue2/I_max2, pValue3/I_max3, pValue4/I_max4, pValue5/I_max5))
+            wKSp.close()
+            #wKSp_Files[ind_rel].write('%s, %e, %e, %e\n' % (branches[i], pValue/I_max, pValue2/I_max2, pValue3/I_max3))
 
             plt.close('all')
             # save the KS curves
@@ -579,10 +624,17 @@ for i in range(0, N_histos):#, N_histos-1 range(N_histos - 1, N_histos):  # 1 N_
             nb_green = nb_green1 + nb_green2 + nb_green3
             print('KS ttl : %d red - %d green for %s' % (nb_red, nb_green, branches[i]))
             print('[ind_rel/nbRels] : [{:d}/{:d}]'.format(ind_rel, nbRels))
-            wKS__Files[ind_rel].write('KS 1 : %d red - %d green for %s\n' % (nb_red1, nb_green1, branches[i]))
-            wKS__Files[ind_rel].write('KS 2 : %d red - %d green for %s\n' % (nb_red2, nb_green2, branches[i]))
-            wKS__Files[ind_rel].write('KS 3 : %d red - %d green for %s\n' % (nb_red3, nb_green3, branches[i]))
-            wKS__Files[ind_rel].write('KS ttl : %d red - %d green for %s\n' % (nb_red, nb_green, branches[i]))
+            KS_resume= pathNb_files + "/histo_resume" + "_" + rel + ".txt"
+            wKS_ = open(KS_resume, 'a')
+            wKS_.write('KS 1 : %d red - %d green for %s\n' % (nb_red1, nb_green1, branches[i]))
+            wKS_.write('KS 2 : %d red - %d green for %s\n' % (nb_red2, nb_green2, branches[i]))
+            wKS_.write('KS 3 : %d red - %d green for %s\n' % (nb_red3, nb_green3, branches[i]))
+            wKS_.write('KS ttl : %d red - %d green for %s\n' % (nb_red, nb_green, branches[i]))
+            wKS_.close()
+            #wKS__Files[ind_rel].write('KS 1 : %d red - %d green for %s\n' % (nb_red1, nb_green1, branches[i]))
+            #wKS__Files[ind_rel].write('KS 2 : %d red - %d green for %s\n' % (nb_red2, nb_green2, branches[i]))
+            #wKS__Files[ind_rel].write('KS 3 : %d red - %d green for %s\n' % (nb_red3, nb_green3, branches[i]))
+            #wKS__Files[ind_rel].write('KS ttl : %d red - %d green for %s\n' % (nb_red, nb_green, branches[i]))
             redGreen1[ind_rel][0] += nb_red1
             redGreen1[ind_rel][1] += nb_green1
             redGreen2[ind_rel][0] += nb_red2
@@ -595,9 +647,16 @@ for i in range(0, N_histos):#, N_histos-1 range(N_histos - 1, N_histos):  # 1 N_
 
 ind_rel = 0
 for elem in sortedRels:
-    wKS__Files[ind_rel].write('KS 1 : %d ttl red - %d ttl green\n' % (redGreen1[ind_rel][0], redGreen1[ind_rel][1]))
-    wKS__Files[ind_rel].write('KS 2 : %d ttl red - %d ttl green\n' % (redGreen2[ind_rel][0], redGreen2[ind_rel][1]))
-    wKS__Files[ind_rel].write('KS 3 : %d ttl red - %d ttl green\n' % (redGreen3[ind_rel][0], redGreen3[ind_rel][1]))
+    rel = elem[1]
+    KS_resume= pathNb_files + "/histo_resume" + "_" + rel + ".txt"
+    wKS_ = open(KS_resume, 'a')
+    wKS_.write('KS 1 : %d ttl red - %d ttl green\n' % (redGreen1[ind_rel][0], redGreen1[ind_rel][1]))
+    wKS_.write('KS 2 : %d ttl red - %d ttl green\n' % (redGreen2[ind_rel][0], redGreen2[ind_rel][1]))
+    wKS_.write('KS 3 : %d ttl red - %d ttl green\n' % (redGreen3[ind_rel][0], redGreen3[ind_rel][1]))
+    wKS_.close()
+    #wKS__Files[ind_rel].write('KS 1 : %d ttl red - %d ttl green\n' % (redGreen1[ind_rel][0], redGreen1[ind_rel][1]))
+    #wKS__Files[ind_rel].write('KS 2 : %d ttl red - %d ttl green\n' % (redGreen2[ind_rel][0], redGreen2[ind_rel][1]))
+    #wKS__Files[ind_rel].write('KS 3 : %d ttl red - %d ttl green\n' % (redGreen3[ind_rel][0], redGreen3[ind_rel][1]))
     ind_rel += 1
 
 toc = time.time()

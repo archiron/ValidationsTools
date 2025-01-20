@@ -22,12 +22,15 @@ from sys import argv
 
 #import seaborn # only with cmsenv on cca.in2p3.fr
 
-argv.append( '-b-' )
+#argv.append( '-b-' )
 import ROOT
 ROOT.gROOT.SetBatch(True)
-argv.remove( '-b-' )
+ROOT.gErrorIgnoreLevel = ROOT.kFatal # ROOT.kBreak # 
+ROOT.PyConfig.DisableRootLogon = True
+ROOT.PyConfig.IgnoreCommandLineOptions = True
+#argv.remove( '-b-' )
 
-from ROOT import *
+from ROOT import gROOT
 root_version = ROOT.gROOT.GetVersion()
 
 if len(sys.argv) > 1:
@@ -78,7 +81,7 @@ from validationsDefault import *
 from rootValues import NB_EVTS
 from controlFunctions import *
 from filesSources import *
-from graphicAutoEncoderFunctions import createCompLossesPicture, createCompPValuesPicture
+from graphicAutoEncoderFunctions import createCompLossesPicture, createCompPValuesPicture, createCompPValuesPicture2
 from graphicFunctions import Graphic
 
 gr = Graphic()
@@ -186,6 +189,12 @@ tic = time.time()
 
 df1 = pd.DataFrame()
 df2 = pd.DataFrame()
+df3 = pd.DataFrame()
+df4 = pd.DataFrame()
+df5 = pd.DataFrame()
+df_ttl1 = []
+df_ttl4 = []
+df_ttl5 = []
 
 for elem in sortedRels:
     print(elem)
@@ -193,6 +202,8 @@ for elem in sortedRels:
 
     # get the KS file datas
     KS_diffName = pathNb_files + "/histo_differences_KScurve" + "_" + rel + "_" + '_{:03d}'.format(nbFiles) + ".txt"
+    KS_diffName_std = pathNb_files + "/histo_differences_KScurve" + "_" + rel + "_" + '_{:03d}'.format(nbFiles) + "-std.txt"
+    KS_diffName_mean = pathNb_files + "/histo_differences_KScurve" + "_" + rel + "_" + '_{:03d}'.format(nbFiles) + "-mean.txt"
     pValue_Name = pathNb_files + "/histo_pValues" + "_" + rel + ".txt"
     if exists(KS_diffName):
         print('%s existe'%KS_diffName)
@@ -204,24 +215,74 @@ for elem in sortedRels:
         print('%s n\'existe pas'%pValue_Name)
 
     wKS0 = open(KS_diffName, 'r').readlines()
+    wKS4 = open(KS_diffName_std, 'r').readlines()
+    wKS5 = open(KS_diffName_mean, 'r').readlines()
     wKS1 = open(pValue_Name, 'r').readlines()
+    sum0 = 0.
+    sum4 = 0.
+    sum5 = 0.
+
     print(len(wKS0))
+    print(len(wKS4))
+    print(len(wKS5))
     print(len(wKS1))
+    
+    # diff
     tmpArr1 = []
     tmpArr2 = []
+    
+
+    nbLines = 0
     for line in wKS0:
         #print(len(line))
         aa = line.split(' : ')
         print(aa[0])
         tmpArr1.append(aa[0])
         tmpArr2.append(float(aa[1][:-1]))
+        sum0 += float(aa[1][:-1])
+        #print('{:s} : {:f}'.format(aa[0], sum0))
+        nbLines += 1
     df1['index'] = tmpArr1
     df1[rel] = tmpArr2
+    df_ttl1.append([rel, sum0/nbLines])
 
+    tmpArr1 = []
+    tmpArr2 = []
+    nbLines = 0
+    for line in wKS4:
+        #print(len(line))
+        aa = line.split(' : ')
+        print(aa[0])
+        tmpArr1.append(aa[0])
+        tmpArr2.append(float(aa[1][:-1]))
+        sum4 += float(aa[1][:-1])
+        nbLines += 1
+    df4['index'] = tmpArr1
+    df4[rel] = tmpArr2
+    df_ttl4.append([rel, sum4/nbLines])
+
+    tmpArr1 = []
+    tmpArr2 = []
+    nbLines = 0
+    for line in wKS5:
+        #print(len(line))
+        aa = line.split(' : ')
+        print(aa[0])
+        tmpArr1.append(aa[0])
+        tmpArr2.append(float(aa[1][:-1]))
+        sum5 += float(aa[1][:-1])
+        nbLines += 1
+    df5['index'] = tmpArr1
+    df5[rel] = tmpArr2
+    df_ttl5.append([rel, sum5/nbLines])
+
+    # pValues
     tmpArr1 = []
     tmpArr2 = []
     tmpArr3 = []
     tmpArr4 = []
+    tmpArr5 = []
+    tmpArr6 = []
     for line in wKS1:
         #print(len(line))
         aa = line.split(', ')
@@ -229,16 +290,36 @@ for elem in sortedRels:
         tmpArr2.append(float(aa[1]))
         tmpArr3.append(float(aa[2]))
         tmpArr4.append(float(aa[3]))#[:-1]
+        tmpArr5.append(float(aa[4]))
+        tmpArr6.append(float(aa[5]))#[:-1]
     df2['index'] = tmpArr1
     df2[rel+'_pV1'] = tmpArr2
     df2[rel+'_pV2'] = tmpArr3
     df2[rel+'_pV3'] = tmpArr4 
+    df2[rel+'_pV4'] = tmpArr5
+    df2[rel+'_pV5'] = tmpArr6 
+    df3['index'] = tmpArr1
+    df3[rel+'_pV1'] = tmpArr2
+    df3[rel+'_pV4'] = tmpArr5
+    df3[rel+'_pV5'] = tmpArr6 
 
 print(df1.head(5))
 print()
+print(df4.head(5))
+print()
+print(df5.head(5))
+print()
 print(df2.head(5))
+print()
+print(df_ttl1)
+print()
+print(df_ttl4)
+print()
+print(df_ttl5)
+print()
     
 labels = list(df1)[1:]
+print('labels')
 print(labels)
 (N_histos, _) = df1.shape
 
@@ -251,24 +332,90 @@ for ind in df1.index:
     #print(val)
     pictureName = pathKS + 'comparison_KS_values_' + branch + '_{:03d}'.format(nbFiles) +'.png' # 
     print(pictureName)
-    title = r"$\bf{" + branch + "}$" + ' : KS diff values vs releases.'
+    title = r"$\bf{" + branch + "}$" + ' : KS cum diff values vs releases.'
     createCompLossesPicture(labels,val, pictureName, title)
-    #if ind == 2:
-    #    break
 
-for ind in df2.index:
+for ind in df4.index:
     print(ind)
-    a = df2.iloc[ind].to_numpy()
+    a = df4.iloc[ind].to_numpy()
     branch = a[0]
     print(branch)
     val = list(a[1:])
     #print(val)
+    pictureName = pathKS + 'comparison_KS_values_' + branch + '_{:03d}'.format(nbFiles) +'-std.png' # 
+    print(pictureName)
+    title = r"$\bf{" + branch + "}$" + ' : KS std diff values vs releases.'
+    createCompLossesPicture(labels,val, pictureName, title)
+
+for ind in df5.index:
+    print(ind)
+    a = df5.iloc[ind].to_numpy()
+    branch = a[0]
+    print(branch)
+    val = list(a[1:])
+    #print(val)
+    pictureName = pathKS + 'comparison_KS_values_' + branch + '_{:03d}'.format(nbFiles) +'-mean.png' # 
+    print(pictureName)
+    title = r"$\bf{" + branch + "}$" + ' : KS mean diff values vs releases.'
+    createCompLossesPicture(labels,val, pictureName, title)
+
+for ind in df2.index:
+    print('df2 : {:d}'.format(ind))
+    a = df2.iloc[ind].to_numpy()
+    branch = a[0]
+    print(branch)
+    val = list(a[1:])
+    print(val)
     pictureName = pathKS + 'comparison_pValues_' + branch + '_{:03d}'.format(nbFiles) +'.png' # 
     print(pictureName)
     title = r"$\bf{" + branch + "}$" + ' : KS pValues vs releases.'
+    createCompPValuesPicture2(labels,val, pictureName, title)
+
+for ind in df3.index:
+    print('df3 : {:d}'.format(ind))
+    a = df3.iloc[ind].to_numpy()
+    branch = a[0]
+    print(branch)
+    val = list(a[1:])
+    print(val)
+    pictureName = pathKS + 'comparison_pValues_' + branch + '_{:03d}'.format(nbFiles) +'_b.png' # 
+    print(pictureName)
+    title = r"$\bf{" + branch + "}$" + ' : KS pValues vs releases.'
     createCompPValuesPicture(labels,val, pictureName, title)
-    #if ind == 2:
-    #    break
+
+# histo complet recapitulatif
+lab = []
+val = []
+for elem in df_ttl1:
+    lab.append(elem[0])
+    val.append(elem[1])
+print(val)
+pictureName = pathKS + 'comparison_KS_values_total_cum_{:03d}'.format(nbFiles) +'.png' # 
+print(pictureName)
+title = r"$\bf{total}$" + ' : KS cum diff values vs releases.'
+createCompLossesPicture(lab,val, pictureName, title)
+
+lab = []
+val = []
+for elem in df_ttl4:
+    lab.append(elem[0])
+    val.append(elem[1])
+print(val)
+pictureName = pathKS + 'comparison_KS_values_total_std_{:03d}'.format(nbFiles) +'.png' # 
+print(pictureName)
+title = r"$\bf{total}$" + ' : KS std diff values vs releases.'
+createCompLossesPicture(lab,val, pictureName, title)
+
+lab = []
+val = []
+for elem in df_ttl5:
+    lab.append(elem[0])
+    val.append(elem[1])
+print(val)
+pictureName = pathKS + 'comparison_KS_values_total_mean_{:03d}'.format(nbFiles) +'.png' # 
+print(pictureName)
+title = r"$\bf{total}$" + ' : KS mean diff values vs releases.'
+createCompLossesPicture(lab,val, pictureName, title)
 
 toc = time.time()
 print('Done in {:.4f} seconds'.format(toc-tic))
