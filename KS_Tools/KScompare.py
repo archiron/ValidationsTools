@@ -192,9 +192,12 @@ df2 = pd.DataFrame()
 df3 = pd.DataFrame()
 df4 = pd.DataFrame()
 df5 = pd.DataFrame()
-df_ttl1 = []
+df_ttl0 = []
 df_ttl4 = []
 df_ttl5 = []
+df_ttl1 = []
+df_ttl2 = []
+df_ttl3 = []
 
 for elem in sortedRels:
     print(elem)
@@ -221,6 +224,9 @@ for elem in sortedRels:
     sum0 = 0.
     sum4 = 0.
     sum5 = 0.
+    sum1 = 0.
+    sum2 = 0.
+    sum3 = 0.
 
     print(len(wKS0))
     print(len(wKS4))
@@ -231,7 +237,6 @@ for elem in sortedRels:
     tmpArr1 = []
     tmpArr2 = []
     
-
     nbLines = 0
     for line in wKS0:
         #print(len(line))
@@ -244,7 +249,7 @@ for elem in sortedRels:
         nbLines += 1
     df1['index'] = tmpArr1
     df1[rel] = tmpArr2
-    df_ttl1.append([rel, sum0/nbLines])
+    df_ttl0.append([rel, sum0/nbLines])
 
     tmpArr1 = []
     tmpArr2 = []
@@ -283,6 +288,7 @@ for elem in sortedRels:
     tmpArr4 = []
     tmpArr5 = []
     tmpArr6 = []
+    nbLines = 0
     for line in wKS1:
         #print(len(line))
         aa = line.split(', ')
@@ -292,6 +298,10 @@ for elem in sortedRels:
         tmpArr4.append(float(aa[3]))#[:-1]
         tmpArr5.append(float(aa[4]))
         tmpArr6.append(float(aa[5]))#[:-1]
+        sum1 += float(aa[1])
+        sum2 += float(aa[4])
+        sum3 += float(aa[5])
+        nbLines += 1
     df2['index'] = tmpArr1
     df2[rel+'_pV1'] = tmpArr2
     df2[rel+'_pV2'] = tmpArr3
@@ -302,6 +312,9 @@ for elem in sortedRels:
     df3[rel+'_pV1'] = tmpArr2
     df3[rel+'_pV4'] = tmpArr5
     df3[rel+'_pV5'] = tmpArr6 
+    df_ttl1.append([rel, sum1/nbLines])
+    df_ttl2.append([rel, sum2/nbLines])
+    df_ttl3.append([rel, sum3/nbLines])
 
 print(df1.head(5))
 print()
@@ -311,11 +324,17 @@ print(df5.head(5))
 print()
 print(df2.head(5))
 print()
-print(df_ttl1)
+print(df_ttl0)
 print()
 print(df_ttl4)
 print()
 print(df_ttl5)
+print()
+print(df_ttl1)
+print()
+print(df_ttl2)
+print()
+print(df_ttl3)
 print()
     
 labels = list(df1)[1:]
@@ -386,7 +405,7 @@ for ind in df3.index:
 # histo complet recapitulatif
 lab = []
 val = []
-for elem in df_ttl1:
+for elem in df_ttl0:
     lab.append(elem[0])
     val.append(elem[1])
 print(val)
@@ -415,6 +434,39 @@ print(val)
 pictureName = pathKS + 'comparison_KS_values_total_mean_{:03d}'.format(nbFiles) +'.png' # 
 print(pictureName)
 title = r"$\bf{total}$" + ' : KS mean diff values vs releases.'
+createCompLossesPicture(lab,val, pictureName, title)
+
+lab = []
+val = []
+for elem in df_ttl1:
+    lab.append(elem[0])
+    val.append(elem[1])
+print(val)
+pictureName = pathKS + 'comparison_pValues_total_cum_{:03d}'.format(nbFiles) +'.png' # 
+print(pictureName)
+title = r"$\bf{total}$" + ' : KS pValues vs releases.'
+createCompLossesPicture(lab,val, pictureName, title)
+
+lab = []
+val = []
+for elem in df_ttl2:
+    lab.append(elem[0])
+    val.append(elem[1])
+print(val)
+pictureName = pathKS + 'comparison_pValues_total_std_{:03d}'.format(nbFiles) +'.png' # 
+print(pictureName)
+title = r"$\bf{total}$" + ' : KS pValues vs releases.'
+createCompLossesPicture(lab,val, pictureName, title)
+
+lab = []
+val = []
+for elem in df_ttl3:
+    lab.append(elem[0])
+    val.append(elem[1])
+print(val)
+pictureName = pathKS + 'comparison_pValues_total_mean_{:03d}'.format(nbFiles) +'.png' # 
+print(pictureName)
+title = r"$\bf{total}$" + ' : KS pValues vs releases.'
 createCompLossesPicture(lab,val, pictureName, title)
 
 toc = time.time()
