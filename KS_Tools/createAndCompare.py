@@ -130,13 +130,6 @@ else:
     print('Folder %s already created\n' % pathCase)
 
 # get list of generated ROOT files
-'''rootFilesList_0 = getListFiles(pathROOTFiles) # get the list of the root files in the folderName folder
-if (len(rootFilesList_0) ==0 ):
-    print('there is no generated ROOT files')
-    exit()
-rootFilesList_0.sort()
-print('there is ' + '{:03d}'.format(len(rootFilesList_0)) + ' generated ROOT files')
-rootFilesList_0 = rootFilesList_0[0:nbFiles]'''
 nbFiles = 1000
 
 pathNb_files = pathCase + '{:03d}'.format(nbFiles)
@@ -250,39 +243,6 @@ for i in range(0, N_histos):#, N_histos-1 range(N_histos - 1, N_histos):  # 1 N_
         print('%s OK' % branches[i])
         name = pathROOTFiles + "histo_" + branches[i] + '_{:03d}'.format(nbFiles) + ".txt"
         print('\n%d - %s' %(i, name))
-        '''df = pd.read_csv(name)
-    
-        # check the values data
-        cols = df.columns.values
-        n_cols = len(cols)
-        print('nb of columns for histos : %d' % n_cols)
-        cols_entries = cols[6::2]
-        df_entries = df[cols_entries]
-
-        # nbBins (GetEntries())
-        df_GetEntries = df['nbBins']
-
-        # get nb of columns & rows for histos
-        (Nrows, Ncols) = df_entries.shape
-        print('[Nrows, Ncols] : [%d, %d]' % (Nrows, Ncols))
-        df_entries = df_entries.iloc[:, 1:Ncols-1]
-        (Nrows, Ncols) = df_entries.shape
-        print('[Nrows, Ncols] : [%d, %d]' % (Nrows, Ncols))
-
-        # create the datas for the p-Value graph
-        # by comparing all curves between them. (KS 1)
-        nb1 = 0
-        totalDiff = []
-        for k in range(0,Nrows-1):
-            for l in range(k+1, Nrows):
-                nb1 += 1
-                series0 = df_entries.iloc[k,:]
-                series1 = df_entries.iloc[l,:]     
-                sum0 = df_GetEntries[k]
-                sum1 = df_GetEntries[l]
-                totalDiff.append(DB.diffMAXKS3(series0, series1)[0]) # 9000, 9000
-
-        print('ttl nb of couples 1 : %d' % nb1)'''
 
         # create the datas for the p-Value graph
         # by comparing 1 curve with the others.
@@ -340,18 +300,6 @@ for i in range(0, N_histos):#, N_histos-1 range(N_histos - 1, N_histos):  # 1 N_
             wKS0 = open(KS_diffName, 'a')
             wKS0.write('{:s} : {:e}\n'.format(branches[i], diffMax0))
             wKS0.close()
-            diffMax4, posMax4, sDKS = DB.diffMAXKS4(s_KSref, s_new)
-            print("diffMax4 : %f - posMax4 : %f" % (diffMax4, posMax4))
-            KS_diffName_std = pathNb_files + "/histo_differences_KScurve" + "_" + rel + "_" + '_{:03d}'.format(nbFiles) + "-std.txt"
-            wKS4 = open(KS_diffName_std, 'a')
-            wKS4.write('{:s} : {:e}\n'.format(branches[i], diffMax4))
-            wKS4.close()
-            diffMax5, posMax5, sDKS = DB.diffMAXKS5(s_KSref, s_new)
-            print("diffMax5 : %f - posMax5 : %f" % (diffMax5, posMax5))
-            KS_diffName_mean = pathNb_files + "/histo_differences_KScurve" + "_" + rel + "_" + '_{:03d}'.format(nbFiles) + "-mean.txt"
-            wKS5 = open(KS_diffName_mean, 'a')
-            wKS5.write('{:s} : {:e}\n'.format(branches[i], diffMax5))
-            wKS5.close()
 
             # print nb of red/green lines
             print('[ind_rel/nbRels] : [{:d}/{:d}]'.format(ind_rel, nbRels))
@@ -361,8 +309,6 @@ for i in range(0, N_histos):#, N_histos-1 range(N_histos - 1, N_histos):  # 1 N_
 
 # generate pictures
 df_ttl0 = []
-df_ttl4 = []
-df_ttl5 = []
 
 for elem in sortedRels:
     print(elem)
@@ -370,31 +316,15 @@ for elem in sortedRels:
 
     # get the KS file datas
     KS_diffName = pathNb_files + "/histo_differences_KScurve" + "_" + rel + "_" + '_{:03d}'.format(nbFiles) + ".txt"
-    KS_diffName_std = pathNb_files + "/histo_differences_KScurve" + "_" + rel + "_" + '_{:03d}'.format(nbFiles) + "-std.txt"
-    KS_diffName_mean = pathNb_files + "/histo_differences_KScurve" + "_" + rel + "_" + '_{:03d}'.format(nbFiles) + "-mean.txt"
     if exists(KS_diffName):
         print('%s existe'%KS_diffName)
     else:
         print('%s n\'existe pas'%KS_diffName)
-    if exists(KS_diffName_std):
-        print('%s existe'%KS_diffName_std)
-    else:
-        print('%s n\'existe pas'%KS_diffName_std)
-    if exists(KS_diffName_mean):
-        print('%s existe'%KS_diffName_mean)
-    else:
-        print('%s n\'existe pas'%KS_diffName_mean)
 
     wKS0 = open(KS_diffName, 'r').readlines()
-    wKS4 = open(KS_diffName_std, 'r').readlines()
-    wKS5 = open(KS_diffName_mean, 'r').readlines()
     sum0 = 0.
-    sum4 = 0.
-    sum5 = 0.
 
     print(len(wKS0))
-    print(len(wKS4))
-    print(len(wKS5))
     
     # diff
     tmpArr1 = []
@@ -412,40 +342,6 @@ for elem in sortedRels:
         nbLines += 1
     df_ttl0.append([rel, sum0/nbLines])
 
-    tmpArr1 = []
-    tmpArr2 = []
-    nbLines = 0
-    for line in wKS4:
-        #print(len(line))
-        aa = line.split(' : ')
-        print(aa[0])
-        tmpArr1.append(aa[0])
-        tmpArr2.append(float(aa[1][:-1]))
-        sum4 += float(aa[1][:-1])
-        nbLines += 1
-    df_ttl4.append([rel, sum4/nbLines])
-
-    tmpArr1 = []
-    tmpArr2 = []
-    nbLines = 0
-    for line in wKS5:
-        #print(len(line))
-        aa = line.split(' : ')
-        print(aa[0])
-        tmpArr1.append(aa[0])
-        tmpArr2.append(float(aa[1][:-1]))
-        sum5 += float(aa[1][:-1])
-        nbLines += 1
-    df_ttl5.append([rel, sum5/nbLines])
-
-
-print(df_ttl0)
-print()
-print(df_ttl4)
-print()
-print(df_ttl5)
-print()
-
 # histo complet recapitulatif
 lab = []
 val = []
@@ -456,28 +352,6 @@ for elem in df_ttl0:
 pictureName = pathKS + 'comparison_KS_values_total_cum_{:03d}'.format(nbFiles) +'.png' # 
 print(pictureName)
 title = r"$\bf{total}$" + ' : KS cum diff values vs releases.'
-createCompLossesPicture(lab,val, pictureName, title)
-
-lab = []
-val = []
-for elem in df_ttl4:
-    lab.append(elem[0])
-    val.append(elem[1])
-#print(val)
-pictureName = pathKS + 'comparison_KS_values_total_std_{:03d}'.format(nbFiles) +'.png' # 
-print(pictureName)
-title = r"$\bf{total}$" + ' : KS std diff values vs releases.'
-createCompLossesPicture(lab,val, pictureName, title)
-
-lab = []
-val = []
-for elem in df_ttl5:
-    lab.append(elem[0])
-    val.append(elem[1])
-print(val)
-pictureName = pathKS + 'comparison_KS_values_total_mean_{:03d}'.format(nbFiles) +'.png' # 
-#print(pictureName)
-title = r"$\bf{total}$" + ' : KS mean diff values vs releases.'
 createCompLossesPicture(lab,val, pictureName, title)
 
 toc = time.time()
