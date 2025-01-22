@@ -408,7 +408,7 @@ val = []
 for elem in df_ttl0:
     lab.append(elem[0])
     val.append(elem[1])
-print(val)
+#print(val)
 pictureName = pathKS + 'comparison_KS_values_total_cum_{:03d}'.format(nbFiles) +'.png' # 
 print(pictureName)
 title = r"$\bf{total}$" + ' : KS cum diff values vs releases.'
@@ -419,7 +419,7 @@ val = []
 for elem in df_ttl4:
     lab.append(elem[0])
     val.append(elem[1])
-print(val)
+#print(val)
 pictureName = pathKS + 'comparison_KS_values_total_std_{:03d}'.format(nbFiles) +'.png' # 
 print(pictureName)
 title = r"$\bf{total}$" + ' : KS std diff values vs releases.'
@@ -432,7 +432,7 @@ for elem in df_ttl5:
     val.append(elem[1])
 print(val)
 pictureName = pathKS + 'comparison_KS_values_total_mean_{:03d}'.format(nbFiles) +'.png' # 
-print(pictureName)
+#print(pictureName)
 title = r"$\bf{total}$" + ' : KS mean diff values vs releases.'
 createCompLossesPicture(lab,val, pictureName, title)
 
@@ -441,7 +441,7 @@ val = []
 for elem in df_ttl1:
     lab.append(elem[0])
     val.append(elem[1])
-print(val)
+#print(val)
 pictureName = pathKS + 'comparison_pValues_total_cum_{:03d}'.format(nbFiles) +'.png' # 
 print(pictureName)
 title = r"$\bf{total}$" + ' : KS pValues vs releases.'
@@ -452,7 +452,7 @@ val = []
 for elem in df_ttl2:
     lab.append(elem[0])
     val.append(elem[1])
-print(val)
+#print(val)
 pictureName = pathKS + 'comparison_pValues_total_std_{:03d}'.format(nbFiles) +'.png' # 
 print(pictureName)
 title = r"$\bf{total}$" + ' : KS pValues vs releases.'
@@ -463,8 +463,47 @@ val = []
 for elem in df_ttl3:
     lab.append(elem[0])
     val.append(elem[1])
-print(val)
+#print(val)
 pictureName = pathKS + 'comparison_pValues_total_mean_{:03d}'.format(nbFiles) +'.png' # 
+print(pictureName)
+title = r"$\bf{total}$" + ' : KS pValues vs releases.'
+createCompLossesPicture(lab,val, pictureName, title)
+
+# remove the point release & value=1 into the plot
+r_release = release.split('_', 1)[1]
+print('extracted release : {:s}'.format(r_release))
+lab = []
+val = []
+for elem in df_ttl1:
+    if (elem[0] != r_release):
+        lab.append(elem[0])
+        val.append(elem[1])
+#print(val)
+pictureName = pathKS + 'comparison_pValues_total_cum_{:03d}'.format(nbFiles) +'b.png' # 
+print(pictureName)
+title = r"$\bf{total}$" + ' : KS pValues vs releases.'
+createCompLossesPicture(lab,val, pictureName, title)
+
+lab = []
+val = []
+for elem in df_ttl2:
+    if (elem[0] != r_release):
+        lab.append(elem[0])
+        val.append(elem[1])
+#print(val)
+pictureName = pathKS + 'comparison_pValues_total_std_{:03d}'.format(nbFiles) +'b.png' # 
+print(pictureName)
+title = r"$\bf{total}$" + ' : KS pValues vs releases.'
+createCompLossesPicture(lab,val, pictureName, title)
+
+lab = []
+val = []
+for elem in df_ttl3:
+    if (elem[0] != r_release):
+        lab.append(elem[0])
+        val.append(elem[1])
+print(val)
+pictureName = pathKS + 'comparison_pValues_total_mean_{:03d}'.format(nbFiles) +'b.png' # 
 print(pictureName)
 title = r"$\bf{total}$" + ' : KS pValues vs releases.'
 createCompLossesPicture(lab,val, pictureName, title)
