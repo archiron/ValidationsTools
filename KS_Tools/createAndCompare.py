@@ -216,16 +216,9 @@ print(h_KSref)
 r_rels = []
 for elem in sortedRels:
     rel = elem[1]
-    KS_diffName = pathNb_files + "/histo_differences_KScurve" + "_" + rel + "_" + '_{:03d}'.format(nbFiles) + ".txt"
-    print("KSname 1 : %s" % KS_diffName)
-    wKS0 = open(KS_diffName, 'w')
-    wKS0.close()
-    r_rels.append(str(rel))#.split('_')[1]
+    r_rels.append(str(rel))
 
-#print(sortedRels)
-#print(r_rels)
 nbRels = len(sortedRels)
-#diffTab = pd.DataFrame(columns=r_rels, index=branches)
 diffTab = pd.DataFrame()
 print(diffTab)
 toto = []
@@ -247,13 +240,10 @@ for i in range(0, N_histos):#, N_histos-1 range(N_histos - 1, N_histos):  # 1 N_
         s_KSref = np.asarray(s_KSref)
         s_KSref = s_KSref[1:-1]
 
-        Ntot_h_KSref = histo_KSref.GetEntries()
-
         print('\nWorking with sorted rels\n')
         ind_rel = 0
         diffValues = []
         for elem in sortedRels:
-            print('[ind_rel/nbRels] : [{:d}/{:d}]'.format(ind_rel, nbRels))
             print(elem)
             rel = elem[1]
             file = elem[2]
@@ -261,7 +251,7 @@ for i in range(0, N_histos):#, N_histos-1 range(N_histos - 1, N_histos):  # 1 N_
             # get the "new" root file datas
             input_rel_file = file
             f_rel = ROOT.TFile(pathDATA + input_rel_file)
-            print('we use the %s file as new release' % input_rel_file)
+            print('we use the {:s} file as new release '.format(input_rel_file))
 
             h_rel = gr.getHisto(f_rel, tp_1)
             histo_rel = h_rel.Get(branches[i])
@@ -271,9 +261,6 @@ for i in range(0, N_histos):#, N_histos-1 range(N_histos - 1, N_histos):  # 1 N_
                 s_new.append(entry)
             s_new = np.asarray(s_new)
             s_new = s_new[1:-1]
-            Ntot_h_rel = histo_rel.GetEntries()
-
-            print('Ntot_h_rel : %d - Ntot_h_KSref : %d' % (Ntot_h_rel, Ntot_h_KSref))
 
             # print min/max for the new curve
             print('\n##########')
@@ -289,86 +276,24 @@ for i in range(0, N_histos):#, N_histos-1 range(N_histos - 1, N_histos):  # 1 N_
                 
             # diff max between new & old
             diffMax0, posMax0, sDKS = DB.diffMAXKS3(s_KSref, s_new)
-            print("diffMax0 : %f - posMax0 : %f" % (diffMax0, posMax0))
+            #print("diffMax0 : %f - posMax0 : %f" % (diffMax0, posMax0))
             print('ind rel : {:d} : {:s} : {:e}\n'.format(ind_rel, branches[i], diffMax0)) # OK
-            KS_diffName = pathNb_files + "/histo_differences_KScurve" + "_" + rel + "_" + '_{:03d}'.format(nbFiles) + ".txt"
-            wKS0 = open(KS_diffName, 'a')
-            wKS0.write('{:s} : {:e}\n'.format(branches[i], diffMax0))
-            wKS0.close()
 
             diffValues.append(diffMax0)
 
-            # print nb of red/green lines
-            print('[ind_rel/nbRels] : [{:d}/{:d}]'.format(ind_rel, nbRels))
             ind_rel += 1
         
-        #print(diffValues)
         toto.append(diffValues)
-        #diffTab.loc(branches[i]) = diffValues
     else:
         print('%s KO' % branches[i])
-print(toto)
 diffTab = pd.DataFrame(toto, columns=r_rels)
-print(diffTab)
 globos = diffTab.mean(axis=0, numeric_only=True)
-print(globos)
 
 # generate pictures
-df_ttl0 = []
-
-for elem in sortedRels:
-    print(elem)
-    rel = elem[1]
-
-    # get the KS file datas
-    KS_diffName = pathNb_files + "/histo_differences_KScurve" + "_" + rel + "_" + '_{:03d}'.format(nbFiles) + ".txt"
-    if exists(KS_diffName):
-        print('%s existe'%KS_diffName)
-    else:
-        print('%s n\'existe pas'%KS_diffName)
-
-    wKS0 = open(KS_diffName, 'r').readlines()
-    sum0 = 0.
-
-    print(len(wKS0))
-    
-    # diff
-    tmpArr1 = []
-    tmpArr2 = []
-    
-    nbLines = 0
-    for line in wKS0:
-        #print(len(line))
-        aa = line.split(' : ')
-        #print(aa[0]) # print histo name
-        tmpArr1.append(aa[0])
-        tmpArr2.append(float(aa[1][:-1]))
-        sum0 += float(aa[1][:-1])
-        #print('{:s} : {:f}'.format(aa[0], sum0))
-        nbLines += 1
-    df_ttl0.append([rel, sum0/nbLines])
-
-# histo complet recapitulatif
-lab = []
-val = []
-for elem in df_ttl0:
-    lab.append(elem[0])
-    val.append(elem[1])
-#print(val)
-pictureName = pathKS + 'comparison_KS_values_total_cum_{:03d}'.format(nbFiles) +'.png' # 
-print(pictureName)
-title = r"$\bf{total}$" + ' : KS cum diff values vs releases.'
-createCompLossesPicture(lab,val, pictureName, title)
-
-#print(globos.to_list())
 dt = globos.head(50)
-#print(list(dt.index.values))
-
 lab = list(dt.index.values)
-print(lab)
 val = globos.to_list()
-#print(val)
-pictureName = pathKS + 'comparison_KS_values_total_cum_{:03d}'.format(nbFiles) +'b.png' # 
+pictureName = pathKS + 'comparison_KS_values_total_cum_{:03d}'.format(nbFiles) +'.png' # 
 print(pictureName)
 title = r"$\bf{total}$" + ' : KS cum diff values vs releases.'
 createCompLossesPicture(lab,val, pictureName, title, 'Releases', 'max diff')
