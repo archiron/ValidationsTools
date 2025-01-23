@@ -200,6 +200,7 @@ if (len(branches) != len(newBranches)):
     branches = newBranches
     N_histos = len(branches)
 print('N_histos : %d' % N_histos)
+#print(branches)
 
 source_dest = pathNb_files + "/ElectronMcSignalHistos.txt"
 shutil.copy2(source, source_dest)
@@ -212,37 +213,30 @@ print('we use the %s file as KS reference' % input_ref_file)
 h_KSref = gr.getHisto(f_KSref, tp_1)
 print(h_KSref)
 
+r_rels = []
 for elem in sortedRels:
     rel = elem[1]
-    
     KS_diffName = pathNb_files + "/histo_differences_KScurve" + "_" + rel + "_" + '_{:03d}'.format(nbFiles) + ".txt"
     print("KSname 1 : %s" % KS_diffName)
     wKS0 = open(KS_diffName, 'w')
     wKS0.close()
+    r_rels.append(str(rel))#.split('_')[1]
 
-    KS_diffName_std = pathNb_files + "/histo_differences_KScurve" + "_" + rel + "_" + '_{:03d}'.format(nbFiles) + "-std.txt"
-    print("KSname 1 : %s" % KS_diffName_std)
-    wKS4 = open(KS_diffName_std, 'w')
-    wKS4.close()
-
-    KS_diffName_mean = pathNb_files + "/histo_differences_KScurve" + "_" + rel + "_" + '_{:03d}'.format(nbFiles) + "-mean.txt"
-    print("KSname 1 : %s" % KS_diffName_mean)
-    wKS5 = open(KS_diffName_mean, 'w')
-    wKS5.close()
-
-
+#print(sortedRels)
+#print(r_rels)
 nbRels = len(sortedRels)
-
+#diffTab = pd.DataFrame(columns=r_rels, index=branches)
+diffTab = pd.DataFrame()
+print(diffTab)
+toto = []
 tic = time.time()
 
 for i in range(0, N_histos):#, N_histos-1 range(N_histos - 1, N_histos):  # 1 N_histos histo for debug
-    print('histo : {:s}'.format(branches[i])) # print histo name
+    #print('histo : {:s}'.format(branches[i])) # print histo name
     
     histo_rel = h_rel.Get(branches[i])
     if (histo_rel):
-        print('%s OK' % branches[i])
-        name = pathROOTFiles + "histo_" + branches[i] + '_{:03d}'.format(nbFiles) + ".txt"
-        print('\n%d - %s' %(i, name))
+        #print('%s OK' % branches[i])
 
         # create the datas for the p-Value graph
         # by comparing 1 curve with the others.
@@ -257,6 +251,7 @@ for i in range(0, N_histos):#, N_histos-1 range(N_histos - 1, N_histos):  # 1 N_
 
         print('\nWorking with sorted rels\n')
         ind_rel = 0
+        diffValues = []
         for elem in sortedRels:
             print('[ind_rel/nbRels] : [{:d}/{:d}]'.format(ind_rel, nbRels))
             print(elem)
@@ -301,11 +296,22 @@ for i in range(0, N_histos):#, N_histos-1 range(N_histos - 1, N_histos):  # 1 N_
             wKS0.write('{:s} : {:e}\n'.format(branches[i], diffMax0))
             wKS0.close()
 
+            diffValues.append(diffMax0)
+
             # print nb of red/green lines
             print('[ind_rel/nbRels] : [{:d}/{:d}]'.format(ind_rel, nbRels))
             ind_rel += 1
+        
+        #print(diffValues)
+        toto.append(diffValues)
+        #diffTab.loc(branches[i]) = diffValues
     else:
         print('%s KO' % branches[i])
+print(toto)
+diffTab = pd.DataFrame(toto, columns=r_rels)
+print(diffTab)
+globos = diffTab.mean(axis=0, numeric_only=True)
+print(globos)
 
 # generate pictures
 df_ttl0 = []
@@ -334,7 +340,7 @@ for elem in sortedRels:
     for line in wKS0:
         #print(len(line))
         aa = line.split(' : ')
-        print(aa[0])
+        #print(aa[0]) # print histo name
         tmpArr1.append(aa[0])
         tmpArr2.append(float(aa[1][:-1]))
         sum0 += float(aa[1][:-1])
@@ -353,6 +359,19 @@ pictureName = pathKS + 'comparison_KS_values_total_cum_{:03d}'.format(nbFiles) +
 print(pictureName)
 title = r"$\bf{total}$" + ' : KS cum diff values vs releases.'
 createCompLossesPicture(lab,val, pictureName, title)
+
+#print(globos.to_list())
+dt = globos.head(50)
+#print(list(dt.index.values))
+
+lab = list(dt.index.values)
+print(lab)
+val = globos.to_list()
+#print(val)
+pictureName = pathKS + 'comparison_KS_values_total_cum_{:03d}'.format(nbFiles) +'b.png' # 
+print(pictureName)
+title = r"$\bf{total}$" + ' : KS cum diff values vs releases.'
+createCompLossesPicture(lab,val, pictureName, title, 'Releases', 'max diff')
 
 toc = time.time()
 print('Done in {:.4f} seconds'.format(toc-tic))
