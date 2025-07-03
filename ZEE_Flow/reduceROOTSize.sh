@@ -18,4 +18,3 @@ cd $2
 #cd -
 
 python3 $2/reduceSize1File.py $1 $3 $4
-

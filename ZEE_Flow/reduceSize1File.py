@@ -19,12 +19,13 @@ from sys import argv
 from os import listdir
 from os.path import isfile, join
 
-argv.append( '-b-' )
 import ROOT
 ROOT.gROOT.SetBatch(True)
-argv.remove( '-b-' )
+ROOT.gErrorIgnoreLevel = ROOT.kFatal # ROOT.kBreak # 
+ROOT.PyConfig.DisableRootLogon = True
+ROOT.PyConfig.IgnoreCommandLineOptions = True
 
-from ROOT import *
+#from ROOT import *
 
 sys.path.append('../ChiLib')
 
@@ -73,22 +74,25 @@ def checkLevel(f_rel, f_out, path0, listkeys, nb, inPath):
 
 if len(sys.argv) > 1:
     print(sys.argv)
-    print("step 4 - arg. 0 :", sys.argv[0]) # name of the script
-    print("step 4 - arg. 1 :", sys.argv[1]) # index
-    #print("step 4 - arg. 2 :", sys.argv[2]) # path
-    print("step 4 - arg. 2 :", sys.argv[2]) # nb of events
-    print("step 4 - arg. 3 :", sys.argv[3]) # RESULTFOLDER
+    print("reduce - arg. 0 :", sys.argv[0]) # name of the script
+    print("reduce - arg. 1 :", sys.argv[1]) # index
+    #print("reduce - arg. 2 :", sys.argv[2]) # path
+    print("reduce - arg. 2 :", sys.argv[2]) # nb of events
+    print("reduce - arg. 3 :", sys.argv[3]) # RESULTFOLDER
     ind = int(sys.argv[1])
     resultPath = sys.argv[3]
     max_number = int(sys.argv[2])
 else:
-    print("step 4 - rien")
+    print("reduce - rien")
     ind = 0
     resultPath = ''
     max_number = 10 # number of events
 
 print("func_ReduceSize")
-input_file = resultPath + '/DQM_V0001_R000000001__Global__CMSSW_X_Y_Z__RECO_' + '%0004d'%max_number + '_' + '%003d'%ind + '.root'
+#input_file = resultPath + '/DQM_V0001_R000000001__Global__CMSSW_X_Y_Z__RECO_' + '%0004d'%max_number + '_' + '%003d'%ind + '.root'
+release = resultPath.split('/')[-1]
+#print('release : {:s}'.format(release))
+input_file = resultPath + '/DQM_V0001_R000000001__RelValZEE_14__' + release + '__RECO_' + '%0004d'%max_number + '_' + '%003d'%ind + '.root'
 racine = input_file.split('.')
 output_file = racine[0] + 'b.' + racine[1]
 
@@ -98,7 +102,7 @@ print('\n %s' % output_file)
 paths = ['DQMData/Run 1/EgammaV', 'DQMData/Run 1/Info']
 
 f_rel = ROOT.TFile(input_file, "UPDATE")
-f_out = TFile(output_file, 'recreate')
+f_out = ROOT.TFile(output_file, 'recreate')
 t2 = f_rel.GetListOfKeys()
 print(racine[0] + 'b.' + racine[1])
 for elem in paths:

@@ -15,6 +15,7 @@ import sys
 import importlib
 import importlib.machinery
 import importlib.util
+import numpy as np
 
 #import seaborn # only with cmsenv on cca.in2p3.fr
 
@@ -99,36 +100,97 @@ nb_ttl_histos = []
 #branches += ["h_recEleNum"]
 for leaf in branches:
     histos[leaf] = []
-    
-fileList = getListFiles(pathROOTFiles) # get the list of the root files in the folderName folder
-if (len(fileList) ==0 ):
-    print('there is no generated ROOT files')
+
+# get list of the added ROOT files for comparison
+pathDATA = os.path.join(pathLIBS, blo.DATA_SOURCE + '/Run3/RECO/') # '/pbs/home/c/chiron/private/KS_Tools/GenExtract/DATA/NewFiles'
+print('pathDATA : {:s}'.format(pathDATA))
+rootFilesList = getListFiles(pathDATA, 'root')
+rootFilesList2 = []
+rootList2 = os.path.join(pathLIBS, blo.DATA_SOURCE + '/Values/rootSourcesRelValZEE_14mcRun3RECO/rootSourcesRelValZEE_14mcRun3RECO.txt')
+
+sourceList = open(rootList2, "r")
+for ligne in sourceList:
+    t_ligne = ligne.replace('_0.txt', '.root')
+    t_ligne = t_ligne.replace('_1.txt', '.root')
+    rootFilesList2.append(t_ligne.rstrip())
+compteur = 0
+for item in rootFilesList2:
+    print('\n{:2d} : {:s}'.format(compteur, item))
+    compteur += 1
+rootFilesList3 = []
+for item in rootFilesList2: 
+    if item not in rootFilesList3: 
+        rootFilesList3.append(item)
+        print(item)
+print('Root files List have {:d} files'.format(len(rootFilesList3)))
+
+print('we use the files :')
+print('there is ' + '{:03d}'.format(len(rootFilesList3)) + ' added ROOT files')
+if (len(rootFilesList3) == 0):
+    print('no added ROOT files to work with. Existing.')
     exit()
-fileList.sort()
-print('there is %d generated ROOT files' % len(fileList))
-fileList = fileList[0:nbFiles]
+for item in rootFilesList3:
+    print('%s' % item)
+fileList = rootFilesList3[0:nbFiles]
 print('file list :')
 print(fileList)
 
+for item in rootFilesList3:
+    tmp_branch = []
+    nbHistos = 0
+    print('\n%s' % item)
+    b = (item.split('__')[2]).split('-')
+    #rels.append([b[0], b[0][6:], item])
+    name = os.path.join(pathDATA, item)
+    print('{:s} : {:d}'.format(item, len(item)))
+    print('name : {:s}'.format(name))
+    f_root = ROOT.TFile(name)
+    h_rel = gr.getHisto(f_root, tp_1)
+    for i in range(0, N_histos): # 1 N_histos histo for debug
+        histo_rel = h_rel.Get(branches[i])
+        if (histo_rel):
+            d = gr.getHistoConfEntry(histo_rel)
+            s_tmp = gr.fill_Snew2(d, histo_rel)
+            if (s_tmp.min() < 0.):
+                print('pbm whith histo %s, min < 0' % branches[i])
+            elif (np.floor(s_tmp.sum()) == 0.):
+                print('pbm whith histo %s, sum = 0' % branches[i])
+            else:
+                nbHistos += 1
+                tmp_branch.append(branches[i])
+        else:
+            print('%s KO' % branches[i])
+    nb_ttl_histos.append(nbHistos)
+    tmp_branches.append(tmp_branch)
+
+if(len(set(nb_ttl_histos))==1):
+    print('All elements are the same with value {:d}.'.format(nb_ttl_histos[0]))
+else:
+    print('All elements are not the same.')
+    print('nb ttl of histos : ' , nb_ttl_histos)
+newBranches = optimizeBranches(tmp_branches)
+
+if (len(branches) != len(newBranches)):
+    print('len std branches : {:d}'.format(len(branches)))
+    print('len new branches : {:d}'.format(len(newBranches)))
+    branches = newBranches
+    N_histos = len(branches)
+print('N_histos : %d' % N_histos)
+
 nbFiles = change_nbFiles(len(fileList), nbFiles)
-print('nbFiles = {:d}'.format(nbFiles))
-#Stop()
 
 for elem in fileList:
-    input_file = pathROOTFiles + str(elem.split()[0])
-    name_1 = input_file.replace(pathROOTFiles, '').replace('DQM_V0001_R000000001__Global__CMSSW_X_Y_Z__RECO_', '').replace('.root', '')
+    input_file = pathDATA + str(elem.split()[0])
+    name_1 = input_file.replace(pathDATA, '').replace('DQM_V0001_R000000001__RelValZEE_14__CMSSW_14_1_0__RECO_', '').replace('.root', '')
     #print('\n %s - name_1 : %s' % (input_file, name_1))
-    #print('\n {:s} - name_1 : {:s}'.format(input_file, colorText(name_1, 'lightyellow')))
-    print('\n {:s} - name_1 : {:s}'.format(input_file, name_1))
+    print('\n {:s} - name_1 : {:s}'.format(input_file, colorText(name_1, 'green')))
     tmp_0 = name_1.split('__')[2]
     tmp_1 = tmp_0.split('-')
-    print(tmp_1)
     release = tmp_1[0]
-    #tmp_2 = tmp_1[1].split('_',1)
-    GT = '' #tmp_2[0]
-    extent = '' #tmp_2[1]
-    #print(' {:s} : {:s} - {:s}'.format(colorText(release, 'blue'), colorText(GT, 'green'), colorText(extent, 'green')))
-    print(' {:s} : {:s} - {:s}'.format(release, GT, extent))
+    tmp_2 = tmp_1[1].split('_',1)
+    GT = tmp_2[0]
+    extent = tmp_2[1]
+    print(' {:s} : {:s} - {:s}'.format(colorText(release, 'blue'), colorText(GT, 'green'), colorText(extent, 'green')))
 
     f_root = ROOT.TFile(input_file) # 
     h1 = gr.getHisto(f_root, tp_1)

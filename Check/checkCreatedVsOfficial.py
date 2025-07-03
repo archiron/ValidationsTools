@@ -22,12 +22,16 @@ import time
 # lines below are only for func_Extract
 from sys import argv
 
-argv.append( '-b-' )
 import ROOT
 ROOT.gROOT.SetBatch(True)
-argv.remove( '-b-' )
+ROOT.gErrorIgnoreLevel = ROOT.kFatal # ROOT.kBreak # 
+ROOT.PyConfig.DisableRootLogon = True
+ROOT.PyConfig.IgnoreCommandLineOptions = True
 
-from ROOT import *
+root_version = ROOT.gROOT.GetVersion()
+
+print('PYTHON     version : {}'.format(sys.version))
+print("ROOT       version : {}".format(root_version))
 
 if len(sys.argv) > 1:
     print(sys.argv)
@@ -72,20 +76,16 @@ pathChiLib = pathLIBS + '/' + blo.LIB_SOURCE # checkFolderName(blo.LIB_SOURCE) #
 sys.path.append(pathChiLib)
 sys.path.append(pathCommonFiles)
 
-import default as dfo
-from default import *
+import validationsDefault as dfo
+from validationsDefault import *
 from rootValues import NB_EVTS
 from controlFunctions import *
-from graphicFunctions import getHisto, getHistoConfEntry, fill_Snew2 #, fill_Snew
+from graphicFunctions import Graphic
 from graphicAutoEncoderFunctions import GraphicKS
 from DecisionBox import DecisionBox
-from sources import *
+from filesSources import *
 
-# extract release from source reference
-release = input_ref_file.split('__')[2].split('-')[0]
-print('extracted release : {:s}'.format(release))
-
-pathNb_evts = pathBase + '/' + '{:04d}'.format(NB_EVTS) + '/' + release
+pathNb_evts = pathBase + '/' + str(NB_EVTS)
 pathNb_evts = checkFolderName(pathNb_evts)
 print('pathNb_evts : {:s}'.format(pathNb_evts))
 pathCase = pathNb_evts + checkFolderName(dfo.folder)
@@ -129,26 +129,23 @@ for item in rootFilesList:
     b = (item.split('__')[2]).split('-')
     rels.append([b[0], b[0][6:], item])
     f_root = ROOT.TFile(pathDATA + item)
-    h_rel = getHisto(f_root, tp_1)
+    h_rel = gr.getHisto(f_root, tp_1)
     for i in range(0, N_histos): # 1 N_histos histo for debug
         histo_rel = h_rel.Get(branches[i])
         if (histo_rel):
             print('%s OK' % branches[i])
-            d = getHistoConfEntry(histo_rel)
-            s_tmp = fill_Snew2(d, histo_rel)
-            #s_tmp = fill_Snew(histo_rel)
+            d = gr.getHistoConfEntry(histo_rel)
+            s_tmp = gr.fill_Snew2(d, histo_rel)
+            #s_tmp = gr.fill_Snew(histo_rel)
             if (s_tmp.min() < 0.):
                 print('pbm whith histo %s, min < 0' % branches[i])
-                tmp_branch.append('KOKO')
             elif (np.floor(s_tmp.sum()) == 0.):
                 print('pbm whith histo %s, sum = 0' % branches[i])
-                tmp_branch.append('KOKO')
             else:
                 nbHistos += 1
                 tmp_branch.append(branches[i])
         else:
             print('%s KO' % branches[i])
-            tmp_branch.append('KOKO')
     nb_ttl_histos.append(nbHistos)
     tmp_branches.append(tmp_branch)
 
@@ -188,7 +185,7 @@ shutil.copy2(source, source_dest)
 # get the "reference" root file datas
 f_KSref = ROOT.TFile(pathDATA + input_ref_file)
 print('we use the %s file as KS reference' % input_ref_file)
-h_KSref = getHisto(f_KSref, tp_1)
+h_KSref = gr.getHisto(f_KSref, tp_1)
 print(h_KSref)
 
 tic = time.time()

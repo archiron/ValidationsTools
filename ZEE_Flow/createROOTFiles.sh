@@ -20,7 +20,7 @@ name31="step3_$(printf "%04d" $3)_$(printf "%03d" $1).root"
 name32="step3_inDQM_$(printf "%04d" $3)_$(printf "%03d" $1).root"
 name33="step3_inMINIAODSIM_$(printf "%04d" $3)_$(printf "%03d" $1).root"
 name34="step3_inNANOEDMAODSIM_$(printf "%04d" $3)_$(printf "%03d" $1).root"
-
+#name4="DQM_V0001_R000000001__Global__CMSSW_X_Y_Z__RECO_$(printf "%04d" $3)_$(printf "%03d" $1).root"
 echo $name1
 echo $name2
 echo $name31
@@ -46,5 +46,4 @@ rm $4/$name33
 rm $4/$name34
 
 #cp *.root $4
-#mv DQM*.root $4
-
+mv DQM*.root $4

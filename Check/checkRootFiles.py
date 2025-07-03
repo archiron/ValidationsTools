@@ -20,12 +20,16 @@ import importlib
 from sys import argv
 from xml.sax.handler import DTDHandler
 
-argv.append( '-b-' )
 import ROOT
 ROOT.gROOT.SetBatch(True)
-argv.remove( '-b-' )
+ROOT.gErrorIgnoreLevel = ROOT.kFatal # ROOT.kBreak # 
+ROOT.PyConfig.DisableRootLogon = True
+ROOT.PyConfig.IgnoreCommandLineOptions = True
 
-from ROOT import *
+root_version = ROOT.gROOT.GetVersion()
+
+print('PYTHON     version : {}'.format(sys.version))
+print("ROOT       version : {}".format(root_version))
 
 if len(sys.argv) > 1:
     print(sys.argv)
@@ -60,13 +64,13 @@ sys.path.append(pathChiLib)
 sys.path.append(pathCommonFiles)
 sys.path.append(pathDATA)
 
-import default as dfo
+import validationsDefault as dfo
 from rootValues import NB_EVTS
 from controlFunctions import *
-from graphicFunctions import getHisto, getHistoConfEntry, fill_Snew, fill_Snew2
+from graphicFunctions import Graphic
 from DecisionBox import DecisionBox
-from default import *
-from sources import *
+from validationsDefault import *
+from filesSources import *
 
 # extract release from source reference
 release = input_ref_file.split('__')[2].split('-')[0]
@@ -78,6 +82,9 @@ pathNb_evts = checkFolderName(pathNb_evts)
 print('pathNb_evts : {:s}'.format(pathNb_evts))
 pathCase = pathNb_evts + checkFolderName(dfo.folder)
 pathDATA = checkFolderName(pathDATA)
+pathROOTFiles = blo.pathROOT + "/" + release
+pathROOTFiles = checkFolderName(pathROOTFiles)
+print('pathROOTFiles : {:s}'.format(pathROOTFiles))
 
 # get the branches for ElectronMcSignalHistos.txt
 ######## ===== COMMON LINES ===== ########
@@ -89,13 +96,16 @@ cleanBranches(branches) # remove some histo wich have a pbm with KS.
 
 print("func_Extract")
 #pathNb_evts = checkFolderName(pathNb_evts)    
+
+gr = Graphic()
+gr.initRoot()
 DB = DecisionBox()
 
 N_histos = len(branches)
 print('N_histos : %d' % N_histos)
 
 # get the list of the generated ROOT files
-fileList = getListFiles(pathNb_evts, 'root') # get the list of the root files in the folderName folder
+fileList = getListFiles(pathROOTFiles, 'root') # get the list of the root files in the folderName folder
 fileList.sort()
 print('list of the generated ROOT files')
 print('there is ' + '{:03d}'.format(len(fileList)) + ' ROOT files')
@@ -112,12 +122,12 @@ for elem in fileList:
     tmp_branch = []
     nbHistosPass1 = 0
     
-    input_file = pathNb_evts + str(elem.split()[0])
-    name_1 = input_file.replace(pathNb_evts, '').replace('DQM_V0001_R000000001__Global__CMSSW_X_Y_Z__RECO_', '').replace('.root', '')
+    input_file = pathROOTFiles + str(elem.split()[0])
+    name_1 = input_file.replace(pathROOTFiles, '').replace('DQM_V0001_R000000001__RelValZEE_14__'+release+'__RECO_', '').replace('.root', '')
     print('\n %s - name_1 : %s' % (input_file, name_1))
     #print('\n %s - name_1 : %s' % (input_file, colorText(name_1, 'lightyellow')))
     f_root = ROOT.TFile(input_file)
-    h1 = getHisto(f_root, tp_1)
+    h1 = gr.getHisto(f_root, tp_1)
     #h1.ls() # OK
 
     for i in range(0, N_histos): # 1 N_histos histo for debug
@@ -125,27 +135,20 @@ for elem in fileList:
         histo_1 = h1.Get(branches[i])
         if (histo_1):
             #print('%s OK' % branches[i])
-
-            d = getHistoConfEntry(histo_1)
-            #print("d = {}".format(d))
-
-            s_new = fill_Snew2(d, histo_1)
+            s_new = gr.fill_Snew(histo_1)
             Ntot_h1 = histo_1.GetEntries()
         
             # print min/max for the new curve
             #print('min : %f - max : %f' % (s_new.min(), s_new.max()))
             if (s_new.min() < 0.):
                 print('pbm whith histo %s, min < 0' % branches[i])
-                tmp_branch.append('KOKO')
             elif (np.floor(s_new.sum()) == 0.):
                 print('pbm whith histo %s, sum = 0' % branches[i])
-                tmp_branch.append('KOKO')
             else:
                 nbHistosPass1 += 1
                 tmp_branch.append(branches[i])
         else:
             print('%s KO' % branches[i])
-            tmp_branch.append('KOKO')
 
     nb_ttl_histos.append(nbHistosPass1)
     tmp_branches.append(tmp_branch)
@@ -157,15 +160,43 @@ if(len(set(nb_ttl_histos))==1):
     print('All elements are the same with value {:d} for PASS 1a.'.format(nb_ttl_histos[0]))
 else:
     print('All elements are not the same for PASS 1a.')
-    print(nb_ttl_histos)
-    print(tmp_branches)
+    #print(nb_ttl_histos)
+    #print(tmp_branches)
     newBranches = optimizeBranches(tmp_branches)
 
 # get list of added ROOT files for comparison
-rootFolderName = pathLIBS + '/' + blo.DATA_SOURCE # '/pbs/home/c/chiron/private/KS_Tools/GenExtract/DATA/NewFiles'
-rootFilesList = getListFiles(rootFolderName, 'root')
-print('\nlist of the added ROOT files')
+AddedRootFolderName = os.path.join(pathLIBS, blo.DATA_SOURCE + '/Run3/RECO/') # '/pbs/home/c/chiron/private/KS_Tools/GenExtract/DATA/NewFiles'
+print('pathDATA : {:s}'.format(AddedRootFolderName))
+rootFilesList = getListFiles(AddedRootFolderName, 'root')
+rootFilesList2 = []
+rootList2 = os.path.join(pathLIBS, blo.DATA_SOURCE + '/Values/rootSourcesRelValZEE_14mcRun3RECO/rootSourcesRelValZEE_14mcRun3RECO.txt')
+
+sourceList = open(rootList2, "r")
+for ligne in sourceList:
+    t_ligne = ligne.replace('_0.txt', '.root')
+    t_ligne = t_ligne.replace('_1.txt', '.root')
+    rootFilesList2.append(t_ligne.rstrip())
+compteur = 0
+for item in rootFilesList2:
+    print('\n{:2d} : {:s}'.format(compteur, item))
+    compteur += 1
+rootFilesList3 = []
+for item in rootFilesList2: 
+    if item not in rootFilesList3: 
+        rootFilesList3.append(item)
+        print(item)
+print('Root files List have {:d} files'.format(len(rootFilesList3)))
+
 print('we use the files :')
+print('there is ' + '{:03d}'.format(len(rootFilesList3)) + ' added ROOT files')
+if (len(rootFilesList3) == 0):
+    print('no added ROOT files to work with. Existing.')
+    exit()
+for item in rootFilesList3:
+    print('%s' % item)
+AddedFilesList = rootFilesList3[0:nbFiles]
+print('file list :')
+print(AddedFilesList)
 
 nb_ttl_histos = []
 tmp_branches = []
@@ -174,35 +205,28 @@ for item in rootFilesList:
     nbHistosPass1 = 0
     
     #print('%s' % item)
-    f_root = ROOT.TFile(rootFolderName + item)
-    h1 = getHisto(f_root, tp_1)
+    f_root = ROOT.TFile(AddedRootFolderName + item)
+    h1 = gr.getHisto(f_root, tp_1)
 
     for i in range(0, N_histos): # 1 N_histos histo for debug
         #print('\n' + branches[i]) # print histo name
         histo_1 = h1.Get(branches[i])
         if (histo_1):
             #print('%s OK' % branches[i])
-
-            d = getHistoConfEntry(histo_1)
-            #print("d = {}".format(d))
-
-            s_new = fill_Snew2(d, histo_1)
+            s_new = gr.fill_Snew(histo_1)
             Ntot_h1 = histo_1.GetEntries()
 
             # print min/max for the new curve
             #print('min : %f - max : %f' % (s_new.min(), s_new.max()))
             if (s_new.min() < 0.):
                 print('pbm whith histo %s, min < 0' % branches[i])
-                tmp_branch.append('KOKO')
             elif (np.floor(s_new.sum()) == 0.):
                 print('pbm whith histo %s, sum = 0' % branches[i])
-                tmp_branch.append('KOKO')
             else:
                 nbHistosPass1 += 1
                 tmp_branch.append(branches[i])
         else:
             print('%s KO' % branches[i])
-            tmp_branch.append('KOKO')
 
     nb_ttl_histos.append(nbHistosPass1)
     tmp_branches.append(tmp_branch)
@@ -226,12 +250,12 @@ for elem in fileList:
     tmp_branch = []
     nbHistosPass2 = 0
     
-    input_file = pathNb_evts + str(elem.split()[0])
-    name_1 = input_file.replace(pathNb_evts, '').replace('DQM_V0001_R000000001__Global__CMSSW_X_Y_Z__RECO_', '').replace('.root', '')
+    input_file = pathROOTFiles + str(elem.split()[0])
+    name_1 = input_file.replace(pathROOTFiles, '').replace('DQM_V0001_R000000001__RelValZEE_14__'+release+'__RECO_', '').replace('.root', '')
     print('\n %s - name_1 : %s' % (input_file, name_1))
     #print('\n %s - name_1 : %s' % (input_file, colorText(name_1, 'lightyellow')))
     f_root = ROOT.TFile(input_file)
-    h1 = getHisto(f_root, tp_1)
+    h1 = gr.getHisto(f_root, tp_1)
 
     for i in range(0, N_histos): # 1 N_histos histo for debug
         #print('\n' + branches[i]) # print histo name
@@ -239,26 +263,23 @@ for elem in fileList:
         if (histo_1):
             #print('%s OK' % branches[i])
             
-            d = getHistoConfEntry(histo_1)
+            d = gr.getHistoConfEntry(histo_1)
             #print("d = {}".format(d))
 
-            s_new = fill_Snew2(d, histo_1)
+            s_new = gr.fill_Snew2(d, histo_1)
             Ntot_h1 = histo_1.GetEntries()
             
             # print min/max for the new curve
             #print('min : %f - max : %f' % (s_new.min(), s_new.max()))
             if (s_new.min() < 0.):
                 print('pbm whith histo %s, min < 0' % branches[i])
-                tmp_branch.append('KOKO')
             elif (np.floor(s_new.sum()) == 0.):
                 print('pbm whith histo %s, sum = 0' % branches[i])
-                tmp_branch.append('KOKO')
             else:
                 nbHistosPass2 += 1
                 tmp_branch.append(branches[i])
         else:
             print('%s KO' % branches[i])
-            tmp_branch.append('KOKO')
 
     nb_ttl_histos.append(nbHistosPass2)
     tmp_branches.append(tmp_branch)
@@ -270,25 +291,23 @@ if(len(set(nb_ttl_histos))==1):
     print('All elements are the same with value {:d} for PASS 2a.'.format(nb_ttl_histos[0]))
 else:
     print('All elements are not the same for PASS 2a.')
-    print(nb_ttl_histos)
-    print(tmp_branches)
+    #print(nb_ttl_histos)
+    #print(tmp_branches)
     newBranches = optimizeBranches(tmp_branches)
 
 # get list of added ROOT files for comparison
-rootFolderName = pathLIBS + '/' + blo.DATA_SOURCE # '/pbs/home/c/chiron/private/KS_Tools/GenExtract/DATA/NewFiles'
-rootFilesList = getListFiles(rootFolderName, 'root')
 print('\nlist of the added ROOT files')
 print('we use the files :')
 
 nb_ttl_histos = []
 tmp_branches = []
-for item in rootFilesList:
+for item in AddedFilesList:
     tmp_branch = []
     nbHistosPass2 = 0
     
     print('%s' % item)
-    f_root = ROOT.TFile(rootFolderName + item)
-    h1 = getHisto(f_root, tp_1)
+    f_root = ROOT.TFile(AddedRootFolderName + item)
+    h1 = gr.getHisto(f_root, tp_1)
 
     for i in range(0, N_histos): # 1 N_histos histo for debug
         #print('\n' + branches[i]) # print histo name
@@ -296,26 +315,23 @@ for item in rootFilesList:
         if (histo_1):
             #print('%s OK PASS 2' % branches[i])
 
-            d = getHistoConfEntry(histo_1)
+            d = gr.getHistoConfEntry(histo_1)
             #print("d = {}".format(d))
 
-            s_new = fill_Snew2(d, histo_1)
+            s_new = gr.fill_Snew2(d, histo_1)
             Ntot_h1 = histo_1.GetEntries()
             
             # print min/max for the new curve
             #print('min : %f - max : %f' % (s_new.min(), s_new.max()))
             if (s_new.min() < 0.):
                 print('pbm whith histo %s, min < 0' % branches[i])
-                tmp_branch.append('KOKO')
             elif (np.floor(s_new.sum()) == 0.):
                 print('pbm whith histo %s, sum = 0' % branches[i])
-                tmp_branch.append('KOKO')
             else:
                 nbHistosPass2 += 1
                 tmp_branch.append(branches[i])
         else:
             print('%s KO PASS 2' % branches[i])
-            tmp_branch.append('KOKO')
 
     nb_ttl_histos.append(nbHistosPass2)
     tmp_branches.append(tmp_branch)
@@ -327,16 +343,16 @@ if(len(set(nb_ttl_histos))==1):
     print('All elements are the same with value {:d} for PASS 2b.'.format(nb_ttl_histos[0]))
 else:
     print('All elements are not the same for PASS 2b.')
-    print(nb_ttl_histos)
-    print(tmp_branches)
+    #print(nb_ttl_histos)
+    #print(tmp_branches)
     newBranches = optimizeBranches(tmp_branches)
 
 # PASS 3 - tests on diffMAXKS
 print('\n\nPASS 3')
 #input_rel_file = file
-f_rel = ROOT.TFile(rootFolderName + input_rel_file)
+f_rel = ROOT.TFile(AddedRootFolderName + input_rel_file)
 print('we use the %s file as new release' % input_rel_file)
-h1 = getHisto(f_rel, tp_1)
+h1 = gr.getHisto(f_rel, tp_1)
 
 if (ind_reference == -1): 
     ind_reference = np.random.randint(0, nbFiles)
@@ -345,11 +361,9 @@ print('reference ind. : %d' % ind_reference)
 for i in range(0, N_histos): # 1 N_histos histo for debug
     histo_1 = h1.Get(branches[i])
     if (histo_1):
-        #print('%s OK PASS 3' % branches[i])
-        name = pathNb_evts + "histo_" + branches[i] + '_{:03d}'.format(nbFiles) + ".txt"
-        #print('\n%d - %s' %(i, name))
+        print('%s OK PASS 3' % branches[i])
+        name = pathROOTFiles + "histo_" + branches[i] + '_{:03d}'.format(nbFiles) + ".txt"
         df = pd.read_csv(name)
-        #print('\n' + branches[i]) # print histo name
 
         s_new = []
         for entry in histo_1:
@@ -357,23 +371,18 @@ for i in range(0, N_histos): # 1 N_histos histo for debug
         s_new = np.asarray(s_new)
         s_new = s_new[1:-1]
         Ntot_h1 = histo_1.GetEntries()
-        #print('nb of entries : {:f}'.format(Ntot_h1))
+        #print('Ntot_h1 : {:f}'.format(Ntot_h1))
 
         # check the values data
-        #print(df.head(5))
         cols = df.columns.values
         n_cols = len(cols)
-        #print('nb of columns for histos : %d' % n_cols)
-        cols_entries = cols[6::2]
+        cols_entries = cols[7::2]
         df_entries = df[cols_entries]
-        #print(df_entries.head(15))#
 
-        # nbBins (GetEntries())
         df_GetEntries = df['nbBins']
 
         # get nb of columns & rows for histos
         (Nrows, Ncols) = df_entries.shape
-        #print('[Nrows, Ncols] : [%d, %d]' % (Nrows, Ncols))
         df_entries = df_entries.iloc[:, 1:Ncols-1]
         (Nrows, Ncols) = df_entries.shape
         print('[Nrows, Ncols] : [%d, %d]' % (Nrows, Ncols))
@@ -398,7 +407,6 @@ for i in range(0, N_histos): # 1 N_histos histo for debug
         # Get a random histo as reference (KS 2)
         series_reference = df_entries.iloc[ind_reference,:]
         nbBins_reference = df_GetEntries[ind_reference]
-        #print('nb bins reference : %d' % nbBins_reference)
         nb2 = 0
         totalDiff2 = []
         for k in range(0,Nrows-0):

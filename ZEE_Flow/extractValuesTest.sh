@@ -14,9 +14,9 @@ echo "paths file : $4"
 
 cd $1
 
-echo "executing $2/extractValues.py $3 $4"
-python3 $2/extractValues.py $3 $4
+#echo "executing $2/extractValuesTest.py $3 $4"
+#python3 $2/extractValuesTest.py $3 $4
 echo " "
-#echo "executing $2/extractNewFilesValues.py $3 $4" # only use if you have AE pictures to create (time very long)
-#python3 $2/extractNewFilesValues.py $3 $4
+echo "executing $2/extractNewFilesValuesTest.py $3 $4" # only use if you have AE pictures to create (very long time)
+python3 $2/extractNewFilesValuesTest.py $3 $4
 

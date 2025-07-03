@@ -18,12 +18,12 @@ cd $1
 #echo "executing $2/checkRootFiles.py"
 #python3 $2/checkRootFiles.py $1 $2 $3
 echo " "
-#echo "executing $2/checkMapDiff.py"
-#python3 $2/checkMapDiff.py $1 $2 $3
+echo "executing $2/checkMapDiff.py"
+python3 $2/checkMapDiffTest.py $1 $2 $3
 echo " "
 #echo "executing $2/checkCreatedVsOfficial.py"
 #python3 $2/checkCreatedVsOfficial.py $1 $2 $3
 echo " "
-echo "executing $2/checkRootFilesvsRef.py"
-python3 $2/checkRootFilesvsRef.py $1 $2 $3
+#echo "executing $2/checkRootFilesvsRef.py"
+#python3 $2/checkRootFilesvsRef.py $1 $2 $3
 

@@ -1,9 +1,9 @@
 #!/bin/sh
-# This file is called ./initAE.sh by generateAE_init.sh
+# This file is called ./postAE.sh by generateAE_init.sh
 
 if [ "$1" == "" ] 
 then
-	echo "initAE.sh has no argument"
+	echo "postAE.sh has no argument"
 	exit
 fi
 
