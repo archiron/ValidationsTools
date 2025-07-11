@@ -12,7 +12,6 @@ echo "chemin WORK : $2"
 echo "chemin COMMON : $3"
 echo "paths file : $4"
 echo "mode : $5"
-echo "histo name : $6"
 
 cd $1
 

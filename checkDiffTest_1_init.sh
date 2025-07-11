@@ -30,25 +30,48 @@ echo "N= $N"
 LOG_SOURCE="$aa/${toto[15]}"
 LOG_SOURCE=${LOG_SOURCE//LOG_SOURCE=}
 LOG_SOURCE=${LOG_SOURCE//\"}
+#LOG_OUTPUT="${toto[15]}"
+#LOG_OUTPUT=${LOG_OUTPUT//LOG_OUTPUT=}
+#LOG_OUTPUT=${LOG_OUTPUT//\"}
 RESULTFOLDER="${toto[17]}"
 RESULTFOLDER=${RESULTFOLDER//RESULTFOLDER=}
 RESULTFOLDER=${RESULTFOLDER//\"}
 LOG_KS_SOURCE="$aa/${toto[18]}"
 LOG_KS_SOURCE=${LOG_KS_SOURCE//LOG_KS_SOURCE=}
 LOG_KS_SOURCE=${LOG_KS_SOURCE//\"}
+#LIB_SOURCE="${toto[19]}"
+#LIB_SOURCE=${LIB_SOURCE//LIB_SOURCE=}
+#LIB_SOURCE=${LIB_SOURCE//\"}
 COMMON_SOURCE="$aa/${toto[20]}"
 COMMON_SOURCE=${COMMON_SOURCE//COMMON_SOURCE=}
 COMMON_SOURCE=${COMMON_SOURCE//\"}
 
 echo "LOG_SOURCE : $LOG_SOURCE"
+echo "LOG_OUTPUT : $LOG_OUTPUT"
 echo "RESULTFOLDER : $RESULTFOLDER"
 echo "LOG_KS_SOURCE : $LOG_KS_SOURCE"
+echo "LIB_SOURCE : $LIB_SOURCE"
 echo "COMMON_SOURCE : $COMMON_SOURCE"
+
+readarray datasets -t array < ChiLib/HistosConfigFiles/ElectronMcSignalHistos.txt # $Chilib_path
+N2=${#datasets[@]}
+echo "nb lines in datasets= $N2"
+var=0
+for line in "${datasets[@]}"
+do
+  if [[ $line == *"ElectronMcSignalValidator/"* ]]; then
+    #echo $line
+    arrLine=(${line//dator/ })
+    #echo "${arrLine[1]} - $var"
+    let "var++"
+  fi
+done
+echo "nb datasets in datasets= $var"
+let "var--"
 
 if [[ "$Choice" == "LLR" ]] 
   then
     echo "LLR"
-    #module purge
     module reset
     source /usr/share/Modules/init/sh
     module use /opt/exp_soft/vo.gridcl.fr/software/modules/
@@ -56,21 +79,13 @@ if [[ "$Choice" == "LLR" ]]
     
     module load python/3.12.4
     source /opt/exp_soft/llr/root/v6.32-el9-gcc13xx-py3124/etc/init.sh
-    #source /opt/exp_soft/llr/root/v6.24.04-el7-gcc9xx-py370/etc/init.sh
 
     cd $LOG_SOURCE
-    /opt/exp_soft/cms/t3/t3submit -8c -long createFiles.sh $LOG_SOURCE $LOG_KS_SOURCE $COMMON_SOURCE $FileName -name "KS_histos"
-    #. createFiles.sh $LOG_SOURCE $LOG_KS_SOURCE $COMMON_SOURCE $FileName
-elif [[ "$Choice" == "PBS" ]] 
-  then
-    echo "PBS"
-    cd $LOG_SOURCE
-    module load Programming_Languages/python/3.9.1
-    module load Compilers/gcc/9.3.1
-    module load DataManagement/xrootd/4.8.1
-    module load Analysis/root/6.24.06
-    sbatch -L sps -n 2 --mem=8000 -t 4-0:0:0 -J $JobName -o $output createFiles.sh $LOG_SOURCE $LOG_KS_SOURCE $COMMON_SOURCE $FileName
+    #/opt/exp_soft/cms/t3/t3submit -8c -long -name "KS_curves_2000 v7" checkDiffTest_1.sh $LOG_SOURCE $LOG_KS_SOURCE $COMMON_SOURCE $FileName "b"
+    . checkDiffTest_1.sh $LOG_SOURCE $LOG_KS_SOURCE $COMMON_SOURCE $FileName "i" # > ~/out.log 2>&1 &
+    #/opt/exp_soft/cms/t3/t3submit -8c -short createFilesTest.sh $LOG_SOURCE $LOG_KS_SOURCE $COMMON_SOURCE $FileName
+    #/opt/exp_soft/cms/t3/t3submit -8c -reserv createFilesTest.sh $LOG_SOURCE $LOG_KS_SOURCE $COMMON_SOURCE $FileName
+
 fi
-
 echo "END"
 

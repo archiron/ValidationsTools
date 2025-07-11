@@ -301,10 +301,10 @@ for i in range(0, N_histos):#,N_histos, N_histos-1 range(N_histos - 1, N_histos)
             #print('[k, l, tps] : [%3d, %3d, %f]' % (k, lj, t6-t5))'''
 
     # Use combinations to generate unique pairs of row indices => OK
-    '''for k, lj in itertools.combinations(range(Nrows), 2):
+    for k, lj in itertools.combinations(range(Nrows), 2):
         series0 = df_entries.iloc[k, :]
         series1 = df_entries.iloc[lj, :]
-        totalDiff.append(DB.diffMAXKS3b(series0, series1))'''
+        totalDiff.append(DB.diffMAXKS3b(series0, series1))
 
     # TEST NUMBA => PAS GLOP
     '''@numba.jit(nopython=True)  # Numba optimization
@@ -336,14 +336,14 @@ for i in range(0, N_histos):#,N_histos, N_histos-1 range(N_histos - 1, N_histos)
     totalDiff = process_pairs(Nrows, df_entries)'''
     
     # TEST MULTIPROCESSING
-    def getSeriesDiff(k_lj):
+    '''def getSeriesDiff(k_lj):
         k, lj, df_entries = k_lj
         series0 = df_entries.iloc[k, :]
         series1 = df_entries.iloc[lj, :]
         return DB.diffMAXKS3b(series0, series1)
     with Pool() as pool:
         args = [(k,lj, df_entries) for k, lj in itertools.combinations(range(Nrows), 2)]
-        totalDiff = pool.map(getSeriesDiff, args)
+        totalDiff = pool.map(getSeriesDiff, args)'''
 
     t4 = time.time()
     t_time.append(t4-t3)

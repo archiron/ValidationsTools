@@ -1,10 +1,5 @@
 #!/bin/sh
 # This file is called with : . createROOTFiles.sh
-# organization of the needed files
-# |
-# --> CommonFiles
-# |
-# --> your folder.
 
 JobName="createROOTFiles_serial_job_test" # for slurm
 output="/sps/cms/chiron/TEMP/createROOTFiles_%j.log" # for slurm
@@ -44,11 +39,11 @@ NB_EVTS="${toor[17]}"
 NB_EVTS=${NB_EVTS//NB_EVTS = }
 NB_EVTS=${NB_EVTS//\"}
 NB_EVTS=${NB_EVTS::-1}
-echo "Nbegin : $Nbegin=="
-echo "Nend : $Nend=="
-echo "NB_EVTS : $NB_EVTS=="
+echo "Nbegin : $Nbegin =="
+echo "Nend : $Nend =="
+echo "NB_EVTS : $NB_EVTS =="
 
-FileName2="sources.py"
+FileName2="filesSources.py"
 echo $FileName2
 readarray releases -t array < CommonFiles/$FileName2
 release="${releases[17]}"
@@ -71,16 +66,17 @@ echo "N= $N"
 
 LOG_SOURCE=$aa
 LOG_SOURCE=${LOG_SOURCE//LOG_SOURCE=}
-LOG_SOURCE=${LOG_SOURCE//\"}
-LOG_SOURCE="${LOG_SOURCE}/ZEE_Flow/${release}/src/Kolmogorov"
-RESULTFOLDER="${toto[17]}"
-RESULTFOLDER=${RESULTFOLDER//RESULTFOLDER=}
-RESULTFOLDER=${RESULTFOLDER//\"}
-RESULTFOLDER=$(printf $RESULTFOLDER)
+LOG_SOURCE1=${LOG_SOURCE//\"}
+LOG_SOURCE="${LOG_SOURCE1}/ZEE_Flow/${release}/src/Kolmogorov"
+#RESULTFOLDER="${toto[17]}"
+#RESULTFOLDER=${RESULTFOLDER//RESULTFOLDER=}
+#RESULTFOLDER=${RESULTFOLDER//\"}
+#RESULTFOLDER=$(printf $RESULTFOLDER)
+RESULTFOLDER="/data_CMS/cms/chiron/ROOT_Files/"
 RESULTRELEASE=$(printf "/%s" $release)
 RESULTAPPEND=$(printf "/%04d" $NB_EVTS)
-RESULTFOLDER="${RESULTFOLDER}${RESULTAPPEND}${RESULTRELEASE}"
-#echo "LOG_OUTPUT : $LOG_OUTPUT"
+#RESULTFOLDER="${RESULTFOLDER}${RESULTAPPEND}${RESULTRELEASE}"
+RESULTFOLDER="${RESULTFOLDER}${RESULTRELEASE}"
 echo "LOG_SOURCE : $LOG_SOURCE"
 echo "RESULTFOLDER : $RESULTFOLDER"
 
@@ -90,13 +86,17 @@ initialSEED=123456 # must be "now" or an integer such as 123456
 if [[ "$Choice" == "LLR" ]] 
   then
     echo "LLR"
-    cd $LOG_SOURCE
-    eval `scramv1 runtime -sh`
-    for i in $(eval echo "{$Nbegin..$Nend}") 
+    cd "${LOG_SOURCE1}/ZEE_Flow/"
+    
+    #for i in $(eval echo "{$Nbegin..$Nend}") 
+    for i in 1593
+    #for i in $(eval echo "{1001..1250}") 
     do
-      #/opt/exp_soft/cms/t3/t3submit -8c -long createROOTFiles.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER 
-      #/opt/exp_soft/cms/t3/t3submit -8c -short createROOTFiles.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER
-      /opt/exp_soft/cms/t3/t3submit -8c -reserv createROOTFiles.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER $initialSEED
+      echo "==> $i"
+      /opt/exp_soft/cms/t3/t3submit -8c -long createROOTFiles.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER $initialSEED & 
+      #/opt/exp_soft/cms/t3/t3submit -8c -short createROOTFiles.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER $initialSEED
+      #. createROOTFiles2.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER $initialSEED #&
+      #/opt/exp_soft/cms/t3/t3submit -8c -reserv createROOTFiles.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER $initialSEED
     done
 elif [[ "$Choice" == "PBS" ]] 
   then
@@ -109,6 +109,7 @@ elif [[ "$Choice" == "PBS" ]]
     done
 fi
 
+cd $aa
 echo "END"
 
 

@@ -46,10 +46,10 @@ if [[ "$Choice" == "LLR" ]]
     echo "LLR"
     source /opt/exp_soft/llr/root/v6.32-el9-gcc13xx-py3124/etc/init.sh
     cd $LOG_SOURCE
-    #/opt/exp_soft/cms/t3/t3submit -8c -long checkRootFiles.sh $COMMON_SOURCE $CHECK_SOURCE $FileName # -mail chiron@llr.in2p3.fr 
-    #/opt/exp_soft/cms/t3/t3submit -8c -short checkRootFiles.sh $COMMON_SOURCE $CHECK_SOURCE $FileName
-    #/opt/exp_soft/cms/t3/t3submit -8c -reserv checkRootFiles.sh $COMMON_SOURCE $CHECK_SOURCE $FileName
-    . checkRootFiles.sh $COMMON_SOURCE $CHECK_SOURCE $FileName # $LOG_SOURCE $LOG_KS_SOURCE 
+    /opt/exp_soft/cms/t3/t3submit -8c -long -name checkMap checkRootFilesTest.sh $COMMON_SOURCE $CHECK_SOURCE $FileName # -mail chiron@llr.in2p3.fr 
+    #/opt/exp_soft/cms/t3/t3submit -8c -short checkRootFilesTest.sh $COMMON_SOURCE $CHECK_SOURCE $FileName
+    #/opt/exp_soft/cms/t3/t3submit -8c -reserv checkRootFilesTest.sh $COMMON_SOURCE $CHECK_SOURCE $FileName
+    #. checkRootFilesTest.sh $COMMON_SOURCE $CHECK_SOURCE $FileName # $LOG_SOURCE $LOG_KS_SOURCE 
 elif [[ "$Choice" == "PBS" ]] 
   then
     echo "PBS"

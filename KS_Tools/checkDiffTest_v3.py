@@ -11,7 +11,10 @@
 #                                                                              
 ################################################################################
 
-import os,sys
+import os
+import sys
+import shutil
+import errno
 import importlib
 import importlib.machinery
 import importlib.util
@@ -25,6 +28,7 @@ import pandas as pd
 import numpy as np
 import matplotlib
 import itertools
+from numba import njit
 
 import ROOT
 ROOT.gROOT.SetBatch(True)
@@ -34,6 +38,7 @@ ROOT.PyConfig.IgnoreCommandLineOptions = True
 
 #from ROOT import gROOT
 root_version = ROOT.gROOT.GetVersion()
+time_begin = time.time()
 
 print('PANDAS     version : {}'.format(pd.__version__))
 print('PYTHON     version : {}'.format(sys.version))
@@ -58,6 +63,9 @@ else:
     pathBase = ''
     mode = "b"
     branche =''
+    pathLIBS = ''
+    filePaths = ''
+    pathCommonFiles = ''
 
 sys.path.append(pathCommonFiles)
 matplotlib.use('agg')
@@ -66,14 +74,22 @@ matplotlib.use('agg')
 #seaborn.set_palette('colorblind')
 
 print("\ncheckDiffTest_v3")
+
+def load_module(file_name, full_path):
+    loader = importlib.machinery.SourceFileLoader(file_name, full_path)
+    spec = importlib.util.spec_from_loader(file_name, loader)
+    module = importlib.util.module_from_spec(spec)
+    loader.exec_module(module)
+    return module
 print('branche : {:s}'.format(branche))
 print(len(branche))
 
 # Import module
-loader = importlib.machinery.SourceFileLoader( filePaths, pathCommonFiles+filePaths )
+'''loader = importlib.machinery.SourceFileLoader( filePaths, pathCommonFiles+filePaths )
 spec = importlib.util.spec_from_loader( filePaths, loader )
 blo = importlib.util.module_from_spec( spec )
-loader.exec_module( blo )
+loader.exec_module( blo )'''
+blo = load_module(filePaths, pathCommonFiles + filePaths)
 print('DATA_SOURCE : %s' % blo.DATA_SOURCE)
 pathBase = blo.RESULTFOLDER 
 print('result path : {:s}'.format(pathBase))
@@ -107,6 +123,29 @@ gr = Graphic()
 gr.initRoot()
 
 rels = []
+
+@njit() # parallel=True
+def diffMAXKS3c(s0, s1):
+    s0 = np.asarray(s0)
+    s1 = np.asarray(s1)
+    if len(s0) != len(s1):
+        raise ValueError("s0 and s1 must have the same length")
+
+    min01 = max(0., -min(s0.min(), s1.min()))
+    s0 = (s0 + min01)
+    s1 = (s1 + min01)
+
+    s0 /= s0.sum()
+    s1 /= s1.sum()
+
+    sDKS = np.abs(np.cumsum(s1 - s0))
+    return np.max(sDKS)
+
+@njit() # parallel=True
+def diffComp(i,j,t_arr):
+    s0 = t_arr[i, :] # .iloc
+    s1 = t_arr[j, :] # .iloc
+    return diffMAXKS3c(s0, s1)
 
 # create folder 
 if not os.path.exists(pathCase):
@@ -152,18 +191,10 @@ for ligne in sourceList:
     t_ligne = t_ligne.replace('_1.txt', '.root')
     #print('[{:s}] - [{:s}]'.format(ligne, t_ligne))
     rootFilesList2.append(t_ligne.rstrip())
-compteur = 0
-for item in rootFilesList2:
-    print('\n{:2d} : {:s}'.format(compteur, item))
-    compteur += 1
 rootFilesList3 = []
 for item in rootFilesList2: 
     if item not in rootFilesList3: 
         rootFilesList3.append(item) 
-compteur = 0
-for item in rootFilesList3:
-    print('\n{:2d} : {:s}'.format(compteur, item))
-    compteur += 1
 print('we use the files :')
 for item in rootFilesList3:
     #print('\n%s' % item)
@@ -222,7 +253,7 @@ t_leaf = [] # get the max for each ROOT file
 
 for item in rootFilesList_0:
     cc = (item.split('.')[0]).split('_')[-1]
-    if (int(cc) < nbFiles):
+    if (int(cc) < nbFiles): # limitation
         name = pathROOTFiles + item
         f_Rootf = ROOT.TFile(name)
         h_Rootf = gr.getHisto(f_Rootf, dfo.tp_1)
@@ -235,31 +266,17 @@ for item in rootFilesList_0:
     
         s0 = np.asarray(s_KSref) # if not this, ind is returned as b_00x instead of int value
         s1 = np.asarray(s_Rootf)
-        N0 = len(s0)
-        N1 = len(s1)
-        if (N0 != N1):
-            print('not the same lengths')
-            print('s0 has {:d} elements'.format(N0))
-            print('s1 has {:d} elements'.format(N1))
-            exit()
-        min0 = s0.min() # min(s0)
-        min1 = s1.min() # min(s1)
-        min01 = np.min([min0, min1])
-        if (min01 > 0.):
-            min01 = 0.
-        else:
-            min01 = np.abs(min01)
-        SumSeries0 = s0.sum() + N0 * min01
-        SumSeries1 = s1.sum() + N1 * min01
-        v0, v1 = 0., 0.
-        sDKS = []
-        s0 = (s0 + min01) / SumSeries0
-        s1 = (s1 + min01) / SumSeries1
-        for j in range(0, N0):
-            v0 += s0[j]
-            v1 += s1[j]
-            sDKS.append(v1 - v0)
-        sDKS = np.abs(sDKS)
+        if len(s0) != len(s1):
+            raise ValueError("s0 and s1 must have the same length")
+
+        min01 = max(0., -min(s0.min(), s1.min()))
+        s0 = (s0 + min01)
+        s1 = (s1 + min01)
+
+        s0 /= s0.sum()
+        s1 /= s1.sum()
+
+        sDKS = np.abs(np.cumsum(s1 - s0))
         t_leaf.append(np.max(sDKS))
         f_Rootf.Close()
 t_leaf2 = [] # get the min/max of t_leaf
@@ -278,30 +295,41 @@ df = pd.read_csv(name)
 # check the values data
 cols = df.columns.values
 cols_entries = cols[7::2]
-df_entries = df[cols_entries]
-df_GetEntries = df['nbBins'] # nbBins (GetEntries())
+df_entries = df[cols_entries].to_numpy()
 
 # get nb of columns & rows for histos
 (Nrows, Ncols) = df_entries.shape
 print('[Nrows, Ncols] : [%d, %d]' % (Nrows, Ncols))
-df_entries = df_entries.iloc[:, 1:Ncols-1]
+df_entries = df_entries[:, 1:Ncols-1] # .iloc
 (Nrows, Ncols) = df_entries.shape
 print('[Nrows, Ncols] : [%d, %d]' % (Nrows, Ncols))
 
 totalDiff = []
 
+# NEW VERSION
+'''for k, lj in itertools.combinations(range(Nrows), 2):
+    series0 = df_entries.iloc[k,:]
+    series1 = df_entries.iloc[lj,:]
+    totalDiff.append(DB.diffMAXKS3(series0, series1)[0])'''
+
 # INNER MULTIPROCESSING
-def getSeriesDiff(k_lj):
-    k, lj, df_entries = k_lj
-    series0 = df_entries.iloc[k, :]
-    series1 = df_entries.iloc[lj, :]
-    return DB.diffMAXKS3b(series0, series1)
+'''def getSeriesDiff(k_lj):
+    #k, lj, df_entries = k_lj
+    #k, lj, s0, s1 = k_lj
+    s0, s1 = k_lj
+    #series0 = df_entries.iloc[k, :]
+    #series1 = df_entries.iloc[lj, :]
+    return DB.diffMAXKS3c(s0, s1) # series0, series1
 with Pool() as pool:
-    args = [(k,lj, df_entries) for k, lj in itertools.combinations(range(Nrows), 2)]
-    totalDiff = pool.map(getSeriesDiff, args)
+    #args = [(k,lj, df_entries) for k, lj in itertools.combinations(range(Nrows), 2)]
+    args = [(df_entries.iloc[k, :], df_entries.iloc[lj, :]) for k, lj in itertools.combinations(range(Nrows), 2)]
+    totalDiff = pool.map(getSeriesDiff, args)'''
+# NUMBA VERSION
+for k, lj in itertools.combinations(range(Nrows), 2):
+    totalDiff.append(diffComp(k, lj, df_entries))
 
 # Kolmogoroff-Smirnov curve
-seriesTotalDiff1 = pd.DataFrame(totalDiff, columns=['KSDiff'])
+seriesTotalDiff1 = pd.DataFrame(totalDiff) # 
 count, division = np.histogram(seriesTotalDiff1[~np.isnan(seriesTotalDiff1)], bins=dfo.nbins)
 
 # draw the picture with KS plot and diff position
@@ -310,7 +338,12 @@ grKS.createSimpleKSttlDiffPicture2(totalDiff, dfo.nbins, branche + ' : ' + str(N
 print(' ')
 
 toc = time.time()
+date_heure = time.localtime(time_begin) # Date/heure locale
+print('begin : {:s}'.format(time.strftime("%Y-%m-%d %H:%M:%S", date_heure)))
+date_heure = time.localtime(toc) # Date/heure locale
+print('end : {:s}'.format(time.strftime("%Y-%m-%d %H:%M:%S", date_heure)))
 print('Done in {:.4f} seconds'.format(toc-tic))
+print(os.cpu_count())
 
 print("Fin !\n")
 

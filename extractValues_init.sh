@@ -56,10 +56,16 @@ echo "COMMON_SOURCE : $COMMON_SOURCE"
 if [[ "$Choice" == "LLR" ]] 
   then
     echo "LLR"
-    source /opt/exp_soft/llr/root/v6.24.04-el7-gcc9xx-py370/etc/init.sh
+    module reset
+    source /usr/share/Modules/init/sh
+    module use /opt/exp_soft/vo.gridcl.fr/software/modules/
+    module use /opt/exp_soft/vo.llr.in2p3.fr/modulefiles_el9
+    module load python/3.12.4 # torch included !
+    source /opt/exp_soft/llr/root/v6.32-el9-gcc13xx-py3124/etc/init.sh
     cd $LOG_SOURCE
-    /opt/exp_soft/cms/t3/t3submit -16c -long extractValues.sh $LOG_SOURCE $LOG_KS_SOURCE $COMMON_SOURCE $FileName # -mail chiron@llr.in2p3.fr 
-    #/opt/exp_soft/cms/t3/t3submit -8c -short extractValues.sh $LOG_SOURCE $LOG_KS_SOURCE $COMMON_SOURCE $FileName
+    /opt/exp_soft/cms/t3/t3submit -8c -long extractValues.sh $LOG_SOURCE $LOG_KS_SOURCE $COMMON_SOURCE $FileName # -mail chiron@llr.in2p3.fr 
+    . extractValues.sh $LOG_SOURCE $LOG_KS_SOURCE $COMMON_SOURCE $FileName
+    #/opt/exp_soft/cms/t3/t3submit -8c -short extractValuesTest.sh $LOG_SOURCE $LOG_KS_SOURCE $COMMON_SOURCE $FileName
     #/opt/exp_soft/cms/t3/t3submit -8c -reserv extractValues.sh $LOG_SOURCE $LOG_KS_SOURCE $COMMON_SOURCE $FileName
 elif [[ "$Choice" == "PBS" ]] 
   then
@@ -72,5 +78,6 @@ elif [[ "$Choice" == "PBS" ]]
     sbatch -L sps -n 8 --mem=8000 -t 4-0:0:0 -J $JobName -o $output extractValues.sh $LOG_SOURCE $LOG_KS_SOURCE $COMMON_SOURCE $FileName
 fi
 
+cd $aa
 echo "END"
 

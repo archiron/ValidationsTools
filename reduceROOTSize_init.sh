@@ -11,7 +11,7 @@ echo "actual path : $aa"
 
 STR=$aa
 Choice='Local'
-for SUB in 'llr' 'pbs' 'cern'
+for SUB in 'llr' 'pbs' 'cern' # llr: LLR lab, pbs: CC Lyon facility, cern: CERN lxplus
 do
   if [[ "$STR" == *"$SUB"* ]]; then
     echo "It's $SUB there.";
@@ -20,6 +20,21 @@ do
 done
 
 echo "Choice is : $Choice"
+
+FileName2="filesSources.py"
+echo $FileName2
+readarray releases -t array < CommonFiles/$FileName2
+release="${releases[17]}"
+tt=${release//input_ref_file = \'DQM_V}
+tt=${tt//\'}
+tt=${tt//__DQMIO.root}
+tt=${tt/__C/ C}
+read -a strarr1 <<< "$tt"
+vv=${strarr1[1]}
+vv=${vv/-/ }
+read -a strarr2 <<< "$vv"
+release=${strarr2[0]}
+echo "release = $release"
 
 FileName1="rootValues.py"
 echo $FileName1
@@ -39,16 +54,15 @@ NB_EVTS="${toor[17]}"
 NB_EVTS=${NB_EVTS//NB_EVTS = }
 NB_EVTS=${NB_EVTS//\"}
 NB_EVTS=${NB_EVTS::-1}
-echo "Nbegin : $Nbegin=="
-echo "Nend : $Nend=="
-echo "NB_EVTS : $NB_EVTS=="
+echo "Nbegin : $Nbegin =="
+echo "Nend : $Nend =="
+echo "NB_EVTS : $NB_EVTS =="
 
 FileName="paths$Choice.py"
 echo $FileName
 readarray toto -t array < CommonFiles/$FileName
 N=${#toto[@]}
 echo "N= $N"
-#echo ${toto[@]}
 
 LOG_SOURCE="$aa/${toto[15]}"
 #LOG_SOURCE=$aa
@@ -58,12 +72,15 @@ LOG_SOURCE=${LOG_SOURCE//\"}
 LOG_OUTPUT="$aa/${toto[16]}"
 LOG_OUTPUT=${LOG_OUTPUT//LOG_OUTPUT=}
 LOG_OUTPUT=${LOG_OUTPUT//\"}
-RESULTFOLDER="${toto[17]}"
-RESULTFOLDER=${RESULTFOLDER//RESULTFOLDER=}
-RESULTFOLDER=${RESULTFOLDER//\"}
-RESULTFOLDER=$(printf $RESULTFOLDER)
+#RESULTFOLDER="${toto[17]}"
+#RESULTFOLDER=${RESULTFOLDER//RESULTFOLDER=}
+#RESULTFOLDER=${RESULTFOLDER//\"}
+#RESULTFOLDER=$(printf $RESULTFOLDER)
+RESULTFOLDER="/data_CMS/cms/chiron/ROOT_Files/"
 RESULTAPPEND=$(printf "/%04d" $NB_EVTS)
-RESULTFOLDER="${RESULTFOLDER}${RESULTAPPEND}"
+RESULTRELEASE=$(printf "/%s" $release)
+#RESULTFOLDER="${RESULTFOLDER}${RESULTAPPEND}${RESULTRELEASE}"
+RESULTFOLDER="${RESULTFOLDER}${RESULTRELEASE}"
 echo "LOG_SOURCE : $LOG_SOURCE"
 echo "LOG_OUTPUT : $LOG_OUTPUT"
 echo "RESULTFOLDER : $RESULTFOLDER"
@@ -71,13 +88,20 @@ echo "RESULTFOLDER : $RESULTFOLDER"
 if [[ "$Choice" == "LLR" ]] 
   then
     echo "LLR"
-    source /opt/exp_soft/llr/root/v6.24.04-el7-gcc9xx-py370/etc/init.sh
+    module reset
+    source /usr/share/Modules/init/sh
+    module use /opt/exp_soft/vo.gridcl.fr/software/modules/
+    module use /opt/exp_soft/vo.llr.in2p3.fr/modulefiles_el9
+    module load python/3.12.4 # torch included !
+    source /opt/exp_soft/llr/root/v6.32-el9-gcc13xx-py3124/etc/init.sh
     cd $LOG_SOURCE
     for i in $(eval echo "{$Nbegin..$Nend}") 
     do
-      #/opt/exp_soft/cms/t3/t3submit -8c -long reduceROOTSize.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER # -mail chiron@llr.in2p3.fr 
+      echo "==> $i"
+      #/opt/exp_soft/cms/t3/t3submit -8c -long reduceROOTSize.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER & # -mail chiron@llr.in2p3.fr 
       #/opt/exp_soft/cms/t3/t3submit -8c -short reduceROOTSize.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER
-      /opt/exp_soft/cms/t3/t3submit -8c -reserv reduceROOTSize.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER
+      . reduceROOTSize.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER &
+      #/opt/exp_soft/cms/t3/t3submit -8c -reserv reduceROOTSize.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER
     done
 elif [[ "$Choice" == "PBS" ]] 
   then
@@ -93,5 +117,7 @@ elif [[ "$Choice" == "PBS" ]]
     done
 fi
 
+cd $aa
 echo "END"
+
 

@@ -57,8 +57,8 @@ if [[ "$Choice" == "LLR" ]]
     source /opt/exp_soft/llr/root/v6.32-el9-gcc13xx-py3124/etc/init.sh
 
     cd $LOG_SOURCE
-    /opt/exp_soft/cms/t3/t3submit -8c -long createAndCompare.sh $LOG_SOURCE $LOG_KS_SOURCE $COMMON_SOURCE $FileName
-    #. createAndCompare.sh $LOG_SOURCE $LOG_KS_SOURCE $COMMON_SOURCE $FileName
+    #/opt/exp_soft/cms/t3/t3submit -8c -long createAndCompare.sh $LOG_SOURCE $LOG_KS_SOURCE $COMMON_SOURCE $FileName
+    . createAndCompare.sh $LOG_SOURCE $LOG_KS_SOURCE $COMMON_SOURCE $FileName
     #/opt/exp_soft/cms/t3/t3submit -8c -short createAndCompare.sh $LOG_SOURCE $LOG_KS_SOURCE $COMMON_SOURCE $FileName
     #/opt/exp_soft/cms/t3/t3submit -8c -reserv createAndCompare.sh $LOG_SOURCE $LOG_KS_SOURCE $COMMON_SOURCE $FileName
 elif [[ "$Choice" == "PBS" ]] 
