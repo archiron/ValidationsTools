@@ -1,37 +1,37 @@
 # Auto generated configuration file
 # using: 
-# Revision: 1.19 
+# Revision: 1.19 CMSSW-15_0_0_pre3 PU
 # Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
-# with command line options: ZEE_14TeV_TuneCP5_cfi --beamspot Realistic25ns13p6TeVEarly2022Collision --conditions auto:phase1_2022_realistic --datatier GEN-SIM --era Run3 --eventcontent FEVTDEBUG --fileout file:step1.root --geometry DB:Extended --nStreams 2 --nThreads 8 --no_exec --number 10 --python_filename step_1_cfg.py --relval 9000,100 --step GEN,SIM
+# with command line options: ZEE_14TeV_TuneCP5_cfi --beamspot DBrealistic --conditions auto:phase1_2025_realistic --datatier GEN-SIM --era Run3_2025 --eventcontent FEVTDEBUG --fileout file:step1.root --geometry DB:Extended --nStreams 1 --nThreads 8 --no_exec --number 10 --python_filename step_1_cfg.py --relval 9000,100 --step GEN,SIM
 import FWCore.ParameterSet.Config as cms
-import os, sys
-from datetime import datetime
+import sys
 
-from Configuration.Eras.Era_Run3_cff import Run3
+from Configuration.Eras.Era_Run3_2025_cff import Run3_2025
 
 if len(sys.argv) > 1:
     print(sys.argv)
-    print("step 1 - arg. 0 :", sys.argv[0]) # command : cmsRun
-    print("step 1 - arg. 1 :", sys.argv[1]) # name of the script
-    print("step 1 - arg. 2 :", sys.argv[2]) # index
-    print("step 1 - arg. 3 :", sys.argv[3]) # path of the script ($LOG_SOURCE)
-    print("step 1 - arg. 4 :", sys.argv[4]) # nb of evts
-    print("step 1 - arg. 5 :", sys.argv[5]) # path of output
-    print("step 1 - arg. 6 :", sys.argv[6]) # initial SEED
-    ind = int(sys.argv[2])
-    max_number = int(sys.argv[4])
-    outputPath = sys.argv[5]
-    initialSEED = sys.argv[6]
+    print("step 1111 - arg. 0 :", sys.argv[0]) # name of the script
+    print("step 1 - arg. 1 :", sys.argv[1]) # index
+    print("step 1 - arg. 2 :", sys.argv[2]) # path of the script ($LOG_SOURCE)
+    print("step 1 - arg. 3 :", sys.argv[3]) # nb of evts
+    print("step 1 - arg. 4 :", sys.argv[4]) # path of output
+    print("step 1 - arg. 5 :", sys.argv[5]) # initialSEED
+    print("step 1 - arg. 5 :", sys.argv[5]) # nb skip
+    ind = int(sys.argv[1])
+    max_number = int(sys.argv[3])
+    outputPath = sys.argv[4]
+    nb_skip = int(sys.argv[5])
 else:
     print("step 1 - rien")
     ind = 0
     path = ''
     max_number = 10 # number of events
-    initialSEED = "now"
+    outputPath = ''
+    nb_skip = 0
 
-max_skipped = ind * max_number
+max_skipped = (ind - 1) * nb_skip
 
-process = cms.Process('SIM',Run3)
+process = cms.Process('SIM',Run3_2025)
 
 # import of standard configurations
 process.load('Configuration.StandardSequences.Services_cff')
@@ -43,7 +43,7 @@ process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
 process.load('Configuration.StandardSequences.GeometrySimDB_cff')
 process.load('Configuration.StandardSequences.MagneticField_cff')
 process.load('Configuration.StandardSequences.Generator_cff')
-process.load('IOMC.EventVertexGenerators.VtxSmearedRealistic25ns13p6TeVEarly2022Collision_cfi')
+process.load('IOMC.EventVertexGenerators.VtxSmearedRealistic_cfi')
 process.load('GeneratorInterface.Core.genFilterSummary_cff')
 process.load('Configuration.StandardSequences.SimIdeal_cff')
 process.load('Configuration.StandardSequences.EndOfProcess_cff')
@@ -51,17 +51,17 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 process.maxEvents = cms.untracked.PSet(
     input = cms.untracked.int32(max_number),
-    output = cms.optional.untracked.allowed(cms.int32,cms.PSet)
+    output = cms.optional.untracked.allowed(cms.int32,cms.PSet),
+    #skipEvents = cms.untracked.uint32(max_skipped),
 )
 
 # Input source
 process.source = cms.Source("EmptySource")
 
 process.options = cms.untracked.PSet(
-    FailPath = cms.untracked.vstring(),
     IgnoreCompletely = cms.untracked.vstring(),
     Rethrow = cms.untracked.vstring(),
-    SkipEvent = cms.untracked.vstring(),
+    TryToContinue = cms.untracked.vstring(),
     accelerators = cms.untracked.vstring('*'),
     allowUnscheduled = cms.obsolete.untracked.bool,
     canDeleteEarly = cms.untracked.vstring(),
@@ -76,7 +76,10 @@ process.options = cms.untracked.PSet(
     ),
     fileMode = cms.untracked.string('FULLMERGE'),
     forceEventSetupCacheClearOnNewRun = cms.untracked.bool(False),
+    holdsReferencesToDeleteEarly = cms.untracked.VPSet(),
     makeTriggerResults = cms.obsolete.untracked.bool,
+    modulesToCallForTryToContinue = cms.untracked.vstring(),
+    modulesToIgnoreForDeleteEarly = cms.untracked.vstring(),
     numberOfConcurrentLuminosityBlocks = cms.untracked.uint32(0),
     numberOfConcurrentRuns = cms.untracked.uint32(1),
     numberOfStreams = cms.untracked.uint32(0),
@@ -105,7 +108,7 @@ process.FEVTDEBUGoutput = cms.OutputModule("PoolOutputModule",
         filterName = cms.untracked.string('')
     ),
     #fileName = cms.untracked.string('file:step1.root'),
-    fileName = cms.untracked.string('file:' + outputPath + '/step1_' + '%0004d'%max_number + '_' + '%003d'%ind + '.root'),
+    fileName = cms.untracked.string('file:' + outputPath + '/step1_' + '%0004d'%max_number + '_' + '%003d'%ind + 'd.root'),
     outputCommands = process.FEVTDEBUGEventContent.outputCommands,
     splitLevel = cms.untracked.int32(0)
 )
@@ -117,7 +120,7 @@ if hasattr(process, "XMLFromDBSource"): process.XMLFromDBSource.label="Extended"
 if hasattr(process, "DDDetectorESProducerFromDB"): process.DDDetectorESProducerFromDB.label="Extended"
 process.genstepfilter.triggerConditions=cms.vstring("generation_step")
 from Configuration.AlCa.GlobalTag import GlobalTag
-process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase1_2022_realistic', '')
+process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase1_2025_realistic', '')
 
 process.generator = cms.EDFilter("Pythia8ConcurrentGeneratorFilter",
     PythiaParameters = cms.PSet(
@@ -173,15 +176,6 @@ process.generator = cms.EDFilter("Pythia8ConcurrentGeneratorFilter",
     pythiaPylistVerbosity = cms.untracked.int32(0)
 )
 
-if (initialSEED == "now"):
-    now = datetime.now().microsecond
-    process.RandomNumberGeneratorService.generator.initialSeed = cms.untracked.uint32(now)
-    process.RandomNumberGeneratorService.g4SimHits.initialSeed  = cms.untracked.uint32(now)
-    print('using now : ',  now)
-else:
-    process.RandomNumberGeneratorService.generator.initialSeed = cms.untracked.uint32(int(initialSEED))
-    process.RandomNumberGeneratorService.g4SimHits.initialSeed  = cms.untracked.uint32(int(initialSEED))
-    print('using initialseed : ', initialSEED)
 
 # Path and EndPath definitions
 process.generation_step = cms.Path(process.pgen)
@@ -197,7 +191,7 @@ associatePatAlgosToolsTask(process)
 
 #Setup FWK for multithreaded
 process.options.numberOfThreads = 8
-process.options.numberOfStreams = 2
+process.options.numberOfStreams = 1
 # filter all path with the production filter sequence
 for path in process.paths:
 	getattr(process,path).insert(0, process.generator)

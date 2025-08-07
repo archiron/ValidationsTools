@@ -84,6 +84,7 @@ if [[ "$Choice" == "LLR" ]]
 
     var=0
     for line in "${datasets[@]}"
+    #for line in h_ele_Et h_ele_vertexP h_ele_superclusterfbrem
     do
       if [[ $line == *"ElectronMcSignalValidator/"* ]]; then
         #echo $line

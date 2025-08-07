@@ -287,7 +287,18 @@ print('plage : ', t_leaf2)
 # draw the picture with KS plot and diff position
 #fileName1 = pathKS + '/KS-ttlDiff_1_' + branche + '_v6.png'
 #legende = [ 'ROOT vs ref diff', 'min/max [ {:.3e} + ,  + {:.3e} + ]'.format(t_leaf2[0], t_leaf2[1]) ]
-#grKS.createSimpleDiffPicture2(branche + ' : ' + str(N0), t_leaf, t_leaf2, ['bins', 'norm. diff.'], legende, fileName1)
+#grKS.createSimpleDiffPicture2(branche, t_leaf, t_leaf2, ['bins', 'norm. diff.'], legende, fileName1)
+
+##### TEMP
+s0 = np.asarray(s_KSref)
+min00 = max(0., -s0.min())
+s0 = (s0 + min01)
+s0 /= s0.sum()
+sDKS = np.abs(np.cumsum(s0))
+fileName1 = pathKS + '/KS-ttlDiff_1_' + branche + '_v8.png'
+legende = [ 'cum sum file' ]
+grKS.createSimpleDiffPicture(branche, sDKS, ['bins', 'norm. value'], legende, fileName1)
+##### TEMP
 
 name = pathROOTFiles + "histo_" + branche + '_{:03d}'.format(nbFiles) + ".txt"
 df = pd.read_csv(name)
@@ -333,7 +344,7 @@ seriesTotalDiff1 = pd.DataFrame(totalDiff) #
 count, division = np.histogram(seriesTotalDiff1[~np.isnan(seriesTotalDiff1)], bins=dfo.nbins)
 
 # draw the picture with KS plot and diff position
-fileName1 = pathKS + '/KS-ttlDiff_1_' + branche + '_v7b.png'
+fileName1 = pathKS + '/KS-ttlDiff_1_' + branche + '_v7d.png'
 grKS.createSimpleKSttlDiffPicture2(totalDiff, dfo.nbins, branche + ' : ' + str(Ncols), fileName1, s_KSref, t_leaf2)
 print(' ')
 

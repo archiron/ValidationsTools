@@ -373,7 +373,7 @@ for i in range(0, N_histos):#,N_histos, N_histos-1 range(N_histos - 1, N_histos)
         # draw the picture with KS plot and diff position
         #fileName1 = pathKS + '/KS-ttlDiff_1_' + branches[i] + '_v6.png'
         #legende = [ 'ROOT vs ref diff', 'min/max [ {:.3e} + ,  + {:.3e} + ]'.format(t_leaf2[0], t_leaf2[1]) ]
-        #grKS.createSimpleDiffPicture2(branches[i] + ' : ' + str(N0), t_leaf, t_leaf2, ['bins', 'norm. diff.'], legende, fileName1)
+        #grKS.createSimpleDiffPicture2(branches[i], t_leaf, t_leaf2, ['bins', 'norm. diff.'], legende, fileName1)
 
         name = pathROOTFiles + "histo_" + branches[i] + '_{:03d}'.format(nbFiles) + ".txt"
         df = pd.read_csv(name)

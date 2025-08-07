@@ -39,14 +39,19 @@ NB_EVTS="${toor[17]}"
 NB_EVTS=${NB_EVTS//NB_EVTS = }
 NB_EVTS=${NB_EVTS//\"}
 NB_EVTS=${NB_EVTS::-1}
+N_skip="${toor[18]}"
+N_skip=${N_skip//N_skip = }
+N_skip=${N_skip//\"}
+N_skip=${N_skip::-1}
 echo "Nbegin : $Nbegin =="
 echo "Nend : $Nend =="
 echo "NB_EVTS : $NB_EVTS =="
+echo "N_skip : $N_skip =="
 
 FileName2="filesSources.py"
 echo $FileName2
 readarray releases -t array < CommonFiles/$FileName2
-release="${releases[17]}"
+release="${releases[19]}"
 tt=${release//input_ref_file = \'DQM_V}
 tt=${tt//\'}
 tt=${tt//__DQMIO.root}
@@ -68,14 +73,9 @@ LOG_SOURCE=$aa
 LOG_SOURCE=${LOG_SOURCE//LOG_SOURCE=}
 LOG_SOURCE1=${LOG_SOURCE//\"}
 LOG_SOURCE="${LOG_SOURCE1}/ZEE_Flow/${release}/src/Kolmogorov"
-#RESULTFOLDER="${toto[17]}"
-#RESULTFOLDER=${RESULTFOLDER//RESULTFOLDER=}
-#RESULTFOLDER=${RESULTFOLDER//\"}
-#RESULTFOLDER=$(printf $RESULTFOLDER)
 RESULTFOLDER="/data_CMS/cms/chiron/ROOT_Files/"
 RESULTRELEASE=$(printf "/%s" $release)
 RESULTAPPEND=$(printf "/%04d" $NB_EVTS)
-#RESULTFOLDER="${RESULTFOLDER}${RESULTAPPEND}${RESULTRELEASE}"
 RESULTFOLDER="${RESULTFOLDER}${RESULTRELEASE}"
 echo "LOG_SOURCE : $LOG_SOURCE"
 echo "RESULTFOLDER : $RESULTFOLDER"
@@ -88,12 +88,15 @@ if [[ "$Choice" == "LLR" ]]
     echo "LLR"
     cd "${LOG_SOURCE1}/ZEE_Flow/"
     
-    #for i in $(eval echo "{$Nbegin..$Nend}") 
-    for i in 1593
-    #for i in $(eval echo "{1001..1250}") 
+    #for i in $(eval echo "{$Nbegin..$Nend..2}") 
+    for i in 6 10
+    #for i in $(eval echo "{1..10..2}") 
     do
-      echo "==> $i"
-      /opt/exp_soft/cms/t3/t3submit -8c -long createROOTFiles.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER $initialSEED & 
+      j=$(($i+1))
+      echo "==> [$i, $j]"
+      #/opt/exp_soft/cms/t3/t3submit -8c -long -name "CMSSW_15_0_0_pre3" createROOTFiles.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER $initialSEED
+      . createROOTFiles.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER $initialSEED $N_skip & > ~/RoutFichier.log 2>&1 #&
+      #. createROOTFiles.sh $j $LOG_SOURCE $NB_EVTS $RESULTFOLDER $initialSEED $N_skip & > ~/RoutFichier.log 2>&1 #&
       #/opt/exp_soft/cms/t3/t3submit -8c -short createROOTFiles.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER $initialSEED
       #. createROOTFiles2.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER $initialSEED #&
       #/opt/exp_soft/cms/t3/t3submit -8c -reserv createROOTFiles.sh $i $LOG_SOURCE $NB_EVTS $RESULTFOLDER $initialSEED
